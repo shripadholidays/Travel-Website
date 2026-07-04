@@ -1,0 +1,68 @@
+services:
+  # ---- MongoDB ----
+  mongo:
+    image: mongo:7
+    container_name: wandeazy-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---- API server ----
+  server:
+    build: ./server
+    container_name: wandeazy-server
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DB_URI: mongodb://mongo:27017/wandeazy
+      # App / auth
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      MOCK_AUTH: ${MOCK_AUTH:-false}
+      LOCAL_FRONTEND_ORIGIN: ${LOCAL_FRONTEND_ORIGIN:-http://localhost:3000}
+      PRODUCTION_FRONTEND_ORIGIN: ${PRODUCTION_FRONTEND_ORIGIN:-http://localhost:3000}
+      COOKIE_SAME_SITE: ${COOKIE_SAME_SITE:-lax}
+      # Google OAuth (optional)
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-}
+      # Stripe (optional)
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      # Email (optional)
+      MAILGUN_HOST: ${MAILGUN_HOST:-}
+      MAILGUN_PORT: ${MAILGUN_PORT:-}
+      MAILGUN_SECURE: ${MAILGUN_SECURE:-}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+    ports:
+      - "8080:8080"
+
+  # ---- Frontend (nginx) ----
+  client:
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
+        VITE_GOOGLE_OAUTH_CLIENT_ID: ${VITE_GOOGLE_OAUTH_CLIENT_ID:-}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-}
+    container_name: wandeazy-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "3000:80"
+
+volumes:
+  mongo-data:

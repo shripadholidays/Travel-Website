@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+server/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+server/.env
+client/.env
+
+# Logs
+*.log
+logs/
+
+# IDE / tool settings
+.claude/
+**/.claude/
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads (local storage — not committed)
+server/uploads/*
+!server/uploads/.gitkeep

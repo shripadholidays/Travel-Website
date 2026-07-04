@@ -1,0 +1,17 @@
+{
+  "name": "Wandeazy — Premium Travel & Tour Booking",
+  "short_name": "Wandeazy",
+  "description": "Discover and book premium travel experiences to the world's most breathtaking destinations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F97316",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
