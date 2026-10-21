@@ -122,8 +122,8 @@ Flow: Stripe webhook `payment_intent.succeeded` → if `Payment.order` set → `
 
 Match the live site's visual language (verified against `Navbar.tsx`, `Hero.tsx`, `TourCard.tsx`, `AdminLayout.tsx`):
 - Tokens: `brand-blue #0F172A`, `brand-orange #F97316`, `brand-light #F8FAFC`, `brand-dark #020617`; slate neutrals (`slate-100` borders, `slate-50` fills).
-- Type: all headings Bebas Neue (`font-display`); body Inter; logo = orange balloon SVG + "Wandeazy" Inter extrabold. Eyebrow labels orange, uppercase, `tracking-[0.3em]`. Prices navy in Bebas (like TourCard), `tabular-nums`.
-- Hero: dark photo with black gradient scrim and transparent white navbar (as Home); inner pages use the frosted `bg-white/90` navbar.
+- Type: use the existing classes (`font-display` headings, `font-sans` body). Note: `index.html` never loads the Google Fonts stylesheet, so today everything renders as bold Arial; the mockups match that. Fixing font loading is out of scope (user: "works for now"). Logo = orange balloon SVG + "Wandeazy" extrabold. Eyebrow labels orange uppercase with a 40px orange rule before them. Prices navy bold, `tabular-nums`.
+- Hero: Flights/Hotels reuse the Home accordion pattern — full-height photo panels, inactive panels grayscale with vertical labels, active panel with per-slide colour tint, orange eyebrow, huge bold title. Offer bar (orange→rose gradient) on top. Transparent navbar over the hero with links inside a glass pill, outlined "Log in", orange "Sign Up"; inner pages use the frosted `bg-white/90` navbar.
 - Buttons: `rounded-full` pills — orange with `shadow-lg shadow-brand-orange/20`, navy, or outlined; circular arrow button (`bg-slate-50`, hover orange).
 - Cards: TourCard style — white, `rounded-[2rem]`, `border-slate-100`, inner image `rounded-[1.5rem]`, white/95 pill chips, navy/90 rating chip with yellow star, orange location with pin icon.
 - Admin: white sidebar, active item orange `rounded-xl` with orange shadow, `bg-slate-50` content.
