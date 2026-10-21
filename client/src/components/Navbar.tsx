@@ -63,7 +63,8 @@ export const Navbar = () => {
 
     const isHome = location.pathname === '/';
     // Flights & Hotels open with a photo hero, so they get the transparent header like Home
-    const isTravelHero = location.pathname === '/flights' || location.pathname === '/hotels';
+    const isTravelHero = (location.pathname === '/flights' && travelFeatures.flights)
+        || (location.pathname === '/hotels' && travelFeatures.hotels);
     const isDetailsPage = location.pathname.startsWith('/destinations/') || location.pathname.startsWith('/tour/') || isTravelHero;
     const isTransparentHeader = isHome || isDetailsPage;
 
