@@ -229,6 +229,17 @@ const siteSettingsSchema = new mongoose.Schema({
         ctaBtn2Link:  { type: String, default: '/contact' },
     },
 
+    // ── Booking services (admin-only switches) ────────────────────────────────
+    // Off by default: when a service is off it does not exist on the public site.
+    features: {
+        flights: { type: Boolean, default: false },
+        hotels:  { type: Boolean, default: false },
+    },
+    travelMarkup: {
+        flightPct: { type: Number, default: 5, min: 0, max: 50 },
+        hotelPct:  { type: Number, default: 8, min: 0, max: 50 },
+    },
+
     // ── Content Section Visibility ────────────────────────────────────────────
     contentSections: [{
         sectionId:   { type: String, required: true },

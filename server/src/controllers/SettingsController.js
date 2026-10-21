@@ -1,6 +1,7 @@
 const SiteSettings = require('../models/SiteSettings');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const { clearTravelConfigCache } = require('../services/travel-config');
 
 // Helper: get or create singleton settings doc
 async function getSettings() {
@@ -26,7 +27,7 @@ const PUBLIC_FIELDS = [
     'companyName', 'contactEmail', 'contactPhone', 'address',
     'socialLinks', 'footer', 'footerExploreLinks', 'footerCompanyLinks',
     'navLinks', 'offerBar', 'heroSlides', 'promoSlides', 'planTrip',
-    'testimonials', 'supportSection', 'faqs', 'aboutPage',
+    'testimonials', 'supportSection', 'faqs', 'aboutPage', 'features',
 ];
 
 // GET /settings (public)
@@ -66,6 +67,7 @@ exports.updateSettings = async (req, res) => {
             'socialLinks', 'footer', 'footerExploreLinks', 'footerCompanyLinks',
             'navLinks', 'offerBar', 'heroSlides', 'promoSlides', 'planTrip',
             'testimonials', 'supportSection', 'faqs', 'aboutPage',
+            'features', 'travelMarkup',
         ];
         for (const key of UPDATABLE) {
             if (req.body[key] !== undefined) {
@@ -83,6 +85,7 @@ exports.updateSettings = async (req, res) => {
             }
         }
         await settings.save();
+        clearTravelConfigCache();
         return ResponseHandler.success(res, { settings }, 'Settings updated');
     } catch (err) {
         logger.error('Failed to update settings', { error: err.message });
