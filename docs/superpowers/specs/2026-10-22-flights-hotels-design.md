@@ -1,6 +1,6 @@
 # Flights & Hotels Booking — Design Spec
 
-**Date:** 2026-10-22 · **Branch:** `feature/flights-hotels` · **Status:** Approved in brainstorming, pending spec review
+**Date:** 2026-10-22 · **Branch:** `feature/flights-hotels` · **Status:** Implemented on feature/flights-hotels (2026-10-22)
 
 ## 1. Goal
 
