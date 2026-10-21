@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
+    // Exactly one of booking (tour) or order (flight/hotel) is set.
     booking: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Booking',
-        required: true
+        ref: 'Booking'
+    },
+    order: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TravelOrder'
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -38,5 +42,12 @@ const paymentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed
     }
 }, { timestamps: true });
+
+paymentSchema.pre('validate', function requireOneTarget(next) {
+    if (Boolean(this.booking) === Boolean(this.order)) {
+        return next(new Error('A payment must reference exactly one of booking or order'));
+    }
+    return next();
+});
 
 module.exports = mongoose.model('Payment', paymentSchema);

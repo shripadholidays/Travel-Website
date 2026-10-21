@@ -1,5 +1,7 @@
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
+const TravelOrder = require('../models/TravelOrder');
+const { finalizeOrder } = require('../services/travel-order-service');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 
@@ -32,8 +34,14 @@ exports.handleWebhook = async (req, res) => {
                     payment.gatewayResponse = paymentIntent;
                     await payment.save();
 
-                    await Booking.findByIdAndUpdate(payment.booking, { status: 'confirmed' });
-                    logger.info('Payment completed and booking confirmed', { paymentId: payment._id });
+                    if (payment.booking) {
+                        await Booking.findByIdAndUpdate(payment.booking, { status: 'confirmed' });
+                        logger.info('Payment completed and booking confirmed', { paymentId: payment._id });
+                    } else if (payment.order) {
+                        const order = await TravelOrder.findById(payment.order);
+                        if (order) await finalizeOrder(order);
+                        logger.info('Payment completed for travel order', { paymentId: payment._id, status: order?.status });
+                    }
                 }
             } catch (err) {
                 logger.error('Error processing payment success webhook', { error: err.message });
