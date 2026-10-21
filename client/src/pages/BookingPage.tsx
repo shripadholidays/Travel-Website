@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Image } from "@/components/ui/image";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
-import { CheckCircle2, ChevronRight, Loader2, AlertCircle, MapPin, Calendar, Users, Lock, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ChevronRight, Loader2, AlertCircle, MapPin, Calendar, Users, Lock, ShieldCheck, Tag, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -14,14 +14,11 @@ import { useTour } from "@/hooks/use-tours";
 import { useCreateBooking } from "@/hooks/use-bookings";
 import { useAuth } from "@/context/AuthContext";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useValidateCoupon, type ValidatedCoupon } from "@/hooks/use-coupons";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-    ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
-    : null;
+import { Elements } from "@stripe/react-stripe-js";
+import { StripePaymentForm, stripeAppearance, stripePromise } from "@/components/payment/StripePaymentForm";
 
 const steps = ['Traveller Details', 'Add-ons', 'Review & Pay', 'Success'];
 
@@ -42,90 +39,6 @@ interface ContactInfo {
     lastName: string;
     email: string;
     phone: string;
-}
-
-// Brand-aligned theme for the Stripe PaymentElement (matches the site's design tokens).
-const stripeAppearance = {
-    theme: 'stripe' as const,
-    variables: {
-        colorPrimary: '#F97316',        // brand-orange accent / focus
-        colorText: '#0F172A',           // brand-blue text
-        colorTextSecondary: '#64748b',
-        colorDanger: '#ef4444',
-        colorBackground: '#ffffff',
-        fontFamily: 'Inter, system-ui, sans-serif',
-        fontSizeBase: '15px',
-        borderRadius: '12px',
-        spacingUnit: '4px',
-    },
-    rules: {
-        '.Input': {
-            border: '1px solid #e2e8f0',
-            boxShadow: 'none',
-            padding: '12px',
-        },
-        '.Input:focus': {
-            border: '1px solid #F97316',
-            boxShadow: '0 0 0 3px rgba(249, 115, 22, 0.15)',
-        },
-        '.Label': {
-            fontWeight: '500',
-            color: '#0F172A',
-        },
-        '.Tab, .Block': {
-            borderRadius: '12px',
-        },
-        '.Tab:focus, .Tab--selected': {
-            borderColor: '#F97316',
-            boxShadow: '0 0 0 2px rgba(249, 115, 22, 0.2)',
-        },
-    },
-};
-
-function StripePaymentForm({ onSuccess, isSubmitting }: { onSuccess: () => void; isSubmitting: boolean }) {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [error, setError] = useState<string | null>(null);
-    const [processing, setProcessing] = useState(false);
-
-    const handleSubmit = async () => {
-        if (!stripe || !elements) return;
-
-        setProcessing(true);
-        setError(null);
-
-        const result = await stripe.confirmPayment({
-            elements,
-            redirect: "if_required",
-        });
-
-        if (result.error) {
-            setError(result.error.message ?? "Payment failed");
-            setProcessing(false);
-        } else {
-            onSuccess();
-        }
-    };
-
-    return (
-        <div className="space-y-4">
-            <PaymentElement />
-            {error && (
-                <div className="flex items-center gap-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    {error}
-                </div>
-            )}
-            <Button
-                onClick={handleSubmit}
-                disabled={!stripe || processing || isSubmitting}
-                className="w-full h-12 bg-brand-orange hover:bg-brand-orange/90 text-white font-bold"
-            >
-                {processing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                {processing ? "Processing..." : "Pay Now"}
-            </Button>
-        </div>
-    );
 }
 
 export const BookingPage = () => {
@@ -150,6 +63,10 @@ export const BookingPage = () => {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [bookingId, setBookingId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [couponCode, setCouponCode] = useState("");
+    const [appliedCoupon, setAppliedCoupon] = useState<ValidatedCoupon | null>(null);
+    const [couponError, setCouponError] = useState("");
+    const validateCoupon = useValidateCoupon();
 
     useEffect(() => {
         if (user?.email && !contactInfo.email) {
@@ -191,7 +108,29 @@ export const BookingPage = () => {
     const numberOfGuests = guests || 1;
     const baseAmount = tour.price * numberOfGuests;
     const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
-    const totalAmount = baseAmount + addonsTotal;
+    const subtotal = baseAmount + addonsTotal;
+    const couponDiscount = appliedCoupon?.discount ?? 0;
+    const totalAmount = Math.max(0, subtotal - couponDiscount);
+
+    const handleApplyCoupon = async () => {
+        const code = couponCode.trim();
+        if (!code) return;
+        setCouponError("");
+        try {
+            const result = await validateCoupon.mutateAsync({ code, orderAmount: subtotal });
+            setAppliedCoupon(result.coupon);
+            toast.success(`Coupon "${result.coupon.code}" applied! You saved ${formatPrice(result.coupon.discount)}.`);
+        } catch (err) {
+            setCouponError((err as Error).message || "Invalid coupon.");
+            setAppliedCoupon(null);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode("");
+        setCouponError("");
+    };
 
     const toggleAddon = (addon: Addon) => {
         setSelectedAddons(prev =>
@@ -543,6 +482,44 @@ export const BookingPage = () => {
                                         </div>
                                     ))}
                                 </div>
+
+                                <div className="border-t border-slate-100" />
+
+                                {/* Coupon input */}
+                                {appliedCoupon ? (
+                                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-3 py-2">
+                                        <div className="flex items-center gap-2 text-green-700 text-sm font-medium">
+                                            <Tag className="w-3.5 h-3.5" />
+                                            <span>{appliedCoupon.code}</span>
+                                            <span className="text-green-600">−{formatPrice(couponDiscount)}</span>
+                                        </div>
+                                        <button onClick={handleRemoveCoupon} className="text-green-600 hover:text-red-500" aria-label="Remove coupon">
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1.5">
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="Promo code"
+                                                value={couponCode}
+                                                onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                                                className="h-9 rounded-xl text-sm flex-1"
+                                                onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
+                                            />
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={handleApplyCoupon}
+                                                disabled={validateCoupon.isPending || !couponCode.trim()}
+                                                className="rounded-xl shrink-0"
+                                            >
+                                                {validateCoupon.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+                                            </Button>
+                                        </div>
+                                        {couponError && <p className="text-xs text-red-500">{couponError}</p>}
+                                    </div>
+                                )}
 
                                 <div className="border-t border-slate-100" />
 

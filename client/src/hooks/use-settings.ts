@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
+import { config } from '@/config';
 
 // ── Sub-types ─────────────────────────────────────────────────────────────────
 
@@ -143,9 +144,14 @@ export interface SiteSettings {
         ctaBtn2Link: string;
     };
     contentSections: { sectionId: string; name: string; description: string; isVisible: boolean }[];
+    /** Admin-only switches: when off, that service does not exist on the public site. */
+    features: { flights: boolean; hotels: boolean };
+    travelMarkup: { flightPct: number; hotelPct: number };
 }
 
-export type PublicSettings = Omit<SiteSettings, '_id'>;
+export type TravelFeature = keyof SiteSettings['features'];
+
+export type PublicSettings = Omit<SiteSettings, '_id' | 'travelMarkup'>;
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 
@@ -154,7 +160,7 @@ export function usePublicSettings() {
     return useQuery({
         queryKey: ['settings', 'public'],
         queryFn: () => api.get<{ settings: PublicSettings }>('/settings'),
-        staleTime: 5 * 60 * 1000,
+        staleTime: config.query.staleTimeMs,
     });
 }
 
