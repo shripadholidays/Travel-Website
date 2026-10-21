@@ -60,6 +60,19 @@ describe('mock flights', () => {
         expect(dom.every((o) => ['6E', 'AI', 'QP', 'SG'].includes(o.airline.code))).toBe(true);
     });
 
+    it('routes foreign carriers via their hub unless the route touches it', async () => {
+        const offers = await flights.search(params);
+        for (const o of offers.filter((x) => ['QR', 'SQ'].includes(x.airline.code))) {
+            expect(o.slices[0].stops).toBe(1);
+            expect(o.slices[0].via).toBe(o.airline.code === 'QR' ? 'DOH' : 'SIN');
+        }
+        for (const o of offers.filter((x) => x.airline.code === 'EK')) expect(o.slices[0].stops).toBe(0);
+        const roundTrip = await flights.search({ ...params, returnDate: future(27) });
+        for (const o of roundTrip) {
+            for (const s of o.slices) expect([s.from, s.to]).not.toContain(s.via);
+        }
+    });
+
     it('re-prices an offer identically', async () => {
         const [first] = await flights.search(params);
         const again = await flights.getOffer(first.id);

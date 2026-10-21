@@ -60,8 +60,9 @@ function normalize(params) {
 }
 
 function buildSlice(rng, airline, fromAp, toAp, date, km, stops) {
+    // Connect at the airline's hub, or at the first big hub that isn't an endpoint.
     const via = stops
-        ? (airline.hub !== fromAp.code && airline.hub !== toAp.code ? airline.hub : (fromAp.country === 'IN' ? 'BOM' : 'DXB'))
+        ? [airline.hub, 'BOM', 'DEL', 'DXB', 'DOH'].find((code) => code !== fromAp.code && code !== toAp.code)
         : null;
     const durationMinutes = Math.round(km / 780 * 60 + 35) + (stops ? 90 + Math.floor(rng() * 120) : 0);
     const depart = Math.floor(rng() * 288) * 5; // 5-minute grid across the day
@@ -94,7 +95,11 @@ function generate(p) {
     const offers = [];
     for (let i = 0; i < count; i += 1) {
         const airline = eligible[Math.floor(rng() * eligible.length)];
-        const stops = rng() < (domesticIndia ? 0.8 : 0.5) ? 0 : 1;
+        // Foreign carriers only fly non-stop when the route touches their hub (e.g. EK on DEL-DXB).
+        const touchesHub = airline.hub === fromAp.code || airline.hub === toAp.code;
+        let stops;
+        if (!airline.domestic) stops = touchesHub ? 0 : 1;
+        else stops = rng() < (domesticIndia ? 0.8 : 0.5) ? 0 : 1;
         const slices = [buildSlice(rng, airline, fromAp, toAp, p.departDate, km, stops)];
         if (p.returnDate) slices.push(buildSlice(rng, airline, toAp, fromAp, p.returnDate, km, stops));
 
