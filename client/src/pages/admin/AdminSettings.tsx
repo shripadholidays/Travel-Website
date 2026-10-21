@@ -9,6 +9,7 @@ import { Facebook, Instagram, Twitter, Save, Loader2 } from "lucide-react";
 import { useSiteSettings, useUpdateSiteSettings } from "@/hooks/use-settings";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BookingServicesCard } from "@/components/admin/BookingServicesCard";
 
 export const AdminSettings = () => {
     const { data, isLoading } = useSiteSettings();
@@ -83,6 +84,8 @@ export const AdminSettings = () => {
             </div>
 
             <div className="grid gap-6">
+                <BookingServicesCard settings={settings} />
+
                 <Card>
                     <CardHeader>
                         <CardTitle>Company Details</CardTitle>

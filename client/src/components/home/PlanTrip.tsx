@@ -5,6 +5,8 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/container";
 import { usePublicSettings, type PlanTripStep } from "@/hooks/use-settings";
+import { useEnabledFeatures } from '@/hooks/use-feature';
+import { stripTravelMentions } from '@/lib/feature-links';
 
 // Resolve icon name string → Lucide component
 function resolveIcon(name: string): LucideIcon {
@@ -24,7 +26,10 @@ export const PlanTrip = () => {
     const { data } = usePublicSettings();
     const planTrip = data?.settings?.planTrip;
 
-    const steps = (planTrip?.steps?.length ?? 0) > 0 ? planTrip!.steps : FALLBACK_STEPS;
+    const travelFeatures = useEnabledFeatures();
+    // Never promise hotels/flights while those services are switched off
+    const steps = ((planTrip?.steps?.length ?? 0) > 0 ? planTrip!.steps : FALLBACK_STEPS)
+        .map((step) => ({ ...step, description: stripTravelMentions(step.description, travelFeatures) }));
     const heading = planTrip?.heading || "Plan Your Dream Trip";
     const subheading = planTrip?.subheading || "Easy as 1-2-3-4";
 

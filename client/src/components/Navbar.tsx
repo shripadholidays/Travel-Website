@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { OfferBar } from '@/components/ui/OfferBar';
+import { useEnabledFeatures } from '@/hooks/use-feature';
+import { withFeatureLinks } from '@/lib/feature-links';
 
 export const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -37,9 +39,32 @@ export const Navbar = () => {
     const { data: settingsData } = usePublicSettings();
     const settingsNavLinks = settingsData?.settings?.navLinks;
     const showOfferBar = settingsData?.settings?.offerBar?.enabled !== false;
+    const travelFeatures = useEnabledFeatures();
+
+    // Flights/Hotels links follow the admin switches (inserted after Tours, removed when off)
+    const sortedSettingsLinks = (settingsNavLinks?.length ?? 0) > 0
+        ? [...settingsNavLinks!].sort((a, b) => a.order - b.order)
+        : null;
+    const desktopNavItems = withFeatureLinks(sortedSettingsLinks ?? [
+        { label: 'Destinations', path: '/destinations', order: 0 },
+        { label: 'Tours', path: '/tours', order: 1 },
+        { label: 'Collections', path: '/collections', order: 2 },
+        { label: 'Magazine', path: '/blog', order: 3 },
+        { label: 'About', path: '/about', order: 4 },
+    ], travelFeatures);
+    const mobileNavItems = withFeatureLinks(sortedSettingsLinks ?? [
+        { label: 'Destinations', path: '/destinations', order: 0 },
+        { label: 'Tours', path: '/tours', order: 1 },
+        { label: 'Collections', path: '/collections', order: 2 },
+        { label: 'Magazine', path: '/blog', order: 3 },
+        { label: 'About', path: '/about', order: 4 },
+        { label: 'Contact', path: '/contact', order: 5 },
+    ], travelFeatures);
 
     const isHome = location.pathname === '/';
-    const isDetailsPage = location.pathname.startsWith('/destinations/') || location.pathname.startsWith('/tour/');
+    // Flights & Hotels open with a photo hero, so they get the transparent header like Home
+    const isTravelHero = location.pathname === '/flights' || location.pathname === '/hotels';
+    const isDetailsPage = location.pathname.startsWith('/destinations/') || location.pathname.startsWith('/tour/') || isTravelHero;
     const isTransparentHeader = isHome || isDetailsPage;
 
     // Standard Pages (Sticky Header, Solid Background)
@@ -98,16 +123,7 @@ export const Navbar = () => {
                                 ? "bg-white/10 backdrop-blur-md border border-white/25 shadow-lg shadow-black/10"
                                 : "bg-transparent border border-transparent"
                         )}>
-                            {((settingsNavLinks?.length ?? 0) > 0
-                                ? [...settingsNavLinks!].sort((a, b) => a.order - b.order)
-                                : [
-                                    { label: 'Destinations', path: '/destinations', order: 0 },
-                                    { label: 'Tours', path: '/tours', order: 1 },
-                                    { label: 'Collections', path: '/collections', order: 2 },
-                                    { label: 'Magazine', path: '/blog', order: 3 },
-                                    { label: 'About', path: '/about', order: 4 },
-                                ]
-                            ).map((item) => {
+                            {desktopNavItems.map((item) => {
                                 const active = location.pathname === item.path;
                                 return (
                                     <Link
@@ -294,17 +310,7 @@ export const Navbar = () => {
                                     </Link>
                                 )}
 
-                                {((settingsNavLinks?.length ?? 0) > 0
-                                    ? [...settingsNavLinks!].sort((a, b) => a.order - b.order)
-                                    : [
-                                        { label: 'Destinations', path: '/destinations', order: 0 },
-                                        { label: 'Tours', path: '/tours', order: 1 },
-                                        { label: 'Collections', path: '/collections', order: 2 },
-                                        { label: 'Magazine', path: '/blog', order: 3 },
-                                        { label: 'About', path: '/about', order: 4 },
-                                        { label: 'Contact', path: '/contact', order: 5 },
-                                    ]
-                                ).map((item) => {
+                                {mobileNavItems.map((item) => {
                                     const active = location.pathname === item.path;
                                     return (
                                         <Link

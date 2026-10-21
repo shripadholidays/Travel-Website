@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { Home } from '@/pages/Home';
 import { SearchPage } from '@/pages/SearchPage';
@@ -24,12 +24,20 @@ import { Spinner } from '@/components/ui/spinner';
 import { AuthProvider } from '@/context/AuthContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { Toaster } from 'sonner';
+import { FeatureRoute } from '@/components/FeatureGate';
 
 // Lazily loaded — heavy deps (map, Stripe) or admin-only
 const TourDetails = lazy(() => import('@/pages/TourDetails').then((m) => ({ default: m.TourDetails })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 const BookingPage = lazy(() => import('@/pages/BookingPage').then((m) => ({ default: m.BookingPage })));
 const WriteArticle = lazy(() => import('@/pages/WriteArticle').then((m) => ({ default: m.WriteArticle })));
+const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPassword').then((m) => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPassword').then((m) => ({ default: m.ResetPasswordPage })));
+const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmail').then((m) => ({ default: m.VerifyEmailPage })));
+const FlightsPage = lazy(() => import('@/pages/Flights').then((m) => ({ default: m.FlightsPage })));
+const HotelsPage = lazy(() => import('@/pages/Hotels').then((m) => ({ default: m.HotelsPage })));
+const HotelDetailsPage = lazy(() => import('@/pages/HotelDetails').then((m) => ({ default: m.HotelDetailsPage })));
+const TravelCheckoutRoute = lazy(() => import('@/pages/TravelCheckout').then((m) => ({ default: m.TravelCheckoutRoute })));
 const AdminLayout = lazy(() => import('@/layouts/AdminLayout').then((m) => ({ default: m.AdminLayout })));
 
 // Admin pages
@@ -50,6 +58,8 @@ const AdminInquiries = lazy(() => import('@/pages/admin/AdminInquiries').then((m
 const AdminSubscribers = lazy(() => import('@/pages/admin/AdminSubscribers').then((m) => ({ default: m.AdminSubscribers })));
 const AdminReviews = lazy(() => import('@/pages/admin/AdminReviews').then((m) => ({ default: m.AdminReviews })));
 const AdminPayments = lazy(() => import('@/pages/admin/AdminPayments').then((m) => ({ default: m.AdminPayments })));
+const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then((m) => ({ default: m.AdminCoupons })));
+const AdminTravelOrders = lazy(() => import('@/pages/admin/AdminTravelOrders').then((m) => ({ default: m.AdminTravelOrders })));
 
 const PageFallback = () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -83,6 +93,10 @@ const router = createBrowserRouter([
                     { index: true, element: <Home /> },
                     { path: "tour/:id", element: <TourDetails /> },
                     { path: "tours", element: <SearchPage /> },
+                    // Flights & hotels: render the normal 404 when switched off (lazy chunks never load)
+                    { path: "flights", element: <FeatureRoute feature="flights"><FlightsPage /></FeatureRoute> },
+                    { path: "hotels", element: <FeatureRoute feature="hotels"><HotelsPage /></FeatureRoute> },
+                    { path: "hotels/:id", element: <FeatureRoute feature="hotels"><HotelDetailsPage /></FeatureRoute> },
                     { path: "destinations", element: <DestinationsPage /> },
                     { path: "destinations/:slug", element: <DestinationDetails /> },
                     { path: "collections", element: <CollectionsPage /> },
@@ -96,16 +110,22 @@ const router = createBrowserRouter([
                     { path: "blog/:slug", element: <BlogDetails /> },
                     { path: "login", element: <LoginPage /> },
                     { path: "register", element: <RegisterPage /> },
+                    { path: "forgot-password", element: <ForgotPasswordPage /> },
+                    { path: "reset-password/:token", element: <ResetPasswordPage /> },
+                    { path: "verify-email/:token", element: <VerifyEmailPage /> },
                     {
                         element: <ProtectedRoute />,
                         children: [
                             { path: "dashboard", element: <Dashboard /> },
                             { path: "book", element: <BookingPage /> },
-                            { path: "write-article", element: <WriteArticle /> },
+                            { path: "checkout/travel/:kind/:offerId", element: <TravelCheckoutRoute /> },
                         ]
                     },
                 ],
             },
+
+            // /admin/login is not a real page — redirect to /login
+            { path: "/admin/login", element: <Navigate to="/login" replace /> },
 
             // Admin Routes
             {
@@ -133,6 +153,7 @@ const router = createBrowserRouter([
                             // Operations
                             { path: "bookings", element: <AdminBookings /> },
                             { path: "payments", element: <AdminPayments /> },
+                            { path: "travel-orders", element: <AdminTravelOrders /> },
                             { path: "reviews", element: <AdminReviews /> },
 
                             // Community
@@ -140,9 +161,13 @@ const router = createBrowserRouter([
                             { path: "inquiries", element: <AdminInquiries /> },
                             { path: "subscribers", element: <AdminSubscribers /> },
                             { path: "blog", element: <AdminBlog /> },
+                            { path: "write-article", element: <WriteArticle /> },
 
                             // Legacy redirect: /admin/content → homepage
                             { path: "content", element: <AdminContent /> },
+
+                            // Coupons
+                            { path: "coupons", element: <AdminCoupons /> },
 
                             // System
                             { path: "settings", element: <AdminSettings /> },

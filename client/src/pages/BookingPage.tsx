@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Elements } from "@stripe/react-stripe-js";
 import { StripePaymentForm, stripeAppearance, stripePromise } from "@/components/payment/StripePaymentForm";
+import { TripAddons } from "@/components/travel/TripAddons";
 
 const steps = ['Traveller Details', 'Add-ons', 'Review & Pay', 'Success'];
 
@@ -392,7 +393,15 @@ export const BookingPage = () => {
                                     </p>
                                 )}
 
-                                <div className="flex justify-center gap-4">
+                                <TripAddons
+                                    variant="success"
+                                    location={tour?.location}
+                                    date={date}
+                                    nights={tour?.duration?.nights || 3}
+                                    linkedBooking={bookingId}
+                                />
+
+                                <div className="flex justify-center gap-4 mt-8">
                                     <Link to="/dashboard">
                                         <Button variant="outline">Go to Dashboard</Button>
                                     </Link>

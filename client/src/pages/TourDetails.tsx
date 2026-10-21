@@ -11,16 +11,18 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useCurrency } from "@/context/CurrencyContext";
 import { TourMap } from "@/components/TourMap";
 import { ReviewSection } from "@/components/ReviewSection";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from "@/hooks/use-wishlist";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 
 import { Container } from "@/components/ui/container";
 
 import { PageTitle } from "@/components/PageTitle";
+import { TripAddons } from '@/components/travel/TripAddons';
 
 export const TourDetails = () => {
     const { id } = useParams();
@@ -35,8 +37,14 @@ export const TourDetails = () => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [guests, setGuests] = useState(2);
 
+    const { addTour: addToRecentlyViewed } = useRecentlyViewed();
     const tour = data?.tour;
     const isWishlisted = !!wishlistData?.wishlist?.tours?.some((t) => t._id === tour?._id);
+
+    // Track this tour as recently viewed once loaded
+    useEffect(() => {
+        if (tour) addToRecentlyViewed(tour);
+    }, [tour?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleShare = async () => {
         const url = window.location.href;
@@ -99,7 +107,7 @@ export const TourDetails = () => {
     const totalPrice = tour.price * guests;
 
     return (
-        <div className="bg-background min-h-screen pb-24">
+        <div className="bg-background min-h-screen pb-24 lg:pb-0">
             <PageTitle
                 title={tour.title}
                 description={description?.slice(0, 160) || `Book ${tour.title} in ${tour.location} with Wandeazy.`}
@@ -153,6 +161,19 @@ export const TourDetails = () => {
                         </div>
                     </Container>
                 </div>
+            </div>
+
+            {/* Sticky mobile booking bar — hidden on large screens which have the sidebar */}
+            <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl px-4 py-3 flex items-center gap-3">
+                <div className="flex-1">
+                    <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wide">From</p>
+                    <p className="text-xl font-bold font-display text-brand-blue">{formatPrice(tour.price)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
+                </div>
+                <Button asChild className="h-12 px-7 text-base font-bold bg-brand-orange hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20 rounded-2xl text-white flex-shrink-0">
+                    <Link to="/book" state={{ tourId: tour._id, date: date ? format(date, 'yyyy-MM-dd') : '', guests }}>
+                        Book Now
+                    </Link>
+                </Button>
             </div>
 
             <Container className="py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -375,6 +396,12 @@ export const TourDetails = () => {
                                 You won't be charged yet
                             </p>
                         </div>
+
+                        <TripAddons
+                            location={tour.location}
+                            date={date ? format(date, 'yyyy-MM-dd') : undefined}
+                            nights={tour.duration?.nights || 3}
+                        />
                     </div>
                 </div>
             </Container>

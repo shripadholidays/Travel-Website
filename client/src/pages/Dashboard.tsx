@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Map, Heart, Settings, LogOut, ArrowRight, X, Shield, Lock, HelpCircle } from "lucide-react";
+import { Map, Heart, Settings, LogOut, ArrowRight, X, Shield, Lock, HelpCircle, Plane, BedDouble } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { useUserBookings, useCancelBooking } from "@/hooks/use-bookings";
 import { useWishlist, useRemoveFromWishlist } from "@/hooks/use-wishlist";
+import { useEnabledFeatures } from "@/hooks/use-feature";
+import { useCancelTravelOrder, useMyTravelOrders } from "@/hooks/use-travel";
+import { TravelOrderCard } from "@/components/travel/TravelOrderCard";
+import type { TravelOrder } from "@/types/travel";
 import { useAuth } from "@/context/AuthContext";
 import { useUpdateProfile } from "@/hooks/use-auth";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -24,14 +28,30 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { Tour, Booking } from "@/types";
 
-const tabs = [
+const baseTabs = [
     { id: 'bookings', label: 'My Bookings', icon: Map },
     { id: 'wishlist', label: 'Wishlist', icon: Heart },
     { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+const linkedBookingId = (order: TravelOrder) =>
+    order.linkedBooking && typeof order.linkedBooking === 'object' ? order.linkedBooking._id : order.linkedBooking ?? null;
+
 export const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('bookings');
+    // Flights/Hotels tabs exist only while the admin has those services switched on
+    const travelFeatures = useEnabledFeatures();
+    const { data: travelData, isLoading: travelLoading } = useMyTravelOrders(travelFeatures.any);
+    const cancelTravelOrder = useCancelTravelOrder();
+    const [travelCancelTarget, setTravelCancelTarget] = useState<TravelOrder | null>(null);
+    const travelOrders = travelFeatures.any ? travelData?.orders ?? [] : [];
+    const tabs = [
+        baseTabs[0],
+        ...(travelFeatures.flights ? [{ id: 'flights', label: 'Flights', icon: Plane }] : []),
+        ...(travelFeatures.hotels ? [{ id: 'hotels', label: 'Hotels', icon: BedDouble }] : []),
+        ...baseTabs.slice(1),
+    ];
+    const currentTab = tabs.some((t) => t.id === activeTab) ? activeTab : 'bookings';
     const { user, logout } = useAuth();
     const { formatPrice } = useCurrency();
     const { data: bookingsData, isLoading: bookingsLoading } = useUserBookings();
@@ -156,7 +176,7 @@ export const Dashboard = () => {
                         <nav className="bg-white border border-slate-100 rounded-[1.75rem] p-3 shadow-sm space-y-1">
                             {tabs.map(tab => {
                                 const Icon = tab.icon;
-                                const active = activeTab === tab.id;
+                                const active = currentTab === tab.id;
                                 return (
                                     <button
                                         key={tab.id}
@@ -184,7 +204,7 @@ export const Dashboard = () => {
 
                     {/* Content */}
                     <main className="flex-1 bg-white border border-slate-100 rounded-[1.75rem] p-6 md:p-8 min-h-[500px] shadow-sm">
-                        {activeTab === 'bookings' && (
+                        {currentTab === 'bookings' && (
                             <div>
                                 <h2 className="text-2xl font-bold font-display mb-6 text-brand-blue">My Bookings</h2>
                                 {bookingsLoading ? (
@@ -226,6 +246,14 @@ export const Dashboard = () => {
                                                                 </span>
                                                             )}
                                                         </div>
+                                                        {travelOrders.some((o) => linkedBookingId(o) === booking._id) && (
+                                                            <div className="mt-4 space-y-2">
+                                                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Linked to this trip</p>
+                                                                {travelOrders.filter((o) => linkedBookingId(o) === booking._id).map((o) => (
+                                                                    <TravelOrderCard key={o._id} order={o} compact />
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="flex sm:flex-col justify-end gap-2 shrink-0">
                                                         <Button variant="outline" size="sm" className="rounded-full" onClick={() => setTicketBooking(booking)}>
@@ -250,7 +278,32 @@ export const Dashboard = () => {
                             </div>
                         )}
 
-                        {activeTab === 'wishlist' && (
+                        {(currentTab === 'flights' || currentTab === 'hotels') && (
+                            <div>
+                                <h2 className="text-2xl font-bold font-display mb-6 text-brand-blue">
+                                    {currentTab === 'flights' ? 'My Flights' : 'My Hotels'}
+                                </h2>
+                                {travelLoading ? (
+                                    <Spinner center />
+                                ) : travelOrders.filter((o) => o.kind === (currentTab === 'flights' ? 'flight' : 'hotel')).length === 0 ? (
+                                    <EmptyState
+                                        icon={currentTab === 'flights' ? Plane : BedDouble}
+                                        title={currentTab === 'flights' ? 'No flights yet' : 'No hotel stays yet'}
+                                        text={currentTab === 'flights' ? 'Book flights that line up with your tours.' : 'Find a stay right next to your tour.'}
+                                        ctaLabel={currentTab === 'flights' ? 'Search flights' : 'Search hotels'}
+                                        ctaTo={currentTab === 'flights' ? '/flights' : '/hotels'}
+                                    />
+                                ) : (
+                                    <div className="space-y-4">
+                                        {travelOrders
+                                            .filter((o) => o.kind === (currentTab === 'flights' ? 'flight' : 'hotel'))
+                                            .map((o) => <TravelOrderCard key={o._id} order={o} onCancel={setTravelCancelTarget} />)}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {currentTab === 'wishlist' && (
                             <div>
                                 <h2 className="text-2xl font-bold font-display mb-6 text-brand-blue">My Wishlist</h2>
                                 {wishlistLoading ? (
@@ -292,7 +345,7 @@ export const Dashboard = () => {
                             </div>
                         )}
 
-                        {activeTab === 'settings' && (
+                        {currentTab === 'settings' && (
                             <div>
                                 <h2 className="text-2xl font-bold font-display mb-6 text-brand-blue">Account Settings</h2>
 
@@ -418,6 +471,27 @@ export const Dashboard = () => {
                     )}
                 </DialogContent>
             </Dialog>
+
+            <ConfirmDialog
+                open={!!travelCancelTarget}
+                onOpenChange={(o) => !o && setTravelCancelTarget(null)}
+                title={travelCancelTarget?.kind === 'hotel' ? 'Cancel this stay?' : 'Cancel this flight?'}
+                description="We'll cancel with the supplier and refund your payment."
+                confirmLabel="Cancel booking"
+                cancelLabel="Keep it"
+                destructive
+                loading={cancelTravelOrder.isPending}
+                onConfirm={() => {
+                    if (!travelCancelTarget) return;
+                    cancelTravelOrder.mutate(travelCancelTarget._id, {
+                        onSuccess: () => {
+                            toast.success('Booking cancelled.');
+                            setTravelCancelTarget(null);
+                        },
+                        onError: (err: Error) => toast.error(err.message || 'Failed to cancel booking.'),
+                    });
+                }}
+            />
 
             {/* Cancel confirmation */}
             <ConfirmDialog

@@ -7,6 +7,8 @@ import { Logo } from '@/components/ui/Logo';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { usePublicSettings } from '@/hooks/use-settings';
+import { useEnabledFeatures } from '@/hooks/use-feature';
+import { withFeatureLinks } from '@/lib/feature-links';
 import { useSubscribeNewsletter } from '@/hooks/use-contact';
 
 const FALLBACK = {
@@ -19,6 +21,7 @@ const FALLBACK = {
 export const Footer = () => {
     const { data } = usePublicSettings();
     const settings = data?.settings;
+    const travelFeatures = useEnabledFeatures();
 
     const companyName = settings?.companyName || FALLBACK.companyName;
     const email = settings?.contactEmail || FALLBACK.contactEmail;
@@ -30,14 +33,14 @@ export const Footer = () => {
         `© ${new Date().getFullYear()} ${companyName}. All rights reserved.`;
     const showNewsletter = settings?.footer?.showNewsletter ?? true;
 
-    const exploreLinks = (settings?.footerExploreLinks?.length ?? 0) > 0
+    const exploreLinks = withFeatureLinks((settings?.footerExploreLinks?.length ?? 0) > 0
         ? settings!.footerExploreLinks
         : [
             { label: 'Destinations', path: '/destinations' },
             { label: 'Tours', path: '/tours' },
             { label: 'Collections', path: '/collections' },
             { label: 'Hot Deals', path: '/tours' },
-        ];
+        ], travelFeatures);
 
     const companyLinks = (settings?.footerCompanyLinks?.length ?? 0) > 0
         ? settings!.footerCompanyLinks

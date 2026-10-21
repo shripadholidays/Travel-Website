@@ -7,7 +7,10 @@ import { PlanTrip } from "@/components/home/PlanTrip";
 import { SupportSection } from "@/components/home/SupportSection";
 import { Testimonials } from "@/components/home/Testimonials";
 import { FaqSection } from "@/components/home/FaqSection";
+import { RecentlyViewedTours } from "@/components/home/RecentlyViewedTours";
 import { PageTitle } from "@/components/PageTitle";
+import { FeatureGate } from "@/components/FeatureGate";
+import { TravelSearchTabs } from "@/components/home/TravelSearchTabs";
 
 export const Home = () => {
     return (
@@ -28,10 +31,14 @@ export const Home = () => {
                 }}
             />
             <Hero />
+            <FeatureGate any>
+                <TravelSearchTabs />
+            </FeatureGate>
             <DestinationsGrid />
             <PromotionalCarousel />
             <Collections />
             <FeaturedTours />
+            <RecentlyViewedTours />
             <PlanTrip />
             <Testimonials />
             <FaqSection />
