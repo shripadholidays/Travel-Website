@@ -32,6 +32,8 @@ const adminRoutes = require('./routes/admin-route');
 const settingsRoutes = require('./routes/settings-route');
 const uploadRoutes = require('./routes/upload-route');
 const couponRoutes = require('./routes/coupon-route');
+const flightRoutes = require('./routes/flight-route');
+const hotelRoutes = require('./routes/hotel-route');
 const cors = require('cors');
 
 const app = express();
@@ -137,6 +139,8 @@ app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/coupons', couponRoutes);
+app.use('/api/v1/flights', flightRoutes);
+app.use('/api/v1/hotels', hotelRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
 // 404 handler
