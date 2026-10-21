@@ -30,7 +30,7 @@ Out of scope: Tailwind v4 migration (project stays on Tailwind 3.4), Vercel's bl
 |---|---|
 | Navbar (desktop + mobile), footer | Link not rendered |
 | Home search tabs / home section | Tab not rendered; both off → home identical to today |
-| Routes `/flights*`, `/hotels*`, `/checkout/travel/*` | Not registered → NotFound page |
+| Routes `/flights*`, `/hotels*`, `/checkout/travel/*` | `FeatureRoute` renders the NotFound page; lazy chunk never requested |
 | Tour details "Fly there / Stay nearby" box | Not rendered |
 | Booking Success "Complete your trip" card | Not rendered |
 | Plan-Trip fallback copy mentioning flights/hotels | Removed from fallback text |
@@ -84,24 +84,24 @@ Interface (identical shapes for every supplier):
 - `book({ offerId, travellers, contact }) → { providerRef, status }`
 - `cancel(providerRef) → { status, refundAmount }`
 
-Mock flights: deterministic results seeded from route+date (IndiGo, Air India, Vistara, SpiceJet, Emirates, Qatar, Singapore Airlines); domestic and international, non-stop and 1-stop. Mock hotels: Goa, Jaipur, Delhi, Mumbai, Kerala, Dubai, Bali, Bangkok, Singapore, Paris. Mock offers expire after 20 min.
+Mock flights: deterministic results seeded from route+date (IndiGo, Air India, Akasa Air, SpiceJet, Emirates, Qatar, Singapore Airlines); domestic and international, non-stop and 1-stop. Mock hotels: Goa, Jaipur, Delhi, Mumbai, Kerala, Dubai, Bali, Bangkok, Singapore, Paris. Mock offers expire after 20 min.
 
-Markup is applied server-side only; the client never receives `supplierAmount`.
+Markup is applied server-side only; the client never receives `supplierAmount`. All provider prices are USD (the site's base currency) and are displayed through the existing currency switcher.
 
 ### 3.3 Routes (`/api/v1`)
 
 | Method & path | Guard | Purpose |
 |---|---|---|
-| `GET /airports?q=` | flights | Airport autocomplete (static JSON of ~300 airports) |
+| `GET /flights/airports?q=` | flights | Airport autocomplete (curated static JSON, India + major international) |
 | `GET /flights/search` | flights | Search |
 | `GET /flights/offers/:id` | flights | Re-priced offer |
 | `GET /hotels/places?q=` | hotels | City/hotel autocomplete |
 | `GET /hotels/search` | hotels | Search |
 | `GET /hotels/:id` | hotels | Hotel detail + rooms |
-| `POST /orders` | feature of `kind`, logged in | Re-price, create pending order + Stripe PaymentIntent; returns `clientSecret`, `priceChanged` |
-| `GET /orders` | logged in | Own orders, filtered to enabled kinds only |
-| `PATCH /orders/:id/cancel` | feature of kind, owner | Cancel via provider |
-| `GET /admin/orders`, `PATCH /admin/orders/:id` | admin | All orders, any switch state |
+| `POST /travel-orders` | feature of `kind`, logged in | Re-price, create pending order + Stripe PaymentIntent; returns `clientSecret`, `priceChanged` |
+| `GET /travel-orders` | logged in, any feature on | Own orders, filtered to enabled kinds only |
+| `POST /travel-orders/:id/confirm`, `PATCH /travel-orders/:id/cancel` | feature of kind, owner | Cancel via provider |
+| `GET /admin/travel-orders`, `PATCH /admin/travel-orders/:id` | admin | All orders, any switch state |
 
 Flow: Stripe webhook `payment_intent.succeeded` → if `Payment.order` set → `provider.book()` → order `confirmed` (or `failed` + automatic Stripe refund). Search routes use the existing `/api/` rate limiter plus a stricter 30 req/min search limiter.
 
