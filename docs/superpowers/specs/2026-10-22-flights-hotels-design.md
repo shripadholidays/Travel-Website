@@ -120,8 +120,14 @@ Flow: Stripe webhook `payment_intent.succeeded` → if `Payment.order` set → `
 
 ### 4.2 Visual system
 
-- Existing tokens: navy `#0F172A`, orange `#F97316`, light `#F8FAFC`, dark `#020617`; Inter / Playfair Display / Bebas Neue; radius 0.75rem; existing shadcn/Radix components; dark mode supported.
-- Prices and times use `tabular-nums`. Skeleton loaders, not spinners.
+Match the live site's visual language (verified against `Navbar.tsx`, `Hero.tsx`, `TourCard.tsx`, `AdminLayout.tsx`):
+- Tokens: `brand-blue #0F172A`, `brand-orange #F97316`, `brand-light #F8FAFC`, `brand-dark #020617`; slate neutrals (`slate-100` borders, `slate-50` fills).
+- Type: all headings Bebas Neue (`font-display`); body Inter; logo = orange balloon SVG + "Wandeazy" Inter extrabold. Eyebrow labels orange, uppercase, `tracking-[0.3em]`. Prices navy in Bebas (like TourCard), `tabular-nums`.
+- Hero: dark photo with black gradient scrim and transparent white navbar (as Home); inner pages use the frosted `bg-white/90` navbar.
+- Buttons: `rounded-full` pills — orange with `shadow-lg shadow-brand-orange/20`, navy, or outlined; circular arrow button (`bg-slate-50`, hover orange).
+- Cards: TourCard style — white, `rounded-[2rem]`, `border-slate-100`, inner image `rounded-[1.5rem]`, white/95 pill chips, navy/90 rating chip with yellow star, orange location with pin icon.
+- Admin: white sidebar, active item orange `rounded-xl` with orange shadow, `bg-slate-50` content.
+- Map: existing Leaflet styling (`#aadaff` ground, rounded zoom controls). Skeleton loaders, not spinners. Mockups: https://claude.ai/artifact/Ed88vhdKrWPTJPQzoWgiPZ
 
 ### 4.3 Motion
 
