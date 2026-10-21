@@ -63,6 +63,18 @@ describe('creating orders (no Stripe configured)', () => {
         expect(saved.pricing.supplierAmount).toBeGreaterThan(0);
     });
 
+    it('treats a placeholder Stripe key as "no gateway"', async () => {
+        process.env.STRIPE_SECRET_KEY = 'sk_test_placeholder';
+        try {
+            const offer = await firstFlight();
+            const res = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact });
+            expect(res.body.data.order.status).toBe('confirmed');
+            expect(res.body.data.clientSecret).toBeUndefined();
+        } finally {
+            process.env.STRIPE_SECRET_KEY = '';
+        }
+    });
+
     it('asks before charging a changed price', async () => {
         const offer = await firstFlight();
         const changed = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact, quotedTotal: offer.price - 5 });

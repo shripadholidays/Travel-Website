@@ -87,11 +87,20 @@ exports.createOrder = async (req, res) => {
             return ResponseHandler.success(res, { order: order.toPublic() }, 'Booking confirmed');
         }
 
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(pricing.total * 100),
-            currency: pricing.currency.toLowerCase(),
-            metadata: { travelOrderId: order._id.toString(), userId: req.user._id.toString() },
-        });
+        let paymentIntent;
+        try {
+            paymentIntent = await stripe.paymentIntents.create({
+                amount: Math.round(pricing.total * 100),
+                currency: pricing.currency.toLowerCase(),
+                metadata: { travelOrderId: order._id.toString(), userId: req.user._id.toString() },
+            });
+        } catch (stripeErr) {
+            logger.error('Stripe payment intent creation failed', { orderId: order._id, error: stripeErr.message });
+            order.status = 'failed';
+            order.failureReason = 'Payment could not be started';
+            await order.save();
+            return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');
+        }
         const payment = await Payment.create({
             order: order._id,
             user: req.user._id,

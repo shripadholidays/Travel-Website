@@ -8,8 +8,11 @@ function getProvider(kind) {
     return kind === 'flight' ? getFlightProvider() : getHotelProvider();
 }
 
+// A missing key or an obvious placeholder (e.g. sk_test_placeholder) means "no gateway" in dev.
 function stripeClient() {
-    return process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
+    const key = process.env.STRIPE_SECRET_KEY || '';
+    if (!key || /placeholder|your_|xxx/i.test(key)) return null;
+    return require('stripe')(key);
 }
 
 // Refunds the order's completed Stripe payment (if any) and marks it refunded.
