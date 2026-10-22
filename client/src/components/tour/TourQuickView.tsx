@@ -34,7 +34,7 @@ export const TourQuickView = () => {
                 <DialogPrimitive.Overlay className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain bg-brand-blue/60 backdrop-blur-sm sm:flex sm:flex-col sm:items-center sm:p-6 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 duration-300 motion-reduce:animate-none">
                     <DialogPrimitive.Content
                         aria-describedby={undefined}
-                        className="relative w-full min-h-full sm:min-h-0 sm:my-auto sm:max-w-5xl bg-background sm:rounded-[2rem] shadow-2xl overflow-clip focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-10 sm:data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-10 sm:data-[state=closed]:zoom-out-95 duration-300 ease-out motion-reduce:animate-none"
+                        className="relative w-full shrink-0 min-h-full sm:min-h-0 sm:my-auto sm:max-w-5xl bg-background sm:rounded-[2rem] shadow-2xl overflow-clip focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-10 sm:data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-10 sm:data-[state=closed]:zoom-out-95 duration-300 ease-out motion-reduce:animate-none"
                     >
                         {/* Zero-height sticky row keeps the close button reachable while scrolling */}
                         <div className="sticky top-0 z-30 h-0">
