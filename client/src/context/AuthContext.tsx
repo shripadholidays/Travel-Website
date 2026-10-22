@@ -24,18 +24,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
-    // Hydrate user from cookie-based session on mount
+    // Hydrate user from cookie-based session on mount.
+    // Only a 401 means "signed out"; a rate limit or network blip is retried
+    // so a signed-in visitor isn't bounced to the login page.
     useEffect(() => {
         let cancelled = false;
         (async () => {
-            try {
-                const data = await api.get<{ user: User }>('/users/profile');
-                if (!cancelled) setUser(data.user);
-            } catch {
-                // Not logged in — that's fine
-            } finally {
-                if (!cancelled) setIsLoading(false);
+            for (const delayMs of [0, 1000, 3000, 6000]) {
+                if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
+                if (cancelled) return;
+                try {
+                    const data = await api.get<{ user: User }>('/users/profile');
+                    if (!cancelled) setUser(data.user);
+                    break;
+                } catch (err) {
+                    if ((err as { status?: number }).status === 401) break;
+                }
             }
+            if (!cancelled) setIsLoading(false);
         })();
         return () => { cancelled = true; };
     }, []);
@@ -47,39 +53,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return () => window.removeEventListener('auth:unauthorized', handler);
     }, []);
 
+    // Sign-in methods only set the user; the login/register pages decide where to go next
+    // (back to where the visitor was — see useReturnAfterAuth).
+
     // Login using Google One Tap credential (ID token)
     const loginWithGoogle = useCallback(async (credential: string) => {
         const data = await api.post<{ user: User }>('/auth/google', { credential });
         setUser(data.user);
-        if (data.user.role === 'admin') {
-            navigate('/admin/dashboard');
-        } else {
-            navigate('/dashboard');
-        }
-    }, [navigate]);
+    }, []);
 
     // Login using redirect (traditional OAuth flow)
     const loginWithRedirect = useCallback(() => {
         window.location.href = `${API_URL}/auth/login`;
     }, []);
 
-    const routeAfterAuth = useCallback((u: User) => {
-        navigate(u.role === 'admin' ? '/admin/dashboard' : '/dashboard');
-    }, [navigate]);
-
     // Manual email/password login
     const loginWithEmail = useCallback(async (email: string, password: string) => {
         const data = await api.post<{ user: User }>('/auth/login', { email, password });
         setUser(data.user);
-        routeAfterAuth(data.user);
-    }, [routeAfterAuth]);
+    }, []);
 
     // Manual email/password registration
     const registerWithEmail = useCallback(async (displayName: string, email: string, password: string) => {
         const data = await api.post<{ user: User }>('/auth/register', { displayName, email, password });
         setUser(data.user);
-        routeAfterAuth(data.user);
-    }, [routeAfterAuth]);
+    }, []);
 
     // Logout
     const logout = useCallback(async () => {

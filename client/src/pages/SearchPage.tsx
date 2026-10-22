@@ -34,11 +34,11 @@ const RATING_OPTIONS = [4, 3, 2];
 
 export const SearchPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const initialQuery = searchParams.get('q') || '';
+    const urlQuery = searchParams.get('q') || '';
 
     // `inputQuery` is the live text box; `query` is what we actually search on.
-    const [inputQuery, setInputQuery] = useState(initialQuery);
-    const [query, setQuery] = useState(initialQuery);
+    const [inputQuery, setInputQuery] = useState(urlQuery);
+    const [query, setQuery] = useState(urlQuery);
     const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
     const [durations, setDurations] = useState<string[]>([]);
     const [minRating, setMinRating] = useState<number | null>(null);
@@ -46,14 +46,32 @@ export const SearchPage = () => {
     const [page, setPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
 
+    // The URL is the source of truth for the search term: the navbar search,
+    // Back/Forward and shared links all land here.
+    useEffect(() => {
+        setInputQuery(urlQuery);
+        setQuery(urlQuery);
+        setPage(1);
+    }, [urlQuery]);
+
+    // Keep ?q= in step with the box, leaving other params (e.g. the tour modal) alone.
+    const syncUrl = (value: string) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            if (value) next.set('q', value); else next.delete('q');
+            return next;
+        }, { replace: true, preventScrollReset: true });
+    };
+
     // Debounce the text box so typing doesn't fire a request per keystroke.
     useEffect(() => {
         const id = setTimeout(() => {
             setQuery(inputQuery);
             setPage(1);
+            if (inputQuery !== urlQuery) syncUrl(inputQuery);
         }, 400);
         return () => clearTimeout(id);
-    }, [inputQuery]);
+    }, [inputQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Reset to page 1 whenever a filter changes.
     useEffect(() => {
@@ -106,7 +124,7 @@ export const SearchPage = () => {
     const submitSearch = () => {
         setQuery(inputQuery);
         setPage(1);
-        setSearchParams(inputQuery ? { q: inputQuery } : {});
+        syncUrl(inputQuery);
     };
 
     const filtersPanel = (
@@ -291,7 +309,7 @@ export const SearchPage = () => {
                     <div className="flex-1">
                         <div className="flex justify-between items-center mb-6">
                             <span className="text-muted-foreground">
-                                {isLoading ? 'Searching…' : <>Showing <strong>{totalCount}</strong> results</>}
+                                {isLoading ? 'Searching…' : <>Showing <strong>{totalCount}</strong> {totalCount === 1 ? 'result' : 'results'}</>}
                             </span>
                             <SortSelect onSortChange={setSort} />
                         </div>

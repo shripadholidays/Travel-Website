@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from '@/hooks/use-wishlist';
+import { rememberReturnTo } from '@/lib/return-to';
 import type { Tour } from '@/types';
 
 /** Wishlist toggle + share for one tour (card, modal and details page). */
 export function useTourActions(tour?: Pick<Tour, '_id' | 'title'>) {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const { data: wishlistData } = useWishlist();
     const addToWishlist = useAddToWishlist();
@@ -18,6 +20,7 @@ export function useTourActions(tour?: Pick<Tour, '_id' | 'title'>) {
     const toggleWishlist = () => {
         if (!user) {
             toast.error('Please sign in to save tours.');
+            rememberReturnTo(location);
             navigate('/login');
             return;
         }

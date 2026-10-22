@@ -15,7 +15,7 @@ interface TourFilters {
     sort?: string;
 }
 
-export function useTours(filters: TourFilters = {}) {
+export function useTours(filters: TourFilters = {}, options: { enabled?: boolean } = {}) {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== '') params.append(key, String(value));
@@ -25,6 +25,7 @@ export function useTours(filters: TourFilters = {}) {
     return useQuery({
         queryKey: ['tours', filters],
         queryFn: () => api.get<PaginatedData<Tour>>(`/tours${query ? `?${query}` : ''}`),
+        enabled: options.enabled ?? true,
     });
 }
 

@@ -1,3 +1,4 @@
+import { tourCountLabel } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import { ArrowUpRight } from "lucide-react";
@@ -16,7 +17,7 @@ export const DestinationCard = ({ dest }: { dest: Destination }) => (
 
         <div className="absolute bottom-6 left-6 z-30">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-orange bg-white/10 backdrop-blur-md px-2 py-1 rounded-full mb-2 inline-block">
-                {dest.tourCount}+ Tours
+                {tourCountLabel(dest.tourCount)}
             </span>
             <h3 className="font-bold text-white text-xl leading-tight">
                 {dest.name}

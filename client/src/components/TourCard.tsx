@@ -125,10 +125,16 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
                     </h3>
 
                     <div className="flex items-center gap-1.5 mb-6 text-sm">
-                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span className="font-bold text-slate-800">{rating}</span>
-                        <span className="text-muted-foreground">·</span>
-                        <span className="text-muted-foreground">{reviewCount} reviews</span>
+                        {reviewCount > 0 ? (
+                            <>
+                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                <span className="font-bold text-slate-800">{rating}</span>
+                                <span className="text-muted-foreground">·</span>
+                                <span className="text-muted-foreground">{reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}</span>
+                            </>
+                        ) : (
+                            <span className="text-xs font-bold uppercase tracking-wider text-brand-orange bg-brand-orange/10 px-2 py-0.5 rounded-full">New — no reviews yet</span>
+                        )}
                     </div>
 
                     <div className="mt-auto flex items-end justify-between pt-5 border-t border-slate-100">

@@ -28,6 +28,7 @@ import {
 import { OfferBar } from '@/components/ui/OfferBar';
 import { useEnabledFeatures } from '@/hooks/use-feature';
 import { withFeatureLinks } from '@/lib/feature-links';
+import { rememberReturnTo } from '@/lib/return-to';
 
 export const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -114,12 +115,12 @@ export const Navbar = () => {
 
             <nav className={cn(navClasses, "relative")}>
                 <div className={containerClasses}>
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-4 xl:gap-8">
                         <Logo light={!isScrolled && isTransparentHeader} className="scale-90 md:scale-100" />
 
                         {/* Desktop Menu */}
                         <div className={cn(
-                            "hidden lg:flex items-center gap-1 rounded-full p-1 transition-all duration-300",
+                            "hidden lg:flex items-center gap-0.5 xl:gap-1 rounded-full p-1 transition-all duration-300",
                             isOverlay
                                 ? "bg-white/10 backdrop-blur-md border border-white/25 shadow-lg shadow-black/10"
                                 : "bg-transparent border border-transparent"
@@ -131,7 +132,7 @@ export const Navbar = () => {
                                         key={item.label}
                                         to={item.path}
                                         className={cn(
-                                            "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                                            "px-2.5 xl:px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap",
                                             isOverlay
                                                 ? cn("text-white hover:bg-white/20 [text-shadow:0_1px_3px_rgba(0,0,0,0.4)]", active && "bg-white/25")
                                                 : cn("text-brand-blue hover:bg-black/5", active && "bg-brand-orange/10 text-brand-orange")
@@ -146,7 +147,7 @@ export const Navbar = () => {
 
                     {/* Right Actions */}
                     <div className={cn(
-                        "hidden lg:flex items-center gap-2",
+                        "hidden lg:flex items-center gap-1.5 xl:gap-2 shrink-0",
                         isOverlay && "[&_button]:[text-shadow:0_1px_2px_rgba(0,0,0,0.35)]"
                     )}>
                         {/* Search */}
@@ -172,19 +173,20 @@ export const Navbar = () => {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 {/* Write */}
-                                <Link to="/write-article">
-                                    <Button
-                                        size="sm"
-                                        className={cn(
-                                            "h-9 rounded-full px-4 gap-1.5 text-sm font-medium border bg-transparent shadow-none transition-colors",
-                                            isOverlay
-                                                ? "text-white border-white/30 hover:bg-white/15"
-                                                : "text-brand-blue border-slate-200 hover:bg-slate-100"
-                                        )}
-                                    >
-                                        <PenLine className="w-4 h-4" /> Write
-                                    </Button>
-                                </Link>
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    className={cn(
+                                        "h-9 rounded-full px-2.5 xl:px-4 gap-1.5 text-sm font-medium border bg-transparent shadow-none transition-colors",
+                                        isOverlay
+                                            ? "text-white border-white/30 hover:bg-white/15"
+                                            : "text-brand-blue border-slate-200 hover:bg-slate-100"
+                                    )}
+                                >
+                                    <Link to="/write-article" aria-label="Write an article">
+                                        <PenLine className="w-4 h-4" /> <span className="hidden xl:inline">Write</span>
+                                    </Link>
+                                </Button>
 
                                 {/* Avatar dropdown */}
                                 <DropdownMenu>
@@ -245,24 +247,21 @@ export const Navbar = () => {
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <Link to="/login">
-                                    <Button
-                                        size="sm"
-                                        className={cn(
-                                            "h-9 rounded-full px-5 font-medium border bg-transparent shadow-none transition-colors",
-                                            isOverlay
-                                                ? "text-white border-white/30 hover:bg-white/15"
-                                                : "text-brand-blue border-slate-200 hover:bg-slate-100"
-                                        )}
-                                    >
-                                        Log in
-                                    </Button>
-                                </Link>
-                                <Link to="/register">
-                                    <Button size="sm" className="h-9 bg-brand-orange text-white hover:bg-brand-orange/90 rounded-full px-5 shadow-lg shadow-brand-orange/20">
-                                        Sign Up
-                                    </Button>
-                                </Link>
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    className={cn(
+                                        "h-9 rounded-full px-4 xl:px-5 font-medium border bg-transparent shadow-none transition-colors",
+                                        isOverlay
+                                            ? "text-white border-white/30 hover:bg-white/15"
+                                            : "text-brand-blue border-slate-200 hover:bg-slate-100"
+                                    )}
+                                >
+                                    <Link to="/login" onClick={() => rememberReturnTo(location)}>Log in</Link>
+                                </Button>
+                                <Button asChild size="sm" className="h-9 bg-brand-orange text-white hover:bg-brand-orange/90 rounded-full px-4 xl:px-5 shadow-lg shadow-brand-orange/20">
+                                    <Link to="/register" onClick={() => rememberReturnTo(location)}>Sign Up</Link>
+                                </Button>
                             </div>
                         )}
                     </div>
@@ -347,10 +346,10 @@ export const Navbar = () => {
                                         </>
                                     ) : (
                                         <div className="grid grid-cols-2 gap-3">
-                                            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                                            <Link to="/login" onClick={() => { rememberReturnTo(location); setIsMobileMenuOpen(false); }}>
                                                 <Button variant="outline" className="w-full">Log In</Button>
                                             </Link>
-                                            <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                                            <Link to="/register" onClick={() => { rememberReturnTo(location); setIsMobileMenuOpen(false); }}>
                                                 <Button className="w-full bg-brand-orange hover:bg-brand-orange/90">Sign Up</Button>
                                             </Link>
                                         </div>

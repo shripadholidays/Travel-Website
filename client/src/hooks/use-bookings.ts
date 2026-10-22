@@ -12,7 +12,9 @@ interface CreateBookingPayload {
         email: string;
         phone: string;
     };
-    addons?: { name: string; price: number }[];
+    // Add-ons and coupons are priced by the server
+    addons?: { name: string }[];
+    couponCode?: string;
     specialRequests?: string;
 }
 

@@ -11,11 +11,10 @@ import { useEnabledFeatures } from '@/hooks/use-feature';
 import { withFeatureLinks } from '@/lib/feature-links';
 import { useSubscribeNewsletter } from '@/hooks/use-contact';
 
+// Address and phone have no stand-ins: a made-up number is worse than none.
 const FALLBACK = {
     companyName: 'Wandeazy',
     contactEmail: 'hello@wandeazy.com',
-    contactPhone: '+1 (555) 000-0000',
-    address: '123 Adventure Lane, Wanderlust City, WL 99999',
 };
 
 export const Footer = () => {
@@ -25,12 +24,13 @@ export const Footer = () => {
 
     const companyName = settings?.companyName || FALLBACK.companyName;
     const email = settings?.contactEmail || FALLBACK.contactEmail;
-    const phone = settings?.contactPhone || FALLBACK.contactPhone;
-    const address = settings?.address || FALLBACK.address;
+    const phone = settings?.contactPhone?.trim();
+    const address = settings?.address?.trim();
     const social = settings?.socialLinks;
-    const copyright =
-        settings?.footer?.copyrightText ||
-        `© ${new Date().getFullYear()} ${companyName}. All rights reserved.`;
+    // Keep the year current even when the admin text was written in an earlier year
+    const year = new Date().getFullYear();
+    const copyright = (settings?.footer?.copyrightText || `© ${year} ${companyName}. All rights reserved.`)
+        .replace(/©\s*\d{4}/, `© ${year}`);
     const showNewsletter = settings?.footer?.showNewsletter ?? true;
 
     const exploreLinks = withFeatureLinks((settings?.footerExploreLinks?.length ?? 0) > 0
@@ -69,19 +69,12 @@ export const Footer = () => {
                             {social?.facebook && <SocialIcon Icon={Facebook} href={social.facebook} label="Facebook" />}
                             {social?.instagram && <SocialIcon Icon={Instagram} href={social.instagram} label="Instagram" />}
                             {social?.twitter && <SocialIcon Icon={Twitter} href={social.twitter} label="Twitter" />}
-                            {!social?.facebook && !social?.instagram && !social?.twitter && (
-                                <>
-                                    <SocialIcon Icon={Facebook} href="#" label="Facebook" />
-                                    <SocialIcon Icon={Instagram} href="#" label="Instagram" />
-                                    <SocialIcon Icon={Twitter} href="#" label="Twitter" />
-                                </>
-                            )}
                         </div>
                     </div>
 
                     {/* Explore Links */}
                     <div>
-                        <h4 className="font-serif text-lg mb-6">Explore</h4>
+                        <h4 className="font-display font-bold text-lg mb-6">Explore</h4>
                         <ul className="space-y-3 text-slate-400 text-sm">
                             {exploreLinks.map((link) => (
                                 <li key={link.path + link.label}>
@@ -93,7 +86,7 @@ export const Footer = () => {
 
                     {/* Company Links */}
                     <div>
-                        <h4 className="font-serif text-lg mb-6">Company</h4>
+                        <h4 className="font-display font-bold text-lg mb-6">Company</h4>
                         <ul className="space-y-3 text-slate-400 text-sm">
                             {companyLinks.map((link) => (
                                 <li key={link.path + link.label}>
@@ -105,16 +98,20 @@ export const Footer = () => {
 
                     {/* Contact + newsletter */}
                     <div>
-                        <h4 className="font-serif text-lg mb-6">Get in Touch</h4>
+                        <h4 className="font-display font-bold text-lg mb-6">Get in Touch</h4>
                         <ul className="space-y-4 text-slate-400 text-sm mb-6">
-                            <li className="flex items-start gap-3">
-                                <MapPin className="w-5 h-5 text-brand-orange shrink-0" />
-                                <span>{address}</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <Phone className="w-5 h-5 text-brand-orange shrink-0" />
-                                <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-brand-orange transition-colors">{phone}</a>
-                            </li>
+                            {address && (
+                                <li className="flex items-start gap-3">
+                                    <MapPin className="w-5 h-5 text-brand-orange shrink-0" />
+                                    <span>{address}</span>
+                                </li>
+                            )}
+                            {phone && (
+                                <li className="flex items-center gap-3">
+                                    <Phone className="w-5 h-5 text-brand-orange shrink-0" />
+                                    <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-brand-orange transition-colors">{phone}</a>
+                                </li>
+                            )}
                             <li className="flex items-center gap-3">
                                 <Mail className="w-5 h-5 text-brand-orange shrink-0" />
                                 <a href={`mailto:${email}`} className="hover:text-brand-orange transition-colors">{email}</a>

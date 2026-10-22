@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useReturnAfterAuth } from "@/hooks/use-return-after-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +17,8 @@ export const RegisterPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const { loginWithGoogle, registerWithEmail, isAuthenticated } = useAuth();
+    const { loginWithGoogle, registerWithEmail } = useAuth();
     const googleBtnRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
 
     const handleEmailRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,9 +41,8 @@ export const RegisterPage = () => {
         }
     };
 
-    useEffect(() => {
-        if (isAuthenticated) navigate('/dashboard', { replace: true });
-    }, [isAuthenticated, navigate]);
+    // Once signed in, return to where the visitor came from (e.g. the booking they started)
+    useReturnAfterAuth();
 
     useEffect(() => {
         const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;

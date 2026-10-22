@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useReturnAfterAuth } from "@/hooks/use-return-after-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,9 +29,8 @@ export const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const { loginWithGoogle, loginWithEmail, isAuthenticated } = useAuth();
+    const { loginWithGoogle, loginWithEmail } = useAuth();
     const googleBtnRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
 
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,10 +49,8 @@ export const LoginPage = () => {
         }
     };
 
-    // Redirect if already logged in
-    useEffect(() => {
-        if (isAuthenticated) navigate('/dashboard', { replace: true });
-    }, [isAuthenticated, navigate]);
+    // Once signed in, return to where the visitor came from (e.g. the booking they started)
+    useReturnAfterAuth();
 
     // Initialize Google Sign-In
     useEffect(() => {

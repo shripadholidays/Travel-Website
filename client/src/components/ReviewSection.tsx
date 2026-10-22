@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Star, Loader2, MessageSquare, BadgeCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { rememberReturnTo } from '@/lib/return-to';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,7 @@ const StarRating = ({
 
 export const ReviewSection = ({ tourId }: { tourId: string }) => {
     const { user } = useAuth();
+    const location = useLocation();
     const { data, isLoading } = useTourReviews(tourId);
     const createReview = useCreateReview();
     const reviews = data?.reviews ?? [];
@@ -199,7 +201,7 @@ export const ReviewSection = ({ tourId }: { tourId: string }) => {
             ) : (
                 <div className="bg-secondary/40 border border-slate-100 rounded-[1.75rem] p-6 mb-8 text-center">
                     <p className="text-muted-foreground">
-                        <Link to="/login" className="text-brand-orange font-semibold hover:underline">Sign in</Link> to share your experience and help other travelers.
+                        <Link to="/login" onClick={() => rememberReturnTo(location)} className="text-brand-orange font-semibold hover:underline">Sign in</Link> to share your experience and help other travelers.
                     </p>
                 </div>
             )}

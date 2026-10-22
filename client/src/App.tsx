@@ -118,6 +118,7 @@ const router = createBrowserRouter([
                         children: [
                             { path: "dashboard", element: <Dashboard /> },
                             { path: "book", element: <BookingPage /> },
+                            { path: "write-article", element: <WriteArticle /> },
                             { path: "checkout/travel/:kind/:offerId", element: <TravelCheckoutRoute /> },
                         ]
                     },

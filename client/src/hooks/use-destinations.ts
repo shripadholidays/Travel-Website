@@ -2,10 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import type { Destination } from '@/types';
 
-export function useDestinations() {
+export function useDestinations(options: { enabled?: boolean } = {}) {
     return useQuery({
         queryKey: ['destinations'],
         queryFn: () => api.get<{ destinations: Destination[] }>('/destinations'),
+        enabled: options.enabled ?? true,
     });
 }
 

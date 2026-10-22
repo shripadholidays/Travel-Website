@@ -13,13 +13,15 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 
+// Mirrors server/src/models/UserInquiry.js
 interface Inquiry {
     _id: string;
-    name: string;
+    fullName: string;
     email: string;
-    phone?: string;
-    subject?: string;
-    message: string;
+    phoneNumber?: string;
+    preferredTravelDate?: string;
+    numberOfTravelers?: number;
+    message?: string;
     status: 'new' | 'read' | 'replied';
     createdAt: string;
 }
@@ -29,6 +31,14 @@ const STATUS_COLORS: Record<string, string> = {
     read: 'bg-slate-50 text-slate-600 border-slate-200',
     replied: 'bg-emerald-50 text-emerald-700 border-emerald-200',
 };
+
+function tripSummary(i: Inquiry) {
+    const parts = [
+        i.preferredTravelDate ? format(new Date(i.preferredTravelDate), 'MMM d, yyyy') : null,
+        i.numberOfTravelers ? `${i.numberOfTravelers} traveller${i.numberOfTravelers === 1 ? '' : 's'}` : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : 'Dates flexible';
+}
 
 function useInquiries() {
     return useQuery({
@@ -54,8 +64,8 @@ export const AdminInquiries = () => {
     const updateStatus = useUpdateInquiry();
 
     const inquiries = (data?.inquiries ?? []).filter(i => {
-        const matchSearch = i.name.toLowerCase().includes(search.toLowerCase()) ||
-            i.email.toLowerCase().includes(search.toLowerCase());
+        const q = search.toLowerCase();
+        const matchSearch = !q || [i.fullName, i.email, i.message].some(v => (v || '').toLowerCase().includes(q));
         const matchFilter = filter === 'all' || i.status === filter;
         return matchSearch && matchFilter;
     });
@@ -106,7 +116,7 @@ export const AdminInquiries = () => {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>From</TableHead>
-                                    <TableHead>Subject / Message</TableHead>
+                                    <TableHead>Trip / Message</TableHead>
                                     <TableHead>Date</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
@@ -116,12 +126,12 @@ export const AdminInquiries = () => {
                                 {inquiries.length > 0 ? inquiries.map(inquiry => (
                                     <TableRow key={inquiry._id} className="cursor-pointer" onClick={() => { setSelected(inquiry); changeStatus(inquiry._id, inquiry.status === 'new' ? 'read' : inquiry.status); }}>
                                         <TableCell>
-                                            <p className="font-semibold">{inquiry.name}</p>
+                                            <p className="font-semibold">{inquiry.fullName}</p>
                                             <p className="text-xs text-muted-foreground">{inquiry.email}</p>
                                         </TableCell>
                                         <TableCell>
-                                            <p className="text-sm font-medium truncate max-w-[200px]">{inquiry.subject || 'No subject'}</p>
-                                            <p className="text-xs text-muted-foreground truncate max-w-[200px]">{inquiry.message}</p>
+                                            <p className="text-sm font-medium truncate max-w-[220px]">{tripSummary(inquiry)}</p>
+                                            <p className="text-xs text-muted-foreground truncate max-w-[220px]">{inquiry.message || 'No message'}</p>
                                         </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">
                                             {format(new Date(inquiry.createdAt), 'MMM d, yyyy')}
@@ -166,7 +176,7 @@ export const AdminInquiries = () => {
             <Dialog open={!!selected} onOpenChange={o => !o && setSelected(null)}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Inquiry from {selected?.name}</DialogTitle>
+                        <DialogTitle>Inquiry from {selected?.fullName}</DialogTitle>
                     </DialogHeader>
                     {selected && (
                         <div className="space-y-4">
@@ -174,25 +184,23 @@ export const AdminInquiries = () => {
                                 <a href={`mailto:${selected.email}`} className="flex items-center gap-1 text-brand-orange hover:underline">
                                     <Mail className="w-3.5 h-3.5" /> {selected.email}
                                 </a>
-                                {selected.phone && (
-                                    <a href={`tel:${selected.phone}`} className="flex items-center gap-1 text-brand-orange hover:underline">
-                                        <Phone className="w-3.5 h-3.5" /> {selected.phone}
+                                {selected.phoneNumber && (
+                                    <a href={`tel:${selected.phoneNumber}`} className="flex items-center gap-1 text-brand-orange hover:underline">
+                                        <Phone className="w-3.5 h-3.5" /> {selected.phoneNumber}
                                     </a>
                                 )}
                             </div>
-                            {selected.subject && (
-                                <div>
-                                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Subject</p>
-                                    <p className="font-semibold">{selected.subject}</p>
-                                </div>
-                            )}
+                            <div>
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Trip</p>
+                                <p className="font-semibold">{tripSummary(selected)}</p>
+                            </div>
                             <div>
                                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Message</p>
-                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-slate-50 rounded-xl p-4">{selected.message}</p>
+                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-slate-50 rounded-xl p-4">{selected.message || 'No message'}</p>
                             </div>
                             <div className="flex gap-2 pt-2">
                                 <Button size="sm" variant="outline" asChild>
-                                    <a href={`mailto:${selected.email}?subject=Re: ${selected.subject || 'Your Inquiry'}`}>
+                                    <a href={`mailto:${selected.email}?subject=${encodeURIComponent('Re: Your Wandeazy inquiry')}`}>
                                         <Mail className="w-3.5 h-3.5 mr-1.5" /> Reply via Email
                                     </a>
                                 </Button>

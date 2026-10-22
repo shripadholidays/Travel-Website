@@ -75,13 +75,16 @@ export const ContactPage = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Contact info */}
                     <div className="space-y-6">
-                        <ContactItem icon={MapPin} label="Visit us" value={settings?.address || '123 Adventure Lane, Wanderlust City'} />
-                        <ContactItem
-                            icon={Phone}
-                            label="Call us"
-                            value={settings?.contactPhone || '+1 (555) 000-0000'}
-                            href={`tel:${(settings?.contactPhone || '').replace(/\s/g, '')}`}
-                        />
+                        {/* No made-up address or phone: these show once set in Admin → Settings */}
+                        {settings?.address && <ContactItem icon={MapPin} label="Visit us" value={settings.address} />}
+                        {settings?.contactPhone && (
+                            <ContactItem
+                                icon={Phone}
+                                label="Call us"
+                                value={settings.contactPhone}
+                                href={`tel:${settings.contactPhone.replace(/\s/g, '')}`}
+                            />
+                        )}
                         <ContactItem
                             icon={Mail}
                             label="Email us"

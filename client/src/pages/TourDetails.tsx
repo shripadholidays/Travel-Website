@@ -108,7 +108,7 @@ export const TourDetails = () => {
                             <span className="flex items-center gap-2"><MapPin className="w-5 h-5 text-brand-orange" /> {tour.location}</span>
                             <span className="flex items-center gap-2"><Clock className="w-5 h-5 text-brand-orange" /> {durationLabel}</span>
                             {rating > 0 && (
-                                <span className="flex items-center gap-2"><Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> {rating} <span className="text-white/70">({reviewCount} reviews)</span></span>
+                                <span className="flex items-center gap-2"><Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> {rating} <span className="text-white/70">({reviewCount} {reviewCount === 1 ? "review" : "reviews"})</span></span>
                             )}
                         </div>
                     </Container>

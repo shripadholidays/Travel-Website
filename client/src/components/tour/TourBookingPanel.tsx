@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Heart, Minus, Plus, Share2, ShieldCheck, Users } from "lucide-react";
@@ -9,6 +9,7 @@ import { TripAddons } from "@/components/travel/TripAddons";
 import { useCurrency } from "@/context/CurrencyContext";
 import type { TourActions, TourBooking } from "@/hooks/use-tour-actions";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import type { Tour } from "@/types";
 
 /** Price, date, guests and Book Now — the sidebar of the details page and the modal. */
@@ -21,6 +22,7 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
 }) => {
     const { formatPrice } = useCurrency();
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const dateTriggerRef = useRef<HTMLButtonElement>(null);
     const { date, setDate, guests, setGuests, bookState } = booking;
     const totalPrice = tour.price * guests;
 
@@ -62,6 +64,7 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
                     <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                         <PopoverTrigger asChild>
                             <Button
+                                ref={dateTriggerRef}
                                 variant="outline"
                                 className={cn(
                                     "w-full justify-start text-left font-medium bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 rounded-2xl",
@@ -130,7 +133,22 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
             </div>
 
             <Button asChild className={cn("w-full font-bold bg-brand-orange hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20 rounded-2xl group relative overflow-hidden text-white", compact ? "h-12 text-base" : "h-14 text-lg")}>
-                <Link to="/book" state={bookState}>
+                <Link
+                    to="/book"
+                    state={bookState}
+                    onClick={(e) => {
+                        // A booking needs a date: ask for it here rather than at checkout.
+                        if (!date) {
+                            e.preventDefault();
+                            toast.error("Pick your travel date first.");
+                            // Focus and click the date field itself (after this click finishes), so the picker
+                            // opens the same way it does for a person — inside the modal's focus trap.
+                            const trigger = dateTriggerRef.current;
+                            trigger?.scrollIntoView({ block: 'center' });
+                            requestAnimationFrame(() => { trigger?.focus(); trigger?.click(); });
+                        }
+                    }}
+                >
                     <span className="relative z-10">Book Now</span>
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </Link>

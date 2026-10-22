@@ -9,6 +9,9 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/context/CurrencyContext";
 import { usePublicSettings, type PromoSlide } from "@/hooks/use-settings";
+import { useQueries } from "@tanstack/react-query";
+import { api } from "@/services/api";
+import type { PaginatedData, Tour } from "@/types";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -42,9 +45,27 @@ export const PromotionalCarousel = () => {
     const { formatPrice } = useCurrency();
     const { data } = usePublicSettings();
 
-    const slides = (data?.settings?.promoSlides?.length ?? 0) > 0
+    const configured = (data?.settings?.promoSlides?.length ?? 0) > 0
         ? data!.settings!.promoSlides
         : FALLBACK;
+
+    // Keep offers honest: a slide only shows if it leads to real tours,
+    // and its "from" price is the cheapest of them.
+    const matches = useQueries({
+        queries: configured.map((slide) => ({
+            queryKey: ['tours', 'promo', slide.searchQuery],
+            queryFn: () => api.get<PaginatedData<Tour>>(`/tours?search=${encodeURIComponent(slide.searchQuery || '')}&sort=price_low&limit=1`),
+            staleTime: 5 * 60 * 1000,
+        })),
+    });
+    const slides = configured.flatMap((slide, i) => {
+        const result = matches[i]?.data;
+        if (!result) return [slide];
+        const cheapest = result.tours[0];
+        return cheapest ? [{ ...slide, fromPrice: cheapest.price }] : [];
+    });
+
+    if (slides.length === 0) return null;
 
     return (
         <section className="py-12 bg-background">

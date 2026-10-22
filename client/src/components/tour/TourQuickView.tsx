@@ -103,7 +103,7 @@ const QuickViewBody = ({ id, preview }: { id: string; preview?: Tour }) => {
                         <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-brand-orange" /> {tour.location}</span>
                         <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-brand-orange" /> {tour.duration.days}D/{tour.duration.nights}N</span>
                         {rating > 0 && (
-                            <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> {rating} <span className="text-white/70">({reviewCount} reviews)</span></span>
+                            <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> {rating} <span className="text-white/70">({reviewCount} {reviewCount === 1 ? "review" : "reviews"})</span></span>
                         )}
                     </div>
                 </div>

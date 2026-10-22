@@ -113,7 +113,7 @@ export const DestinationDetails = () => {
 
                             {/* Stat chips */}
                             <div className="flex flex-wrap gap-3 mt-7">
-                                <HeroStat icon={Compass} value={`${destination.tourCount}+`} label="Tours" />
+                                <HeroStat icon={Compass} value={destination.tourCount ? String(destination.tourCount) : "Soon"} label={destination.tourCount === 1 ? "Tour" : "Tours"} />
                                 {destination.rating > 0 && (
                                     <HeroStat icon={Star} value={destination.rating.toFixed(1)} label="Avg rating" starred />
                                 )}
@@ -181,7 +181,7 @@ export const DestinationDetails = () => {
                             aside={
                                 destinationTours.length > 0 ? (
                                     <span className="text-sm font-medium text-muted-foreground bg-secondary/60 px-3 py-1.5 rounded-full">
-                                        {destinationTours.length} experiences
+                                        {destinationTours.length} {destinationTours.length === 1 ? "experience" : "experiences"}
                                     </span>
                                 ) : undefined
                             }
@@ -234,7 +234,7 @@ export const DestinationDetails = () => {
 
                             {/* Key facts */}
                             <div className="space-y-3">
-                                <InfoRow icon={Compass} label="Available tours" value={`${destination.tourCount}+`} />
+                                <InfoRow icon={Compass} label="Available tours" value={destination.tourCount ? String(destination.tourCount) : "Coming soon"} />
                                 {destination.rating > 0 && (
                                     <InfoRow icon={Star} label="Average rating" value={`${destination.rating.toFixed(1)} / 5`} starred />
                                 )}

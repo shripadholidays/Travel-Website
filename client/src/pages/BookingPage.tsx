@@ -6,10 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Image } from "@/components/ui/image";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
-import { CheckCircle2, ChevronRight, Loader2, AlertCircle, MapPin, Calendar, Users, Lock, ShieldCheck, Tag, X } from "lucide-react";
+import { CheckCircle2, ChevronRight, Loader2, AlertCircle, MapPin, Calendar, Users, Lock, ShieldCheck, Tag, X, Minus, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { Calendar as DatePicker } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { api } from "@/services/api";
+import type { Booking } from "@/types";
 import { useTour } from "@/hooks/use-tours";
 import { useCreateBooking } from "@/hooks/use-bookings";
 import { useAuth } from "@/context/AuthContext";
@@ -53,9 +57,14 @@ export const BookingPage = () => {
     const { data: tourData, isLoading: tourLoading } = useTour(tourId || '');
 
     const [currentStep, setCurrentStep] = useState(0);
+    const [travelDate, setTravelDate] = useState<Date | undefined>(date ? parseISO(date) : undefined);
+    const [isDateOpen, setIsDateOpen] = useState(false);
+    const [guestCount, setGuestCount] = useState(Math.max(1, guests || 1));
+    const [confirmed, setConfirmed] = useState<Booking | null>(null);
+    const [firstName = "", ...restOfName] = (user?.displayName || "").trim().split(/\s+/);
     const [contactInfo, setContactInfo] = useState<ContactInfo>({
-        firstName: "",
-        lastName: "",
+        firstName,
+        lastName: restOfName.join(" "),
         email: user?.email || "",
         phone: "",
     });
@@ -75,13 +84,23 @@ export const BookingPage = () => {
         }
     }, [user]);
 
+    // A coupon's discount depends on the subtotal, so re-check it when guests or add-ons change.
+    const tourPrice = tourData?.tour?.price ?? 0;
+    const liveSubtotal = tourPrice * guestCount + selectedAddons.reduce((sum, a) => sum + a.price, 0);
+    useEffect(() => {
+        if (!appliedCoupon) return;
+        validateCoupon.mutateAsync({ code: appliedCoupon.code, orderAmount: liveSubtotal })
+            .then((r) => setAppliedCoupon(r.coupon))
+            .catch((err) => { setAppliedCoupon(null); setCouponError((err as Error).message || "Coupon no longer applies."); });
+    }, [liveSubtotal]); // eslint-disable-line react-hooks/exhaustive-deps
+
     if (!tourId) {
         return (
             <div className="pt-24 pb-12 bg-background min-h-screen flex flex-col items-center justify-center">
                 <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold mb-2">No tour selected</h2>
                 <p className="text-muted-foreground mb-6">Please select a tour first before booking.</p>
-                <Link to="/tours"><Button>Browse Tours</Button></Link>
+                <Button asChild><Link to="/tours">Browse Tours</Link></Button>
             </div>
         );
     }
@@ -101,12 +120,12 @@ export const BookingPage = () => {
                 <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold mb-2">Tour not found</h2>
                 <p className="text-muted-foreground mb-6">The selected tour could not be found.</p>
-                <Link to="/tours"><Button>Browse Tours</Button></Link>
+                <Button asChild><Link to="/tours">Browse Tours</Link></Button>
             </div>
         );
     }
 
-    const numberOfGuests = guests || 1;
+    const numberOfGuests = guestCount;
     const baseAmount = tour.price * numberOfGuests;
     const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
     const subtotal = baseAmount + addonsTotal;
@@ -141,28 +160,32 @@ export const BookingPage = () => {
         );
     };
 
-    const isStep0Valid = contactInfo.firstName.trim() && contactInfo.lastName.trim() && contactInfo.email.trim() && contactInfo.phone.trim();
+    const isStep0Valid = !!travelDate && contactInfo.firstName.trim() && contactInfo.lastName.trim() && contactInfo.email.trim() && contactInfo.phone.trim();
+    const dateLabel = travelDate ? format(travelDate, 'MMM dd, yyyy') : null;
 
     const handleCreateBooking = async () => {
         setIsSubmitting(true);
         try {
             const result = await createBooking.mutateAsync({
                 tour: tour._id,
-                travelDate: date || new Date().toISOString(),
+                travelDate: format(travelDate!, 'yyyy-MM-dd'),
                 numberOfTravelers: numberOfGuests,
                 contactInfo,
-                addons: selectedAddons.map(a => ({ name: a.name, price: a.price })),
+                addons: selectedAddons.map(a => ({ name: a.name })),
+                couponCode: appliedCoupon?.code,
                 specialRequests: specialRequests || undefined,
             });
 
             setBookingId(result.booking._id);
+            setConfirmed(result.booking);
 
             if (result.clientSecret && stripePromise) {
                 setClientSecret(result.clientSecret);
-            } else {
-                // No Stripe configured — go to success directly
+            } else if (result.booking.status === 'confirmed') {
                 setCurrentStep(3);
                 toast.success("Booking confirmed!");
+            } else {
+                toast.error("We couldn't start the payment. Please try again.");
             }
         } catch (err) {
             toast.error((err as Error).message || "Failed to create booking. Please try again.");
@@ -171,12 +194,24 @@ export const BookingPage = () => {
         }
     };
 
-    const handlePaymentSuccess = () => {
+    // Stripe took the payment; have the server verify it and confirm the booking.
+    const handlePaymentSuccess = async () => {
+        try {
+            const res = await api.post<{ booking: Booking }>('/payments/confirm', { bookingId });
+            setConfirmed(res.booking);
+            toast.success("Payment successful! Booking confirmed.");
+        } catch {
+            toast.success("Payment received — your confirmation is on its way.");
+        }
         setCurrentStep(3);
-        toast.success("Payment successful! Booking confirmed.");
     };
 
     const handleNext = () => {
+        if (currentStep === 0 && !travelDate) {
+            toast.error("Please choose your travel date.");
+            setIsDateOpen(true);
+            return;
+        }
         if (currentStep === 0 && !isStep0Valid) {
             toast.error("Please fill in all traveller details.");
             return;
@@ -223,6 +258,47 @@ export const BookingPage = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                             >
+                                <h2 className="text-2xl font-bold font-display mb-1 text-brand-blue">Your trip</h2>
+                                <p className="text-sm text-muted-foreground mb-6">When are you going, and how many of you?</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="travelDate">Travel date *</Label>
+                                        <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    id="travelDate"
+                                                    variant="outline"
+                                                    className={cn("w-full h-11 justify-start rounded-xl font-normal", !travelDate && "text-muted-foreground")}
+                                                >
+                                                    <Calendar className="w-4 h-4 mr-2 text-brand-orange" />
+                                                    {dateLabel ?? "Choose a date"}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <DatePicker
+                                                    mode="single"
+                                                    selected={travelDate}
+                                                    onSelect={(d) => { setTravelDate(d); setIsDateOpen(false); }}
+                                                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label id="guests-label">Travellers *</Label>
+                                        <div className="flex items-center justify-between h-11 px-1.5 border border-input rounded-xl" role="group" aria-labelledby="guests-label">
+                                            <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="Fewer travellers" disabled={guestCount <= 1} onClick={() => setGuestCount(g => Math.max(1, g - 1))}>
+                                                <Minus className="w-4 h-4" />
+                                            </Button>
+                                            <span className="font-bold tabular-nums" aria-live="polite">{guestCount}</span>
+                                            <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="More travellers" onClick={() => setGuestCount(g => g + 1)}>
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <h2 className="text-2xl font-bold font-display mb-1 text-brand-blue">Traveller Details</h2>
                                 <p className="text-sm text-muted-foreground mb-6">Who should we send the booking confirmation to?</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -347,7 +423,7 @@ export const BookingPage = () => {
                                         </div>
                                         <div>
                                             <span className="text-muted-foreground block text-xs">Travel date</span>
-                                            <p className="font-medium">{date ? format(new Date(date), 'MMM dd, yyyy') : 'Flexible'}</p>
+                                            <p className="font-medium">{dateLabel}</p>
                                         </div>
                                         {specialRequests && (
                                             <div className="col-span-2">
@@ -385,7 +461,10 @@ export const BookingPage = () => {
                                 </div>
                                 <h2 className="text-3xl font-bold font-display mb-4">You're Booked!</h2>
                                 <p className="text-muted-foreground mb-2 text-lg">Your Wandeazy journey begins now.</p>
-                                <p className="text-muted-foreground mb-8">A confirmation email has been sent to {contactInfo.email}.</p>
+                                <p className="text-muted-foreground mb-8">
+                                    We'll email your confirmation to {contactInfo.email}.
+                                    {confirmed && <> Total charged: <span className="font-semibold text-brand-blue">{formatPrice(confirmed.totalAmount)}</span>.</>}
+                                </p>
 
                                 {bookingId && (
                                     <p className="text-sm text-muted-foreground mb-6">
@@ -396,18 +475,18 @@ export const BookingPage = () => {
                                 <TripAddons
                                     variant="success"
                                     location={tour?.location}
-                                    date={date}
+                                    date={travelDate ? format(travelDate, 'yyyy-MM-dd') : undefined}
                                     nights={tour?.duration?.nights || 3}
                                     linkedBooking={bookingId}
                                 />
 
                                 <div className="flex justify-center gap-4 mt-8">
-                                    <Link to="/dashboard">
-                                        <Button variant="outline">Go to Dashboard</Button>
-                                    </Link>
-                                    <Link to="/">
-                                        <Button className="bg-brand-blue">Back to Home</Button>
-                                    </Link>
+                                    <Button variant="outline" asChild>
+                                        <Link to="/dashboard">Go to Dashboard</Link>
+                                    </Button>
+                                    <Button className="bg-brand-blue" asChild>
+                                        <Link to="/">Back to Home</Link>
+                                    </Button>
                                 </div>
                             </motion.div>
                         )}
@@ -466,8 +545,8 @@ export const BookingPage = () => {
                                 <div className="space-y-2.5 text-sm">
                                     <div className="flex items-center justify-between">
                                         <span className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4 text-brand-orange" /> Date</span>
-                                        <span className="font-medium">
-                                            {date ? format(new Date(date), 'MMM dd, yyyy') : 'Flexible'}
+                                        <span className={cn("font-medium", !dateLabel && "text-brand-orange")}>
+                                            {dateLabel ?? 'Choose a date'}
                                         </span>
                                     </div>
                                     <div className="flex items-center justify-between">

@@ -46,7 +46,7 @@ export const AdminBlog = () => {
                     <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Blog & Articles</h2>
                     <p className="text-muted-foreground">Manage your travel blog posts and guides.</p>
                 </div>
-                <Link to="/write-article">
+                <Link to="/admin/write-article">
                     <Button className="bg-brand-orange hover:bg-brand-orange/90 gap-2">
                         <PenTool className="w-4 h-4" /> Write New Article
                     </Button>

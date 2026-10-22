@@ -14,9 +14,11 @@ export const SearchDialog = () => {
     const { openTour } = useTourModal();
     const navigate = useNavigate();
 
-    // Fetch all tours and destinations once for instant client-side filtering
-    const { data: toursData } = useTours({ limit: 100 });
-    const { data: destinationsData } = useDestinations();
+    // Fetch all tours and destinations the first time search opens, then filter client-side
+    const [wasOpened, setWasOpened] = useState(false);
+    useEffect(() => { if (open) setWasOpened(true); }, [open]);
+    const { data: toursData } = useTours({ limit: 100 }, { enabled: wasOpened });
+    const { data: destinationsData } = useDestinations({ enabled: wasOpened });
 
     const allTours = toursData?.tours ?? [];
     const allDestinations = destinationsData?.destinations ?? [];

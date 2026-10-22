@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useDestinations } from "@/hooks/use-destinations";
 import { ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, tourCountLabel } from "@/lib/utils";
 import { Image } from "@/components/ui/image";
 import { Link } from "react-router-dom";
 
@@ -84,7 +84,7 @@ export const DestinationsGrid = () => {
 
                                     <div className={cn("absolute z-30", useBento && index === 0 ? "bottom-7 left-7" : "bottom-4 left-4")}>
                                         <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-white bg-brand-orange px-2.5 py-1 rounded-full mb-2 inline-block shadow-sm">
-                                            {dest.tourCount}+ Tours
+                                            {tourCountLabel(dest.tourCount)}
                                         </span>
                                         <h3 className={cn("font-bold text-white leading-tight drop-shadow-md", useBento && index === 0 ? "text-3xl md:text-4xl" : "text-lg md:text-xl")}>
                                             {dest.name}
