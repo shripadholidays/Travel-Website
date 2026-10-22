@@ -1,6 +1,10 @@
 const UserInquiry = require('../models/UserInquiry');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const { sendInquiryAcknowledgment, sendAdminAlert } = require('../services/email-service');
+
+// Only the contact form's own fields; status and timestamps are never client-controlled.
+const FIELDS = ['fullName', 'email', 'phoneNumber', 'preferredTravelDate', 'numberOfTravelers', 'message'];
 
 /**
  * Handles the creation of a new user inquiry.
@@ -9,11 +13,23 @@ const logger = require('../utils/logger');
  */
 exports.createInquiry = async (req, res) => {
     try {
-        // Create a new inquiry instance from the request body
-        const newInquiry = new UserInquiry(req.body);
+        const data = Object.fromEntries(FIELDS.filter((f) => req.body?.[f] !== undefined).map((f) => [f, req.body[f]]));
+        const newInquiry = new UserInquiry(data);
 
         // Save the new inquiry to the database
         const savedInquiry = await newInquiry.save();
+
+        // Acknowledge the traveller and alert the team; neither may fail the request.
+        Promise.allSettled([
+            sendInquiryAcknowledgment(savedInquiry),
+            sendAdminAlert(`New inquiry from ${savedInquiry.fullName}`, [
+                ['Email', savedInquiry.email],
+                ['Phone', savedInquiry.phoneNumber],
+                ['Travel date', savedInquiry.preferredTravelDate ? new Date(savedInquiry.preferredTravelDate).toDateString() : 'Flexible'],
+                ['Travellers', savedInquiry.numberOfTravelers],
+                ['Message', savedInquiry.message],
+            ]),
+        ]).catch(() => {});
 
         // Send a success response with the created inquiry data
         return ResponseHandler.success(res, savedInquiry, 'Inquiry submitted successfully!');

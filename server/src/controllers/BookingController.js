@@ -3,7 +3,8 @@ const Payment = require('../models/Payment');
 const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
-const { sendBookingConfirmation } = require('../services/email-service');
+const { BookingError, parseTravelDate, priceBooking, confirmBooking } = require('../services/booking-service');
+const { stripeClient } = require('../services/travel-order-service');
 const config = require('../config');
 
 // POST /bookings - Create booking + payment intent
@@ -11,43 +12,46 @@ exports.createBooking = async (req, res) => {
     try {
         const {
             tour: tourField, tourId: tourIdField, travelDate, numberOfTravelers,
-            contactInfo, addons, specialRequests, currency
+            contactInfo, addons, specialRequests, couponCode
         } = req.body;
 
         // Accept either `tour` or `tourId` from the client.
         const tourId = tourIdField || tourField;
         if (!tourId) return ResponseHandler.fail(res, 400, 'A tour is required to create a booking.');
-        if (!travelDate) return ResponseHandler.fail(res, 400, 'A travel date is required.');
-        if (!numberOfTravelers || numberOfTravelers < 1) return ResponseHandler.fail(res, 400, 'At least one traveler is required.');
+        const date = parseTravelDate(travelDate);
 
         const tour = await TravelDestination.findById(tourId);
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
 
-        const baseAmount = tour.price * numberOfTravelers;
-        const addonsTotal = (addons || []).reduce((sum, a) => sum + (a.price || 0), 0);
-        const totalAmount = baseAmount + addonsTotal;
+        // Prices, add-ons and coupons are all worked out here, never trusted from the client.
+        const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode });
+        const currency = config.stripe.defaultCurrency;
 
         const booking = await Booking.create({
             user: req.user._id,
             tour: tourId,
-            travelDate,
+            travelDate: date,
             numberOfTravelers,
             contactInfo,
-            addons: addons || [],
-            totalAmount,
-            currency: currency || config.stripe.defaultCurrency,
+            addons: pricing.addons,
+            subtotalAmount: pricing.subtotalAmount,
+            coupon: pricing.coupon || undefined,
+            totalAmount: pricing.totalAmount,
+            currency,
             specialRequests,
             status: 'pending'
         });
 
-        // Create Stripe payment intent if configured
+        const stripe = stripeClient();
         let clientSecret = null;
-        if (process.env.STRIPE_SECRET_KEY) {
+        if (!stripe || pricing.totalAmount === 0) {
+            // No payment gateway (local dev) or nothing to pay: confirm straight away.
+            await confirmBooking(booking);
+        } else {
             try {
-                const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
                 const paymentIntent = await stripe.paymentIntents.create({
-                    amount: Math.round(totalAmount * 100),
-                    currency: (currency || config.stripe.defaultCurrency).toLowerCase(),
+                    amount: Math.round(pricing.totalAmount * 100),
+                    currency: currency.toLowerCase(),
                     metadata: {
                         bookingId: booking._id.toString(),
                         userId: req.user._id.toString()
@@ -57,8 +61,8 @@ exports.createBooking = async (req, res) => {
                 const payment = await Payment.create({
                     booking: booking._id,
                     user: req.user._id,
-                    amount: totalAmount,
-                    currency: currency || config.stripe.defaultCurrency,
+                    amount: pricing.totalAmount,
+                    currency,
                     method: 'stripe',
                     stripePaymentIntentId: paymentIntent.id,
                     status: 'pending'
@@ -68,7 +72,11 @@ exports.createBooking = async (req, res) => {
                 await booking.save();
                 clientSecret = paymentIntent.client_secret;
             } catch (stripeErr) {
-                logger.error('Stripe payment intent creation failed', { error: stripeErr.message });
+                // Don't tell the traveller they're booked when payment can't even start.
+                logger.error('Stripe payment intent creation failed', { error: stripeErr.message, bookingId: booking._id });
+                booking.status = 'cancelled';
+                await booking.save();
+                return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');
             }
         }
 
@@ -76,21 +84,12 @@ exports.createBooking = async (req, res) => {
             .populate('tour', 'title imageURL location price duration')
             .populate('user', 'displayName email');
 
-        // Send booking confirmation email (non-blocking)
-        try {
-            const userEmail = populatedBooking.user?.email || contactInfo?.email;
-            if (userEmail) {
-                await sendBookingConfirmation(populatedBooking, userEmail);
-            }
-        } catch (emailErr) {
-            logger.error('Failed to send booking confirmation email', { error: emailErr.message, bookingId: booking._id });
-        }
-
         return ResponseHandler.success(res, {
             booking: populatedBooking,
             clientSecret
         }, 'Booking created successfully');
     } catch (err) {
+        if (err instanceof BookingError) return ResponseHandler.fail(res, err.status, err.message);
         if (err.name === 'ValidationError') {
             const messages = Object.values(err.errors).map(val => val.message);
             return ResponseHandler.fail(res, 400, messages.join(', '));

@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Booking = require('../models/Booking');
 const TravelDestination = require('../models/TravelDestination');
 const Review = require('../models/Review');
+const { recomputeTourRating } = require('../services/rating-service');
 const UserInquiry = require('../models/UserInquiry');
 const NewsletterSubscriber = require('../models/NewsletterSubscriber');
 const Payment = require('../models/Payment');
@@ -199,6 +200,7 @@ exports.deleteReview = async (req, res) => {
     try {
         const review = await Review.findByIdAndDelete(req.params.id);
         if (!review) return ResponseHandler.fail(res, 404, 'Review not found');
+        await recomputeTourRating(review.tour);
         return ResponseHandler.success(res, null, 'Review deleted');
     } catch (err) {
         logger.error('Error deleting review', { error: err.message });

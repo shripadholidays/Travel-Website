@@ -1,7 +1,9 @@
+const mongoose = require('mongoose');
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
+const { confirmBooking } = require('../services/booking-service');
 const TravelOrder = require('../models/TravelOrder');
-const { finalizeOrder } = require('../services/travel-order-service');
+const { finalizeOrder, stripeClient } = require('../services/travel-order-service');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 
@@ -35,7 +37,8 @@ exports.handleWebhook = async (req, res) => {
                     await payment.save();
 
                     if (payment.booking) {
-                        await Booking.findByIdAndUpdate(payment.booking, { status: 'confirmed' });
+                        const booking = await Booking.findById(payment.booking);
+                        if (booking) await confirmBooking(booking);
                         logger.info('Payment completed and booking confirmed', { paymentId: payment._id });
                     } else if (payment.order) {
                         const order = await TravelOrder.findById(payment.order);
@@ -70,29 +73,29 @@ exports.handleWebhook = async (req, res) => {
     res.status(200).json({ received: true });
 };
 
-// POST /payments/confirm - Manual confirmation (dev/fallback)
+// POST /payments/confirm - called by the client after Stripe confirms (webhook-independent).
+// Only the booking's owner can call it, and only a payment Stripe reports as succeeded confirms it.
 exports.confirmPayment = async (req, res) => {
     try {
         const { bookingId } = req.body;
-        const booking = await Booking.findById(bookingId);
+        if (!mongoose.isValidObjectId(bookingId)) return ResponseHandler.fail(res, 404, 'Booking not found');
+        const booking = await Booking.findOne({ _id: bookingId, user: req.user._id });
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
+        if (booking.status !== 'pending') return ResponseHandler.success(res, { booking }, 'Booking already processed');
 
-        booking.status = 'confirmed';
-        await booking.save();
+        const stripe = stripeClient();
+        const payment = booking.paymentId ? await Payment.findById(booking.paymentId) : null;
+        if (stripe) {
+            if (!payment?.stripePaymentIntentId) return ResponseHandler.fail(res, 400, 'Payment not completed');
+            const intent = await stripe.paymentIntents.retrieve(payment.stripePaymentIntentId);
+            if (intent.status !== 'succeeded') return ResponseHandler.fail(res, 400, 'Payment not completed');
+            payment.status = 'completed';
+            payment.gatewayResponse = intent;
+            await payment.save();
+        }
 
-        const payment = await Payment.create({
-            booking: booking._id,
-            user: req.user._id,
-            amount: booking.totalAmount,
-            currency: booking.currency,
-            method: 'stripe',
-            status: 'completed'
-        });
-
-        booking.paymentId = payment._id;
-        await booking.save();
-
-        return ResponseHandler.success(res, { booking, payment }, 'Payment confirmed successfully');
+        await confirmBooking(booking);
+        return ResponseHandler.success(res, { booking }, 'Payment confirmed successfully');
     } catch (err) {
         logger.error('Error confirming payment', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to confirm payment');

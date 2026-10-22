@@ -51,7 +51,8 @@ const config = {
     rateLimit: {
         api: {
             windowMs: Number(e.RATE_LIMIT_API_WINDOW_MS) || 15 * 60_000,
-            max:      Number(e.RATE_LIMIT_API_MAX)        || 100,
+            // A full page load makes 6-8 API calls, so 100 locked visitors out after ~15 pages.
+            max:      Number(e.RATE_LIMIT_API_MAX)        || 1000,
         },
         auth: {
             windowMs: Number(e.RATE_LIMIT_AUTH_WINDOW_MS) || 15 * 60_000,
@@ -78,6 +79,8 @@ const config = {
         brandColor:  e.EMAIL_BRAND_COLOR     || '#0F172A',
         accentColor: e.EMAIL_ACCENT_COLOR    || '#F97316',
         copyrightYear: e.EMAIL_COPYRIGHT_YEAR || new Date().getFullYear().toString(),
+        // Where new inquiries / confirmed bookings are announced (optional)
+        adminNotifyAddress: e.ADMIN_NOTIFY_EMAIL || '',
     },
 
     stripe: {

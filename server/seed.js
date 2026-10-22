@@ -5,6 +5,7 @@
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
+const { recomputeAllTourRatings } = require('./src/services/rating-service');
 const TravelDestination = require('./src/models/TravelDestination');
 const Destination = require('./src/models/Destination');
 const Collection = require('./src/models/Collection');
@@ -634,6 +635,10 @@ async function seed() {
             ],
         });
         console.log('  ✓ Site settings created');
+
+        // Ratings shown on the site come from real reviews, not the sample numbers above
+        await recomputeAllTourRatings();
+        console.log('  ✓ Tour ratings recomputed from reviews');
 
         console.log('\n✅ Database seeded successfully!');
         console.log(`   Tours: ${createdTours.length}`);

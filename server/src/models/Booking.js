@@ -32,6 +32,14 @@ const bookingSchema = new mongoose.Schema({
         name: { type: String },
         price: { type: Number }
     }],
+    // Before any coupon; totalAmount is what the traveller pays
+    subtotalAmount: {
+        type: Number
+    },
+    coupon: {
+        code: { type: String },
+        discount: { type: Number }
+    },
     totalAmount: {
         type: Number,
         required: true

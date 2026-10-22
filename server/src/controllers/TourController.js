@@ -3,6 +3,23 @@ const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const config = require('../config');
 
+const SEARCH_FIELDS = ['title', 'location', 'categories', 'overview.about'];
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Every word must appear in at least one field (title, location, category or description),
+// so "Japan", "Nepal trek" and partial words like "Toky" all find their tours.
+function buildSearchQuery(search) {
+    const words = String(search).trim().split(/\s+/).filter(Boolean).slice(0, 8);
+    if (words.length === 0) return {};
+    return {
+        $and: words.map((word) => {
+            const re = new RegExp(escapeRegex(word), 'i');
+            return { $or: SEARCH_FIELDS.map((field) => ({ [field]: re })) };
+        }),
+    };
+}
+exports.buildSearchQuery = buildSearchQuery;
+
 // GET /tours - List with filters & pagination
 exports.getTours = async (req, res) => {
     try {
@@ -51,7 +68,7 @@ exports.getTours = async (req, res) => {
             if (validTo) query.validity.$lte = new Date(validTo);
         }
         if (search) {
-            query.$text = { $search: search };
+            Object.assign(query, buildSearchQuery(search));
         }
         if (isFeatured === 'true') {
             query.isFeatured = true;

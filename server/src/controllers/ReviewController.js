@@ -3,6 +3,7 @@ const Booking = require('../models/Booking');
 const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const { recomputeTourRating } = require('../services/rating-service');
 
 // POST /tours/:tourId/reviews
 exports.createReview = async (req, res) => {
@@ -33,12 +34,7 @@ exports.createReview = async (req, res) => {
             isVerifiedBooking: !!hasBooking
         });
 
-        // Update tour's aggregate rating
-        const allReviews = await Review.find({ tour: tourId });
-        const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
-        tour.reviews.rating = Math.round(avgRating * 10) / 10;
-        tour.reviews.basedOn = allReviews.length;
-        await tour.save();
+        await recomputeTourRating(tourId);
 
         const populatedReview = await Review.findById(review._id)
             .populate('user', 'displayName profilePicture');

@@ -2,7 +2,10 @@ const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
 const config = require('../config');
 
-const { host, port, secure, domain, apiKey, fromName, fromAddress, brandColor, accentColor, copyrightYear } = config.email;
+const { host, port, secure, domain, apiKey, fromName, fromAddress, brandColor, accentColor, copyrightYear, adminNotifyAddress } = config.email;
+
+// Customer-entered text goes into HTML emails, so escape it.
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let transporter = null;
 
@@ -71,7 +74,7 @@ const sendInquiryAcknowledgment = async (inquiry) => {
         subject: 'We received your travel inquiry!',
         html: emailLayout(`
             <div style="padding: 32px; background: #fff;">
-                <h2 style="color: ${brandColor};">Hi ${inquiry.fullName}!</h2>
+                <h2 style="color: ${brandColor};">Hi ${escapeHtml(inquiry.fullName)}!</h2>
                 <p>Thank you for your travel inquiry. Our team will review your request and get back to you within 24 hours.</p>
             </div>`),
     });
@@ -116,4 +119,19 @@ const sendVerificationEmail = async (userEmail, verifyUrl) => {
     });
 };
 
-module.exports = { sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail };
+/** Tells the staff inbox (ADMIN_NOTIFY_EMAIL) about something that needs attention. */
+const sendAdminAlert = async (subject, rows) => {
+    if (!adminNotifyAddress) return null;
+    const body = rows
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`)
+        .join('');
+    return sendEmail({
+        from: `"${fromName}" <${fromAddress}>`,
+        to: adminNotifyAddress,
+        subject,
+        html: emailLayout(`<div style="padding: 32px; background: #fff;"><h2 style="color: ${brandColor}; margin-top: 0;">${escapeHtml(subject)}</h2>${body}</div>`),
+    });
+};
+
+module.exports = { sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail, sendAdminAlert };

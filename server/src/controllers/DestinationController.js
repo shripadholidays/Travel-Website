@@ -1,6 +1,23 @@
 const Destination = require('../models/Destination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const TravelDestination = require('../models/TravelDestination');
+
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Tour counts and ratings are worked out from the tours we actually sell
+// (matched on location/title), never from hand-entered numbers.
+async function withLiveStats(destinations) {
+    const tours = await TravelDestination.find({ status: { $ne: 'draft' } }, 'title location reviews').lean();
+    return destinations.map((doc) => {
+        const dest = doc.toObject ? doc.toObject() : doc;
+        const names = [dest.name, dest.country].filter(Boolean).map((n) => new RegExp(`\\b${escapeRegex(n)}\\b`, 'i'));
+        const matching = tours.filter((t) => names.some((re) => re.test(t.location) || re.test(t.title)));
+        const rated = matching.filter((t) => t.reviews?.basedOn > 0);
+        const rating = rated.length ? Math.round((rated.reduce((s, t) => s + t.reviews.rating, 0) / rated.length) * 10) / 10 : 0;
+        return { ...dest, tourCount: matching.length, rating };
+    });
+}
 
 // GET /destinations
 exports.getDestinations = async (req, res) => {
@@ -20,7 +37,7 @@ exports.getDestinations = async (req, res) => {
         const total = await Destination.countDocuments(query);
 
         return ResponseHandler.success(res, {
-            destinations,
+            destinations: await withLiveStats(destinations),
             pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / Number(limit)) }
         }, 'Destinations fetched successfully');
     } catch (err) {
@@ -34,7 +51,8 @@ exports.getDestinationBySlug = async (req, res) => {
     try {
         const destination = await Destination.findOne({ slug: req.params.slug });
         if (!destination) return ResponseHandler.fail(res, 404, 'Destination not found');
-        return ResponseHandler.success(res, { destination }, 'Destination fetched successfully');
+        const [withStats] = await withLiveStats([destination]);
+        return ResponseHandler.success(res, { destination: withStats }, 'Destination fetched successfully');
     } catch (err) {
         logger.error('Error fetching destination', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to fetch destination');
