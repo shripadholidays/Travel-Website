@@ -7,6 +7,7 @@ export interface User {
     email: string;
     profilePicture?: string;
     role: 'user' | 'moderator' | 'admin';
+    isEmailVerified?: boolean;
     createdAt: string;
     updatedAt: string;
 }
@@ -43,6 +44,7 @@ export interface Tour {
             reviewedOn: string;
         }[];
     };
+    maxGroupSize?: number | null;
     isFeatured?: boolean;
     status?: 'active' | 'inactive' | 'draft';
     coordinates?: { lat: number | null; lng: number | null };

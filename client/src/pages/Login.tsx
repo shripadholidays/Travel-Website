@@ -160,7 +160,12 @@ export const LoginPage = () => {
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="password">Password</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password">Password</Label>
+                                <Link to="/forgot-password" className="text-xs text-brand-orange hover:underline font-medium">
+                                    Forgot password?
+                                </Link>
+                            </div>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input

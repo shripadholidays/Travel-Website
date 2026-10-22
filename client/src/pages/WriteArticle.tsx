@@ -5,12 +5,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { ArrowLeft, Loader2, ImageIcon, Calendar, Eye, Type, Tag as TagIcon } from "lucide-react";
+import { ArrowLeft, Loader2, ImageIcon, Calendar, Eye, Type, Tag as TagIcon, Lock, Star, ShoppingBag, Clock } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
 import { toast } from "sonner";
 import { useBlogPost, useCreateBlogPost, useUpdateBlogPost } from "@/hooks/use-blog";
+import { useWriteEligibility } from "@/hooks/use-write-eligibility";
+import { cn } from "@/lib/utils";
 
 import { Container } from "@/components/ui/container";
 
@@ -24,6 +26,7 @@ export const WriteArticle = () => {
     const { data: existing, isLoading: loadingExisting } = useBlogPost(editSlug);
     const createPost = useCreateBlogPost();
     const updatePost = useUpdateBlogPost();
+    const { data: eligibility, isLoading: eligibilityLoading } = useWriteEligibility();
 
     const [title, setTitle] = useState("");
     const [excerpt, setExcerpt] = useState("");
@@ -77,6 +80,120 @@ export const WriteArticle = () => {
             toast.error((err as Error).message || "Failed to save article.");
         }
     };
+
+    if (eligibilityLoading) {
+        return (
+            <div className="min-h-screen bg-secondary/20 pt-24 flex items-center justify-center">
+                <Spinner label="Checking eligibility…" />
+            </div>
+        );
+    }
+
+    // Show gate for non-eligible users (admins/moderators bypass)
+    if (eligibility && !eligibility.eligible && eligibility.reason !== "privileged") {
+        const { reviewCount = 0, completedBookings = 0, accountAgeDays = 0, requirements } = eligibility;
+        const ageOk = accountAgeDays >= requirements.accountAgeDays;
+        const engagementOk = (reviewCount ?? 0) >= requirements.reviews || (completedBookings ?? 0) >= 1;
+        const reviewProgress = Math.min(100, ((reviewCount ?? 0) / requirements.reviews) * 100);
+        const ageProgress = Math.min(100, (accountAgeDays / requirements.accountAgeDays) * 100);
+
+        return (
+            <div className="min-h-screen bg-secondary/20 pt-24 pb-16">
+                <PageTitle title="Write Article" noIndex />
+                <Container className="max-w-2xl">
+                    <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-brand-orange mb-6 text-sm transition-colors">
+                        <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Blog
+                    </Link>
+                    <div className="bg-white border border-slate-100 rounded-[2rem] p-8 md:p-12 shadow-sm text-center">
+                        <div className="w-16 h-16 bg-brand-orange/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <Lock className="w-8 h-8 text-brand-orange" />
+                        </div>
+                        <h1 className="text-3xl font-display font-bold text-brand-blue mb-3">Unlock Article Writing</h1>
+                        <p className="text-muted-foreground mb-10 max-w-md mx-auto">
+                            Contribute to the Wandeazy community by sharing your travel stories. Complete the requirements below to unlock the writer feature.
+                        </p>
+
+                        <div className="space-y-5 text-left max-w-sm mx-auto mb-10">
+                            {/* Account age requirement */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between text-sm font-medium">
+                                    <span className="flex items-center gap-2">
+                                        <Clock className={cn("w-4 h-4", ageOk ? "text-green-500" : "text-brand-orange")} />
+                                        Account age
+                                    </span>
+                                    <span className={cn("font-bold", ageOk ? "text-green-600" : "text-slate-600")}>
+                                        {Math.floor(accountAgeDays)} / {requirements.accountAgeDays} days
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className={cn("h-full rounded-full transition-all", ageOk ? "bg-green-500" : "bg-brand-orange")}
+                                        style={{ width: `${ageProgress}%` }}
+                                    />
+                                </div>
+                                {ageOk && <p className="text-xs text-green-600 font-medium">✓ Requirement met</p>}
+                            </div>
+
+                            {/* Engagement divider */}
+                            <p className="text-xs text-center text-muted-foreground font-semibold uppercase tracking-wider">
+                                + one of the following
+                            </p>
+
+                            {/* Reviews requirement */}
+                            <div className={cn("space-y-2 p-4 rounded-2xl border-2 transition-colors", engagementOk && (reviewCount ?? 0) >= requirements.reviews ? "border-green-200 bg-green-50/50" : "border-slate-100")}>
+                                <div className="flex items-center justify-between text-sm font-medium">
+                                    <span className="flex items-center gap-2">
+                                        <Star className={cn("w-4 h-4", (reviewCount ?? 0) >= requirements.reviews ? "text-green-500" : "text-brand-orange")} />
+                                        Write reviews
+                                    </span>
+                                    <span className={cn("font-bold", (reviewCount ?? 0) >= requirements.reviews ? "text-green-600" : "text-slate-600")}>
+                                        {reviewCount ?? 0} / {requirements.reviews}
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className={cn("h-full rounded-full transition-all", (reviewCount ?? 0) >= requirements.reviews ? "bg-green-500" : "bg-brand-orange")}
+                                        style={{ width: `${reviewProgress}%` }}
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground">Leave honest reviews on tours you've explored.</p>
+                            </div>
+
+                            {/* OR divider */}
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1 h-px bg-slate-200" />
+                                <span className="text-xs text-muted-foreground font-bold">OR</span>
+                                <div className="flex-1 h-px bg-slate-200" />
+                            </div>
+
+                            {/* Booking requirement */}
+                            <div className={cn("space-y-2 p-4 rounded-2xl border-2 transition-colors", (completedBookings ?? 0) >= 1 ? "border-green-200 bg-green-50/50" : "border-slate-100")}>
+                                <div className="flex items-center justify-between text-sm font-medium">
+                                    <span className="flex items-center gap-2">
+                                        <ShoppingBag className={cn("w-4 h-4", (completedBookings ?? 0) >= 1 ? "text-green-500" : "text-brand-orange")} />
+                                        Complete a booking
+                                    </span>
+                                    <span className={cn("font-bold", (completedBookings ?? 0) >= 1 ? "text-green-600" : "text-slate-600")}>
+                                        {(completedBookings ?? 0) >= 1 ? "Done!" : "0 / 1"}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">Book and complete any tour through Wandeazy.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Link to="/tours">
+                                <Button variant="brand" className="rounded-xl px-8">Browse Tours</Button>
+                            </Link>
+                            <Link to="/dashboard">
+                                <Button variant="outline" className="rounded-xl px-8">Go to Dashboard</Button>
+                            </Link>
+                        </div>
+                    </div>
+                </Container>
+            </div>
+        );
+    }
 
     if (isEdit && loadingExisting) {
         return (

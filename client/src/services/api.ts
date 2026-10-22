@@ -1,6 +1,7 @@
 import type { ApiResponse } from '@/types';
+import { config } from '@/config';
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+export const API_BASE_URL = config.api.baseUrl;
 const BASE_URL = API_BASE_URL;
 
 class ApiError extends Error {
