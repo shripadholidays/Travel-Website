@@ -288,7 +288,8 @@ export const AdminCollections = () => {
                                         >
                                             <Checkbox
                                                 checked={form.selectedTours.includes(tour._id)}
-                                                onCheckedChange={checked => {
+                                                onChange={e => {
+                                                    const checked = e.target.checked;
                                                     setForm(p => ({
                                                         ...p,
                                                         selectedTours: checked

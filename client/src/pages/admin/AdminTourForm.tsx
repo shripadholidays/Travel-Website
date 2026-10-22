@@ -30,20 +30,6 @@ type Inclusion = { title: string; included: boolean };
 type ItineraryDay = { day: number; activity: string; location: string };
 type GalleryItem = { imageURL: string; altText: string };
 
-function buildDefaultTour(): Partial<Tour> {
-    return {
-        title: '', location: '', price: 0, currency: 'USD',
-        duration: { days: 1, nights: 0 },
-        validity: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        imageURL: '', images: [], categories: [],
-        inclusions: [], itinerary: [],
-        overview: { about: '', gallery: [] },
-        emi: '',
-        isFeatured: false, status: 'active',
-        coordinates: { lat: null, lng: null },
-    };
-}
-
 export const AdminTourForm = () => {
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
@@ -344,7 +330,7 @@ export const AdminTourForm = () => {
                                 onChange={setItinerary}
                                 addLabel="Add day"
                                 createEmpty={() => ({ day: itinerary.length + 1, activity: '', location: '' })}
-                                renderItem={(day, i, onChange) => (
+                                renderItem={(day, _i, onChange) => (
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                         <div className="space-y-1">
                                             <Label className="text-xs">Day</Label>
@@ -382,8 +368,8 @@ export const AdminTourForm = () => {
                                     <div className="flex items-center gap-3">
                                         <Checkbox
                                             checked={item.included}
-                                            onCheckedChange={checked => onChange({ ...item, included: !!checked })}
-                                            className="data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                            onChange={e => onChange({ ...item, included: e.target.checked })}
+                                            className="accent-emerald-500"
                                         />
                                         <Input
                                             value={item.title}

@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Globe2, ShieldCheck, Heart, Users } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/PageTitle";
 import { usePublicSettings, type AboutStat, type AboutValue } from "@/hooks/use-settings";
 
 function resolveIcon(name: string): LucideIcon {
-    return (LucideIcons as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
+    return (LucideIcons as unknown as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
 }
 
 const FALLBACK_STATS: AboutStat[] = [

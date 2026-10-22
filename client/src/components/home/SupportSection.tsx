@@ -6,7 +6,7 @@ import { Send, Headphones, ShieldCheck } from "lucide-react";
 import { usePublicSettings, type SupportFeature, type ChatMessage } from "@/hooks/use-settings";
 
 function resolveIcon(name: string): LucideIcon {
-    return (LucideIcons as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
+    return (LucideIcons as unknown as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
 }
 
 const FALLBACK_FEATURES: SupportFeature[] = [

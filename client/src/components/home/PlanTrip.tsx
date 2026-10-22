@@ -10,7 +10,7 @@ import { stripTravelMentions } from '@/lib/feature-links';
 
 // Resolve icon name string → Lucide component
 function resolveIcon(name: string): LucideIcon {
-    const icon = (LucideIcons as Record<string, LucideIcon>)[name];
+    const icon = (LucideIcons as unknown as Record<string, LucideIcon>)[name];
     return icon || LucideIcons.HelpCircle;
 }
 

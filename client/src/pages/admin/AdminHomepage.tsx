@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Save, Loader2, Plus, Download } from 'lucide-react';
+import { Save, Loader2, Download } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -615,7 +615,7 @@ export const AdminHomepage = () => {
                                 addLabel="Add nav link"
                                 maxItems={8}
                                 createEmpty={() => ({ label: '', path: '/', order: navLinks.length })}
-                                renderItem={(link, i, onChange) => (
+                                renderItem={(link, _i, onChange) => (
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1">
                                             <Label className="text-xs">Label</Label>

@@ -53,21 +53,21 @@ export const AdminTours = () => {
     const bulkCreate = useBulkCreateTours();
 
     const handleBulkImport = async (rows: Record<string, unknown>[]) => {
-        const mapped = rows.map(r => ({
-            title: r.title,
-            location: r.location,
+        const mapped: Partial<Tour>[] = rows.map(r => ({
+            title: String(r.title ?? ''),
+            location: String(r.location ?? ''),
             price: Number(r.price),
-            currency: r.currency || '₹',
+            currency: String(r.currency || '₹'),
             duration: {
                 days: Number((r as Record<string, unknown>)['duration.days'] ?? (r.duration as Record<string,unknown>)?.days ?? 1),
                 nights: Number((r as Record<string, unknown>)['duration.nights'] ?? (r.duration as Record<string,unknown>)?.nights ?? 0),
             },
-            imageURL: r.imageURL || '',
+            imageURL: String(r.imageURL || ''),
             categories: typeof r.categories === 'string' ? r.categories.split(',').map((s: string) => s.trim()) : (r.categories as string[]) || [],
-            status: r.status || 'active',
+            status: (r.status as Tour['status']) || 'active',
             isFeatured: r.isFeatured === true || r.isFeatured === 'true',
-            overview: (r.overview as Record<string,unknown>) || { about: '', gallery: [] },
-            validity: r.validity ? new Date(r.validity as string) : new Date(Date.now() + 365 * 86400000),
+            overview: (r.overview as Tour['overview']) || { about: '', gallery: [] },
+            validity: (r.validity ? new Date(r.validity as string) : new Date(Date.now() + 365 * 86400000)).toISOString(),
         }));
         const toastId = toast.loading(`Importing ${mapped.length} tour(s)…`);
         try {

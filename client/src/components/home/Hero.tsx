@@ -42,7 +42,6 @@ export const Hero = () => {
         : FALLBACK_SLIDES;
 
     const [activeIdx, setActiveIdx] = useState(1);
-    const active = slides[Math.min(activeIdx, slides.length - 1)];
 
     return (
         <div className="relative h-screen w-full overflow-hidden bg-black flex flex-col">
