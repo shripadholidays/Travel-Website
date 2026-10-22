@@ -1,6 +1,7 @@
 import { Outlet, ScrollRestoration } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { TourQuickView } from "@/components/tour/TourQuickView";
 
 export const MainLayout = () => {
     return (
@@ -16,6 +17,7 @@ export const MainLayout = () => {
                 <Outlet />
             </main>
             <Footer />
+            <TourQuickView />
             <ScrollRestoration />
         </div>
     );

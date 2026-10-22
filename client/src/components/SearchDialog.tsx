@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useTours } from "@/hooks/use-tours";
 import { useDestinations } from "@/hooks/use-destinations";
 import { Image } from "@/components/ui/image";
+import { useTourModal } from "@/hooks/use-tour-modal";
 
 export const SearchDialog = () => {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
+    const { openTour } = useTourModal();
     const navigate = useNavigate();
 
     // Fetch all tours and destinations once for instant client-side filtering
@@ -138,7 +140,7 @@ export const SearchDialog = () => {
                                         {filteredTours.map(tour => (
                                             <div
                                                 key={tour._id}
-                                                onClick={() => handleSelect(`/tour/${tour._id}`)}
+                                                onClick={() => { setOpen(false); openTour(tour); }}
                                                 className="group flex items-center gap-4 p-2 rounded-xl hover:bg-brand-light/50 cursor-pointer transition-colors"
                                             >
                                                 <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">

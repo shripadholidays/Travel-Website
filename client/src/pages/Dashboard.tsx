@@ -21,6 +21,7 @@ import { useCancelTravelOrder, useMyTravelOrders } from "@/hooks/use-travel";
 import { TravelOrderCard } from "@/components/travel/TravelOrderCard";
 import type { TravelOrder } from "@/types/travel";
 import { useAuth } from "@/context/AuthContext";
+import { useTourModal } from "@/hooks/use-tour-modal";
 import { useUpdateProfile } from "@/hooks/use-auth";
 import { useCurrency } from "@/context/CurrencyContext";
 import { format } from "date-fns";
@@ -62,6 +63,7 @@ export const Dashboard = () => {
 
     const bookings = bookingsData?.bookings ?? [];
     const wishlistTours = wishlistData?.wishlist?.tours ?? [];
+    const { openTour } = useTourModal();
 
     const [displayName, setDisplayName] = useState(user?.displayName ?? '');
     const [avatarError, setAvatarError] = useState(false);
@@ -320,7 +322,14 @@ export const Dashboard = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {wishlistTours.map((tour) => (
                                             <div key={tour._id} className="relative group overflow-hidden rounded-2xl border border-slate-100 aspect-[4/3]">
-                                                <Link to={`/tour/${tour._id}`}>
+                                                <Link
+                                                    to={`/tour/${tour._id}`}
+                                                    onClick={(e) => {
+                                                        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                                                        e.preventDefault();
+                                                        openTour(tour);
+                                                    }}
+                                                >
                                                     <img src={tour.imageURL} alt={tour.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4 text-white">
                                                         <h4 className="font-bold">{tour.title}</h4>

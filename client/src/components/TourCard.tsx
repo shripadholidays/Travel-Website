@@ -1,35 +1,28 @@
 import { Star, Clock, MapPin, ArrowUpRight, Heart } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Image } from "@/components/ui/image";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from "@/hooks/use-wishlist";
-import { useAuth } from "@/context/AuthContext";
+import { useTourActions } from "@/hooks/use-tour-actions";
+import { useTourModal } from "@/hooks/use-tour-modal";
 import type { Tour } from "@/types";
 
 export const TourCard = ({ tour, className }: { tour: Tour, className?: string }) => {
     const { formatPrice } = useCurrency();
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const { data: wishlistData } = useWishlist();
-    const addToWishlist = useAddToWishlist();
-    const removeFromWishlist = useRemoveFromWishlist();
-    const isWishlisted = !!wishlistData?.wishlist?.tours?.some((t) => t._id === tour._id);
+    const { isWishlisted, toggleWishlist: toggle, wishlistPending } = useTourActions(tour);
+    const { openTour } = useTourModal();
 
     const toggleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!user) {
-            toast.error('Please sign in to save tours.');
-            navigate('/login');
-            return;
-        }
-        if (isWishlisted) {
-            removeFromWishlist.mutate(tour._id, { onSuccess: () => toast.success('Removed from wishlist.') });
-        } else {
-            addToWishlist.mutate(tour._id, { onSuccess: () => toast.success('Added to wishlist!') });
-        }
+        toggle();
+    };
+
+    // Plain click opens the quick view; Ctrl/Cmd/Shift/middle click keep the real link (new tab, etc.).
+    const handleOpen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        openTour(tour);
     };
 
     const durationLabel = `${tour.duration.days}D/${tour.duration.nights}N`;
@@ -64,7 +57,7 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
     const hasDiscount = finalPrice < tour.price;
 
     return (
-        <Link to={`/tour/${tour._id}`} className={cn("group block h-full", className)}>
+        <Link to={`/tour/${tour._id}`} onClick={handleOpen} className={cn("group block h-full", className)}>
             <div className="relative h-full flex flex-col bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm transition-[transform,box-shadow] duration-500 ease-out transform-gpu [backface-visibility:hidden] hover:shadow-2xl hover:shadow-brand-blue/10 hover:-translate-y-1.5">
 
                 {/* Image Section */}
@@ -93,7 +86,7 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
                         {/* Wishlist Button */}
                         <button
                             onClick={toggleWishlist}
-                            disabled={addToWishlist.isPending || removeFromWishlist.isPending}
+                            disabled={wishlistPending}
                             aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                             aria-pressed={isWishlisted}
                             className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-transform group/heart"
