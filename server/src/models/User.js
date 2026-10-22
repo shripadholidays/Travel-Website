@@ -30,6 +30,15 @@ const userSchema = new mongoose.Schema({
     },
     profilePicture: String,
     role: { type: String, enum: ['user', 'moderator', 'admin'], default: 'user' },
+
+    // Email verification
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, select: false },
+    emailVerificationTokenExpiry: { type: Date, select: false },
+
+    // Password reset
+    resetPasswordToken: { type: String, select: false },
+    resetPasswordExpiry: { type: Date, select: false },
 }, { timestamps: true });
 
 // Hash password before saving when it has been set/changed.

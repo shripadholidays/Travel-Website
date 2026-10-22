@@ -1,13 +1,14 @@
 const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const config = require('../config');
 
 // GET /tours - List with filters & pagination
 exports.getTours = async (req, res) => {
     try {
         const {
             page = 1,
-            limit = 10,
+            limit = config.pagination.defaultLimit,
             category,
             country,
             minPrice,
@@ -95,11 +96,11 @@ exports.getRecommendedTours = async (req, res) => {
     try {
         let tours = await TravelDestination.find({ isFeatured: true, status: 'active' })
             .sort({ 'reviews.rating': -1 })
-            .limit(12);
+            .limit(config.tours.recommendedFeaturedLimit);
         if (tours.length === 0) {
             tours = await TravelDestination.find({ status: { $ne: 'draft' } })
                 .sort({ 'reviews.rating': -1 })
-                .limit(6);
+                .limit(config.tours.recommendedFallbackLimit);
         }
         return ResponseHandler.success(res, { tours }, 'Recommended tours fetched successfully');
     } catch (err) {

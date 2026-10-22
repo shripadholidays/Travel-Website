@@ -4,6 +4,7 @@ const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const { sendBookingConfirmation } = require('../services/email-service');
+const config = require('../config');
 
 // POST /bookings - Create booking + payment intent
 exports.createBooking = async (req, res) => {
@@ -34,7 +35,7 @@ exports.createBooking = async (req, res) => {
             contactInfo,
             addons: addons || [],
             totalAmount,
-            currency: currency || 'USD',
+            currency: currency || config.stripe.defaultCurrency,
             specialRequests,
             status: 'pending'
         });
@@ -46,7 +47,7 @@ exports.createBooking = async (req, res) => {
                 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
                 const paymentIntent = await stripe.paymentIntents.create({
                     amount: Math.round(totalAmount * 100),
-                    currency: (currency || 'usd').toLowerCase(),
+                    currency: (currency || config.stripe.defaultCurrency).toLowerCase(),
                     metadata: {
                         bookingId: booking._id.toString(),
                         userId: req.user._id.toString()
@@ -57,7 +58,7 @@ exports.createBooking = async (req, res) => {
                     booking: booking._id,
                     user: req.user._id,
                     amount: totalAmount,
-                    currency: currency || 'USD',
+                    currency: currency || config.stripe.defaultCurrency,
                     method: 'stripe',
                     stripePaymentIntentId: paymentIntent.id,
                     status: 'pending'
@@ -102,7 +103,7 @@ exports.createBooking = async (req, res) => {
 // GET /bookings - Get user's bookings
 exports.getUserBookings = async (req, res) => {
     try {
-        const { page = 1, limit = 10, status } = req.query;
+        const { page = 1, limit = config.pagination.defaultLimit, status } = req.query;
         const query = { user: req.user._id };
         if (status) query.status = status;
 
@@ -172,7 +173,7 @@ exports.cancelBooking = async (req, res) => {
 // GET /admin/bookings
 exports.getAllBookings = async (req, res) => {
     try {
-        const { page = 1, limit = 20, status } = req.query;
+        const { page = 1, limit = config.pagination.adminDefaultLimit, status } = req.query;
         const query = {};
         if (status) query.status = status;
 

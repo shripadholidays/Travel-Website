@@ -1,11 +1,12 @@
 const BlogPost = require('../models/BlogPost');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const config = require('../config');
 
 // GET /blog
 exports.getPosts = async (req, res) => {
     try {
-        const { page = 1, limit = 10, tag, search, status } = req.query;
+        const { page = 1, limit = config.pagination.defaultLimit, tag, search, status } = req.query;
         const query = {};
 
         // Public users only see published posts

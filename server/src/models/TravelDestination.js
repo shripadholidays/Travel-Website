@@ -54,6 +54,7 @@ const travelDestinationSchema = new mongoose.Schema({
         basedOn: { type: Number, default: 0 },
         individualReviews: [reviewSchema],
     },
+    maxGroupSize: { type: Number, default: null },
     isFeatured: { type: Boolean, default: false, index: true },
     status: { type: String, enum: ['active', 'inactive', 'draft'], default: 'active', index: true },
     coordinates: {

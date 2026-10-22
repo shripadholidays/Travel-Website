@@ -3,12 +3,13 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const config = require('../config');
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production';
+const client = new OAuth2Client(config.google.clientId);
+const JWT_SECRET = config.auth.jwtSecret;
 
 module.exports = async function isLoggedIn(req, res, next) {
-    const token = req.cookies?.['wandeazy.token'];
+    const token = req.cookies?.[config.auth.cookieName];
     if (!token) return ResponseHandler.fail(res, 401, 'Unauthorized: No token provided');
 
     // 1) Try our own JWT (manual email/password sessions)

@@ -7,6 +7,7 @@ const NewsletterSubscriber = require('../models/NewsletterSubscriber');
 const Payment = require('../models/Payment');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const config = require('../config');
 
 // GET /admin/stats
 exports.getDashboardStats = async (req, res) => {
@@ -28,7 +29,7 @@ exports.getDashboardStats = async (req, res) => {
             .populate('user', 'displayName email')
             .populate('tour', 'title')
             .sort({ createdAt: -1 })
-            .limit(5);
+            .limit(config.pagination.dashboardRecentLimit);
 
         const bookingsByStatus = await Booking.aggregate([
             { $group: { _id: '$status', count: { $sum: 1 } } }
@@ -52,7 +53,7 @@ exports.getDashboardStats = async (req, res) => {
 // GET /admin/users
 exports.getUsers = async (req, res) => {
     try {
-        const { page = 1, limit = 20, role, search } = req.query;
+        const { page = 1, limit = config.pagination.adminDefaultLimit, role, search } = req.query;
         const query = {};
         if (role) query.role = role;
         if (search) {
@@ -111,7 +112,7 @@ exports.deleteUser = async (req, res) => {
 // GET /admin/inquiries
 exports.getInquiries = async (req, res) => {
     try {
-        const { page = 1, limit = 20, status } = req.query;
+        const { page = 1, limit = config.pagination.adminDefaultLimit, status } = req.query;
         const query = status ? { status } : {};
         const inquiries = await UserInquiry.find(query)
             .sort({ createdAt: -1 })
@@ -144,7 +145,7 @@ exports.updateInquiryStatus = async (req, res) => {
 // GET /admin/subscribers
 exports.getSubscribers = async (req, res) => {
     try {
-        const { page = 1, limit = 50 } = req.query;
+        const { page = 1, limit = config.pagination.subscribersLimit } = req.query;
         const subscribers = await NewsletterSubscriber.find()
             .sort({ createdAt: -1 })
             .skip((Number(page) - 1) * Number(limit))
@@ -175,7 +176,7 @@ exports.deleteSubscriber = async (req, res) => {
 // GET /admin/reviews
 exports.getAllReviews = async (req, res) => {
     try {
-        const { page = 1, limit = 20 } = req.query;
+        const { page = 1, limit = config.pagination.adminDefaultLimit } = req.query;
         const reviews = await Review.find()
             .populate('user', 'displayName email profilePicture')
             .populate('tour', 'title')
@@ -208,7 +209,7 @@ exports.deleteReview = async (req, res) => {
 // GET /admin/payments
 exports.getPayments = async (req, res) => {
     try {
-        const { page = 1, limit = 20 } = req.query;
+        const { page = 1, limit = config.pagination.adminDefaultLimit } = req.query;
         const payments = await Payment.find()
             .populate('user', 'displayName email')
             .populate('booking')

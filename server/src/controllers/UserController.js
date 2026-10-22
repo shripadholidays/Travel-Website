@@ -1,10 +1,55 @@
 const User = require('../models/User');
+const Review = require('../models/Review');
+const Booking = require('../models/Booking');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+
+const REQUIRED_REVIEWS = 5;
+const REQUIRED_ACCOUNT_AGE_DAYS = 30;
 
 // GET /users/profile
 exports.getProfile = (req, res) => {
     ResponseHandler.success(res, { user: req.user }, 'Profile data retrieved successfully.');
+};
+
+// GET /users/write-eligibility
+exports.getWriteEligibility = async (req, res) => {
+    try {
+        const user = req.user;
+        const accountAgeDays = Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+        const isPrivileged = user.role === 'admin' || user.role === 'moderator';
+
+        if (isPrivileged) {
+            return ResponseHandler.success(res, {
+                eligible: true,
+                reviewCount: null,
+                completedBookings: null,
+                accountAgeDays,
+                requirements: { reviews: REQUIRED_REVIEWS, accountAgeDays: REQUIRED_ACCOUNT_AGE_DAYS },
+                reason: 'privileged',
+            });
+        }
+
+        const [reviewCount, completedBookings] = await Promise.all([
+            Review.countDocuments({ user: user._id }),
+            Booking.countDocuments({ user: user._id, status: 'completed' }),
+        ]);
+
+        const ageOk = accountAgeDays >= REQUIRED_ACCOUNT_AGE_DAYS;
+        const engagementOk = reviewCount >= REQUIRED_REVIEWS || completedBookings >= 1;
+        const eligible = ageOk && engagementOk;
+
+        return ResponseHandler.success(res, {
+            eligible,
+            reviewCount,
+            completedBookings,
+            accountAgeDays,
+            requirements: { reviews: REQUIRED_REVIEWS, accountAgeDays: REQUIRED_ACCOUNT_AGE_DAYS },
+        });
+    } catch (err) {
+        logger.error('Error fetching write eligibility', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to fetch eligibility.');
+    }
 };
 
 // PATCH /users/profile

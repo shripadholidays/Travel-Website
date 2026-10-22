@@ -1,11 +1,18 @@
 const express = require('express');
-const { googleLogin, googleCallback, exchangeToken, googleOneTap, loginFailure, logout, register, login } = require('../controllers/AuthController');
+const { googleLogin, googleCallback, exchangeToken, googleOneTap, loginFailure, logout, register, login, forgotPassword, resetPassword, verifyEmail } = require('../controllers/AuthController');
 
 const router = express.Router();
 
 // --- Manual email/password auth ---
 router.post('/register', register);
 router.post('/login', login);
+
+// --- Password reset ---
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+
+// --- Email verification ---
+router.get('/verify-email/:token', verifyEmail);
 
 // --- Google Login ---
 router.get('/login', googleLogin);

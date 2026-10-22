@@ -1,17 +1,17 @@
 const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
+const config = require('../config');
+
+const { host, port, secure, domain, apiKey, fromName, fromAddress, brandColor, accentColor, copyrightYear } = config.email;
 
 let transporter = null;
 
-if (process.env.MAILGUN_HOST && process.env.MAILGUN_API_KEY && process.env.MAILGUN_API_KEY !== 'your_mailgun_api_key') {
+if (host && apiKey && apiKey !== 'your_mailgun_api_key') {
     transporter = nodemailer.createTransport({
-        host: process.env.MAILGUN_HOST,
-        port: process.env.MAILGUN_PORT || 587,
-        secure: process.env.MAILGUN_SECURE === 'true',
-        auth: {
-            user: process.env.MAILGUN_DOMAIN,
-            pass: process.env.MAILGUN_API_KEY,
-        },
+        host,
+        port,
+        secure,
+        auth: { user: domain, pass: apiKey },
     });
 }
 
@@ -30,56 +30,90 @@ const sendEmail = async (mailOptions) => {
     }
 };
 
+function emailLayout(bodyHtml) {
+    return `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: ${brandColor}; padding: 24px; text-align: center;">
+                <h1 style="color: ${accentColor}; margin: 0;">${fromName}</h1>
+            </div>
+            ${bodyHtml}
+            <div style="background: #F8FAFC; padding: 16px; text-align: center; font-size: 12px; color: #64748B;">
+                <p>&copy; ${copyrightYear} ${fromName}. All rights reserved.</p>
+            </div>
+        </div>`;
+}
+
 const sendBookingConfirmation = async (booking, userEmail) => {
     const tourTitle = booking.tour?.title || 'your tour';
     return sendEmail({
-        from: `"Wandeazy" <noreply@${process.env.MAILGUN_DOMAIN || 'wandeazy.com'}>`,
+        from: `"${fromName}" <${fromAddress}>`,
         to: userEmail,
         subject: `Booking Confirmed - ${tourTitle}`,
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #0F172A; padding: 24px; text-align: center;">
-                    <h1 style="color: #F97316; margin: 0;">Wandeazy</h1>
+        html: emailLayout(`
+            <div style="padding: 32px; background: #fff;">
+                <h2 style="color: ${brandColor};">Booking Confirmed!</h2>
+                <p>Your booking for <strong>${tourTitle}</strong> has been confirmed.</p>
+                <div style="background: #F8FAFC; padding: 16px; border-radius: 8px; margin: 16px 0;">
+                    <p><strong>Booking ID:</strong> ${booking._id}</p>
+                    <p><strong>Travel Date:</strong> ${new Date(booking.travelDate).toLocaleDateString()}</p>
+                    <p><strong>Travelers:</strong> ${booking.numberOfTravelers}</p>
+                    <p><strong>Total:</strong> $${booking.totalAmount}</p>
                 </div>
-                <div style="padding: 32px; background: #fff;">
-                    <h2 style="color: #0F172A;">Booking Confirmed!</h2>
-                    <p>Your booking for <strong>${tourTitle}</strong> has been confirmed.</p>
-                    <div style="background: #F8FAFC; padding: 16px; border-radius: 8px; margin: 16px 0;">
-                        <p><strong>Booking ID:</strong> ${booking._id}</p>
-                        <p><strong>Travel Date:</strong> ${new Date(booking.travelDate).toLocaleDateString()}</p>
-                        <p><strong>Travelers:</strong> ${booking.numberOfTravelers}</p>
-                        <p><strong>Total:</strong> $${booking.totalAmount}</p>
-                    </div>
-                    <p>We'll send you more details as your travel date approaches.</p>
-                </div>
-                <div style="background: #F8FAFC; padding: 16px; text-align: center; font-size: 12px; color: #64748B;">
-                    <p>&copy; 2025 Wandeazy. All rights reserved.</p>
-                </div>
-            </div>
-        `
+                <p>We'll send you more details as your travel date approaches.</p>
+            </div>`),
     });
 };
 
 const sendInquiryAcknowledgment = async (inquiry) => {
     return sendEmail({
-        from: `"Wandeazy" <noreply@${process.env.MAILGUN_DOMAIN || 'wandeazy.com'}>`,
+        from: `"${fromName}" <${fromAddress}>`,
         to: inquiry.email,
         subject: 'We received your travel inquiry!',
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #0F172A; padding: 24px; text-align: center;">
-                    <h1 style="color: #F97316; margin: 0;">Wandeazy</h1>
-                </div>
-                <div style="padding: 32px; background: #fff;">
-                    <h2 style="color: #0F172A;">Hi ${inquiry.fullName}!</h2>
-                    <p>Thank you for your travel inquiry. Our team will review your request and get back to you within 24 hours.</p>
-                </div>
-                <div style="background: #F8FAFC; padding: 16px; text-align: center; font-size: 12px; color: #64748B;">
-                    <p>&copy; 2025 Wandeazy. All rights reserved.</p>
-                </div>
-            </div>
-        `
+        html: emailLayout(`
+            <div style="padding: 32px; background: #fff;">
+                <h2 style="color: ${brandColor};">Hi ${inquiry.fullName}!</h2>
+                <p>Thank you for your travel inquiry. Our team will review your request and get back to you within 24 hours.</p>
+            </div>`),
     });
 };
 
-module.exports = { sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment };
+const sendPasswordResetEmail = async (userEmail, resetUrl) => {
+    return sendEmail({
+        from: `"${fromName}" <${fromAddress}>`,
+        to: userEmail,
+        subject: 'Reset your password',
+        html: emailLayout(`
+            <div style="padding: 32px; background: #fff;">
+                <h2 style="color: ${brandColor}; margin-top: 0;">Reset your password</h2>
+                <p>We received a request to reset your password. Click the button below to choose a new one.</p>
+                <p style="text-align: center; margin: 32px 0;">
+                    <a href="${resetUrl}" style="display: inline-block; background: ${accentColor}; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                        Reset Password
+                    </a>
+                </p>
+                <p style="color: #64748B; font-size: 14px;">This link expires in 1 hour. If you did not request a password reset, you can safely ignore this email.</p>
+                <p style="color: #64748B; font-size: 12px; word-break: break-all;">Or copy this link: ${resetUrl}</p>
+            </div>`),
+    });
+};
+
+const sendVerificationEmail = async (userEmail, verifyUrl) => {
+    return sendEmail({
+        from: `"${fromName}" <${fromAddress}>`,
+        to: userEmail,
+        subject: `Verify your ${fromName} account`,
+        html: emailLayout(`
+            <div style="padding: 32px; background: #fff;">
+                <h2 style="color: ${brandColor}; margin-top: 0;">Verify your email</h2>
+                <p>Thanks for signing up! Click the button below to verify your email address and activate your account.</p>
+                <p style="text-align: center; margin: 32px 0;">
+                    <a href="${verifyUrl}" style="display: inline-block; background: ${accentColor}; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                        Verify Email
+                    </a>
+                </p>
+                <p style="color: #64748B; font-size: 14px;">This link expires in 24 hours. If you didn't create an account, you can safely ignore this email.</p>
+            </div>`),
+    });
+};
+
+module.exports = { sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail };

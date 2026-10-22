@@ -1,27 +1,27 @@
+const crypto = require('crypto');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
+const config = require('../config');
+const { sendPasswordResetEmail, sendVerificationEmail } = require('../services/email-service');
 
-if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET environment variable is required in production.');
-}
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-insecure-secret';
-const TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const { jwtSecret, tokenMaxAgeDays, oneTapMaxAgeMs, cookieName, sidCookieName, cookieSameSite } = config.auth;
+const TOKEN_MAX_AGE_MS = tokenMaxAgeDays * 24 * 60 * 60 * 1000;
 
-// Issues our own session JWT and sets it in the auth cookie.
 function setAuthCookie(res, user) {
     const token = jwt.sign(
         { sub: user._id.toString(), email: user.email, provider: 'local' },
-        JWT_SECRET,
-        { expiresIn: '7d' }
+        jwtSecret,
+        { expiresIn: `${tokenMaxAgeDays}d` }
     );
-    res.cookie('wandeazy.token', token, {
+    const isProd = config.app.nodeEnv === 'production';
+    res.cookie(cookieName, token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: TOKEN_MAX_AGE,
-        sameSite: process.env.COOKIE_SAME_SITE || 'lax',
+        secure: isProd,
+        maxAge: TOKEN_MAX_AGE_MS,
+        sameSite: cookieSameSite,
     });
 }
 
@@ -35,7 +35,7 @@ function publicUser(user) {
     };
 }
 
-// POST /auth/register — email/password signup
+// POST /auth/register
 exports.register = async (req, res) => {
     try {
         const { displayName, email, password } = req.body || {};
@@ -51,22 +51,32 @@ exports.register = async (req, res) => {
             return ResponseHandler.fail(res, 409, 'An account with this email already exists.');
         }
 
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 h
+
         const user = await User.create({
             displayName: displayName.trim(),
             email: email.toLowerCase().trim(),
             password,
             authProvider: 'local',
+            emailVerificationToken: verificationToken,
+            emailVerificationTokenExpiry: verificationExpiry,
         });
 
+        const isProd = config.app.nodeEnv === 'production';
+        const frontendOrigin = isProd ? config.cors.productionOrigin : config.cors.localOrigin;
+        const verifyUrl = `${frontendOrigin}/verify-email/${verificationToken}`;
+        sendVerificationEmail(user.email, verifyUrl).catch(() => {}); // fire-and-forget
+
         setAuthCookie(res, user);
-        return ResponseHandler.success(res, { user: publicUser(user) }, 'Account created successfully!');
+        return ResponseHandler.success(res, { user: publicUser(user) }, 'Account created! Please check your email to verify your account.');
     } catch (err) {
         logger.error('Registration failed', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to create account.');
     }
 };
 
-// POST /auth/login — email/password login
+// POST /auth/login
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body || {};
@@ -92,34 +102,35 @@ exports.login = async (req, res) => {
     }
 };
 
-// Redirect to Google OAuth page
+// GET /auth/login — redirect to Google OAuth
 exports.googleLogin = (req, res) => {
     const redirectUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     redirectUrl.searchParams.set('response_type', 'code');
-    redirectUrl.searchParams.set('client_id', process.env.GOOGLE_CLIENT_ID);
-    redirectUrl.searchParams.set('redirect_uri', process.env.GOOGLE_CALLBACK_URL);
+    redirectUrl.searchParams.set('client_id', config.google.clientId);
+    redirectUrl.searchParams.set('redirect_uri', config.google.callbackUrl);
     redirectUrl.searchParams.set('scope', 'openid profile email');
     redirectUrl.searchParams.set('access_type', 'offline');
     redirectUrl.searchParams.set('prompt', 'consent');
-
     res.redirect(redirectUrl.toString());
 };
 
-// Google callback after login
+// GET /auth/callback — Google OAuth callback
 exports.googleCallback = async (req, res) => {
     const { code } = req.query;
-
     if (!code) return ResponseHandler.fail(res, 400, 'Authorization code is required.');
+
+    const isProd = config.app.nodeEnv === 'production';
+    const frontendOrigin = isProd ? config.cors.productionOrigin : config.cors.localOrigin;
 
     try {
         const { data: tokenData } = await axios.post(
             'https://oauth2.googleapis.com/token',
             new URLSearchParams({
                 code,
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                redirect_uri: process.env.GOOGLE_CALLBACK_URL,
-                grant_type: 'authorization_code'
+                client_id:     config.google.clientId,
+                client_secret: config.google.clientSecret,
+                redirect_uri:  config.google.callbackUrl,
+                grant_type:    'authorization_code',
             }).toString(),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
@@ -132,47 +143,38 @@ exports.googleCallback = async (req, res) => {
             user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google' });
         }
 
-        // Set secure cookies
-        res.cookie('wandeazy.token', tokenData.id_token, {
+        const cookieOpts = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: isProd,
             maxAge: tokenData.expires_in * 1000,
-            sameSite: process.env.COOKIE_SAME_SITE || "none",
-        });
+            sameSite: cookieSameSite,
+        };
+        res.cookie(cookieName,    tokenData.id_token,     cookieOpts);
+        res.cookie(sidCookieName, tokenData.access_token, cookieOpts);
 
-        res.cookie('wandeazy.sid', tokenData.access_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: tokenData.expires_in * 1000,
-            sameSite: process.env.COOKIE_SAME_SITE || "none",
-        });
-
-        // Redirect to dashboard (frontend can read user info from cookies)
-        return res.redirect(`${process.env.PRODUCTION_FRONTEND_ORIGIN}`);
-
+        return res.redirect(`${frontendOrigin}/dashboard`);
     } catch (error) {
         logger.error('Error during Google callback', { error: error.response?.data || error.message });
         return ResponseHandler.error(res, 500, 'Google token exchange failed');
     }
 };
 
-// Token exchange endpoint (if needed)
+// POST /auth/token — token exchange (for SPA OAuth code flow)
 exports.exchangeToken = async (req, res) => {
-    // Only accept the auth code from the client. Secrets/client_id come from env ONLY —
-    // never trust these from the request body.
     const { code } = req.body;
-
     if (!code) return ResponseHandler.fail(res, 400, 'Authorization code is required.');
+
+    const isProd = config.app.nodeEnv === 'production';
 
     try {
         const { data: tokenData } = await axios.post(
             'https://oauth2.googleapis.com/token',
             new URLSearchParams({
                 code,
-                grant_type: 'authorization_code',
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                redirect_uri: process.env.GOOGLE_CALLBACK_URL
+                grant_type:    'authorization_code',
+                client_id:     config.google.clientId,
+                client_secret: config.google.clientSecret,
+                redirect_uri:  config.google.callbackUrl,
             }).toString(),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
@@ -185,40 +187,36 @@ exports.exchangeToken = async (req, res) => {
             user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google' });
         }
 
-        res.cookie('wandeazy.token', tokenData.id_token, {
+        const cookieOpts = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: isProd,
             maxAge: tokenData.expires_in * 1000,
-            sameSite: process.env.COOKIE_SAME_SITE || "none",
-        });
-
-        res.cookie('wandeazy.sid', tokenData.access_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: tokenData.expires_in * 1000,
-            sameSite: process.env.COOKIE_SAME_SITE || "none",
-        });
+            sameSite: cookieSameSite,
+        };
+        res.cookie(cookieName,    tokenData.id_token,     cookieOpts);
+        res.cookie(sidCookieName, tokenData.access_token, cookieOpts);
 
         return ResponseHandler.token(res, tokenData);
-
     } catch (err) {
         logger.error('Error in /token route', { error: err.message });
         return ResponseHandler.error(res, 500, 'Internal Server Error during token exchange.');
     }
 };
 
-// Google One Tap / Sign-In with Google (receives credential = ID token directly)
+// POST /auth/google — Google One Tap (receives ID token directly)
 exports.googleOneTap = async (req, res) => {
     const { credential } = req.body;
     if (!credential) return ResponseHandler.fail(res, 400, 'Google credential is required.');
 
+    const isProd = config.app.nodeEnv === 'production';
+
     try {
         const { OAuth2Client } = require('google-auth-library');
-        const oauthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const oauthClient = new OAuth2Client(config.google.clientId);
 
         const ticket = await oauthClient.verifyIdToken({
             idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: config.google.clientId,
         });
 
         const payload = ticket.getPayload();
@@ -229,40 +227,116 @@ exports.googleOneTap = async (req, res) => {
             user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google' });
         }
 
-        res.cookie('wandeazy.token', credential, {
+        res.cookie(cookieName, credential, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 60 * 60 * 1000,
-            sameSite: process.env.COOKIE_SAME_SITE || 'none',
+            secure: isProd,
+            maxAge: oneTapMaxAgeMs,
+            sameSite: cookieSameSite,
         });
 
-        return ResponseHandler.success(res, { user: {
-            _id: user._id,
-            googleId: user.googleId,
-            displayName: user.displayName,
-            email: user.email,
-            profilePicture: user.profilePicture,
-            role: user.role,
-        }}, 'Logged in successfully!');
+        return ResponseHandler.success(res, {
+            user: {
+                _id: user._id, googleId: user.googleId, displayName: user.displayName,
+                email: user.email, profilePicture: user.profilePicture, role: user.role,
+            }
+        }, 'Logged in successfully!');
     } catch (err) {
         logger.error('Google One Tap verification failed', { error: err.message });
         return ResponseHandler.fail(res, 401, 'Invalid Google credential');
     }
 };
 
-// Login failure
 exports.loginFailure = (req, res) => {
     ResponseHandler.fail(res, 401, 'Authentication failed!');
 };
 
-// Logout
-exports.logout = (req, res, next) => {
-    const secure = process.env.NODE_ENV === 'production';
-    const sameSite = process.env.COOKIE_SAME_SITE || (secure ? 'none' : 'lax');
-    res.clearCookie('wandeazy.sid', { sameSite, secure, path: '/' });
-    res.clearCookie('wandeazy.token', { sameSite, secure, path: '/' });
+exports.logout = (req, res) => {
+    const isProd = config.app.nodeEnv === 'production';
+    const sameSite = cookieSameSite;
+    res.clearCookie(sidCookieName, { sameSite, secure: isProd, path: '/' });
+    res.clearCookie(cookieName,    { sameSite, secure: isProd, path: '/' });
     if (req.session) {
         return req.session.destroy(() => ResponseHandler.success(res, null, 'Logged out successfully!'));
     }
     return ResponseHandler.success(res, null, 'Logged out successfully!');
+};
+
+// POST /auth/forgot-password
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body || {};
+        if (!email) return ResponseHandler.fail(res, 400, 'Email is required.');
+
+        const user = await User.findOne({ email: email.toLowerCase() });
+        // Always respond the same way — don't reveal whether the account exists
+        if (!user || user.authProvider !== 'local') {
+            return ResponseHandler.success(res, null, 'If an account with that email exists, a reset link has been sent.');
+        }
+
+        const token = crypto.randomBytes(32).toString('hex');
+        user.resetPasswordToken = token;
+        user.resetPasswordExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+        await user.save();
+
+        const isProd = config.app.nodeEnv === 'production';
+        const frontendOrigin = isProd ? config.cors.productionOrigin : config.cors.localOrigin;
+        const resetUrl = `${frontendOrigin}/reset-password/${token}`;
+        await sendPasswordResetEmail(user.email, resetUrl);
+
+        return ResponseHandler.success(res, null, 'If an account with that email exists, a reset link has been sent.');
+    } catch (err) {
+        logger.error('Forgot password failed', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to process request.');
+    }
+};
+
+// POST /auth/reset-password/:token
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body || {};
+        if (!password) return ResponseHandler.fail(res, 400, 'New password is required.');
+        if (password.length < 6) return ResponseHandler.fail(res, 400, 'Password must be at least 6 characters.');
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiry: { $gt: new Date() },
+        }).select('+resetPasswordToken +resetPasswordExpiry');
+
+        if (!user) return ResponseHandler.fail(res, 400, 'Reset link is invalid or has expired.');
+
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiry = undefined;
+        await user.save();
+
+        return ResponseHandler.success(res, null, 'Password reset successfully. You can now sign in.');
+    } catch (err) {
+        logger.error('Reset password failed', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to reset password.');
+    }
+};
+
+// GET /auth/verify-email/:token
+exports.verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        const user = await User.findOne({
+            emailVerificationToken: token,
+            emailVerificationTokenExpiry: { $gt: new Date() },
+        }).select('+emailVerificationToken +emailVerificationTokenExpiry');
+
+        if (!user) return ResponseHandler.fail(res, 400, 'Verification link is invalid or has expired.');
+
+        user.isEmailVerified = true;
+        user.emailVerificationToken = undefined;
+        user.emailVerificationTokenExpiry = undefined;
+        await user.save();
+
+        return ResponseHandler.success(res, { user: publicUser(user) }, 'Email verified successfully!');
+    } catch (err) {
+        logger.error('Email verification failed', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to verify email.');
+    }
 };

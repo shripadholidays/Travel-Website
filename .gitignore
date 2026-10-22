@@ -31,3 +31,6 @@ Thumbs.db
 # Uploads (local storage — not committed)
 server/uploads/*
 !server/uploads/.gitkeep
+
+# One-time admin bootstrap script (contains a hardcoded password)
+server/create-admin.js
