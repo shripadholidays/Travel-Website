@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { api } from '@/services/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, MoreHorizontal, Mail, Phone } from 'lucide-react';
+import { MoreHorizontal, Mail, Phone, MessageSquare } from 'lucide-react';
+import { EmptyState, PageHeader, SearchField, StatusTabs, TableFooter } from '@/components/admin/AdminUI';
+import { toQuery } from '@/hooks/use-admin';
+import { useDebounced } from '@/hooks/use-debounced';
+import type { Pagination } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -62,10 +65,11 @@ function tripSummary(i: Inquiry) {
     return parts.length ? parts.join(' · ') : 'Dates flexible';
 }
 
-function useInquiries() {
+function useInquiries(params: { status: string; search: string; page: number }) {
     return useQuery({
-        queryKey: ['admin', 'inquiries'],
-        queryFn: () => api.get<{ inquiries: Inquiry[] }>('/admin/inquiries'),
+        queryKey: ['admin', 'inquiries', params],
+        queryFn: () => api.get<{ inquiries: Inquiry[]; statusCounts: Partial<Record<Inquiry['status'], number>>; pagination: Pagination }>(`/admin/inquiries${toQuery(params)}`),
+        placeholderData: keepPreviousData,
     });
 }
 
@@ -74,61 +78,53 @@ function useUpdateInquiry() {
     return useMutation({
         mutationFn: ({ id, status }: { id: string; status: string }) =>
             api.patch(`/admin/inquiries/${id}`, { status }),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'inquiries'] }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ['admin', 'inquiries'] });
+            qc.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        },
     });
 }
 
 export const AdminInquiries = () => {
+    const [params, setParams] = useSearchParams();
+    const filter = params.get('status') ?? 'all';
+    const page = Number(params.get('page') || 1);
     const [search, setSearch] = useState('');
-    const [filter, setFilter] = useState<string>('all');
+    const debounced = useDebounced(search, 300);
+    const setParam = (key: string, value: string) => {
+        const next = new URLSearchParams(params);
+        if (value && value !== 'all' && !(key === 'page' && value === '1')) next.set(key, value); else next.delete(key);
+        if (key !== 'page') next.delete('page');
+        setParams(next, { replace: true });
+    };
     const [selected, setSelected] = useState<Inquiry | null>(null);
-    const { data, isLoading } = useInquiries();
+    const { data, isLoading } = useInquiries({ status: filter, search: debounced, page });
     const updateStatus = useUpdateInquiry();
+    const inquiries = data?.inquiries ?? [];
+    const counts = data?.statusCounts ?? {};
 
-    const inquiries = (data?.inquiries ?? []).filter(i => {
-        const q = search.toLowerCase();
-        const matchSearch = !q || [i.fullName, i.email, i.message, i.context].some(v => (v || '').toLowerCase().includes(q));
-        const matchFilter = filter === 'all' || i.status === filter;
-        return matchSearch && matchFilter;
-    });
-
-    const changeStatus = async (id: string, status: string) => {
-        const toastId = toast.loading('Updating…');
+    const changeStatus = async (id: string, status: string, quiet = false) => {
         try {
             await updateStatus.mutateAsync({ id, status });
-            toast.success('Status updated', { id: toastId });
+            if (!quiet) toast.success(`Marked ${status}`);
         } catch {
-            toast.error('Failed to update', { id: toastId });
+            toast.error('Failed to update');
         }
     };
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Inquiries</h2>
-                <p className="text-muted-foreground">Messages from the Contact page, the homepage message box, and tour and destination pages.</p>
-            </div>
+            <PageHeader title="Inquiries" description="Messages from the Contact page, the homepage message box, and tour and destination pages. Opening one marks it read." />
 
             <Card>
-                <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between gap-3">
-                        <CardTitle>All Inquiries</CardTitle>
-                        <div className="flex items-center gap-2">
-                            <Select value={filter} onValueChange={setFilter}>
-                                <SelectTrigger className="w-32 h-9"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All</SelectItem>
-                                    <SelectItem value="new">New</SelectItem>
-                                    <SelectItem value="read">Read</SelectItem>
-                                    <SelectItem value="replied">Replied</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <div className="relative w-56">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="Search…" className="pl-9 h-9" value={search} onChange={e => setSearch(e.target.value)} />
-                            </div>
-                        </div>
-                    </div>
+                <CardHeader className="pb-3 space-y-4">
+                    <StatusTabs value={filter} onChange={(v) => setParam('status', v)} options={[
+                        { id: 'all', label: 'All', count: (counts.new ?? 0) + (counts.read ?? 0) + (counts.replied ?? 0) },
+                        { id: 'new', label: 'New', count: counts.new ?? 0, tone: 'orange' },
+                        { id: 'read', label: 'Read', count: counts.read ?? 0 },
+                        { id: 'replied', label: 'Replied', count: counts.replied ?? 0 },
+                    ]} />
+                    <SearchField value={search} onChange={(v) => { setSearch(v); setParam('page', '1'); }} placeholder="Name, email or message…" className="sm:w-80" />
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
@@ -138,24 +134,24 @@ export const AdminInquiries = () => {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>From</TableHead>
-                                    <TableHead>Trip / Message</TableHead>
-                                    <TableHead>Date</TableHead>
+                                    <TableHead className="hidden md:table-cell">Trip / Message</TableHead>
+                                    <TableHead className="hidden sm:table-cell">Date</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {inquiries.length > 0 ? inquiries.map(inquiry => (
-                                    <TableRow key={inquiry._id} className="cursor-pointer" onClick={() => { setSelected(inquiry); changeStatus(inquiry._id, inquiry.status === 'new' ? 'read' : inquiry.status); }}>
+                                    <TableRow key={inquiry._id} className="cursor-pointer" onClick={() => { setSelected(inquiry); if (inquiry.status === 'new') changeStatus(inquiry._id, 'read', true); }}>
                                         <TableCell>
                                             <p className="font-semibold">{inquiry.fullName}</p>
                                             <p className="text-xs text-muted-foreground">{inquiry.email}</p>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <p className="text-sm font-medium truncate max-w-[220px]">{tripSummary(inquiry)}</p>
                                             <p className="text-xs text-muted-foreground truncate max-w-[220px]">{inquiry.message || 'No message'}</p>
                                         </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground">
+                                        <TableCell className="hidden sm:table-cell text-sm text-muted-foreground whitespace-nowrap">
                                             {format(new Date(inquiry.createdAt), 'MMM d, yyyy')}
                                         </TableCell>
                                         <TableCell>
@@ -185,12 +181,13 @@ export const AdminInquiries = () => {
                                     </TableRow>
                                 )) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No inquiries found.</TableCell>
+                                        <TableCell colSpan={5}><EmptyState icon={MessageSquare} title="No inquiries found" description={debounced || filter !== 'all' ? 'Try another search or status.' : 'Messages from travellers will appear here.'} /></TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
                         </Table>
                     )}
+                    <TableFooter pagination={data?.pagination} onPageChange={(p) => setParam('page', String(p))} noun="inquiries" />
                 </CardContent>
             </Card>
 

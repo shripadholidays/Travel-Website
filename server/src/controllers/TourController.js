@@ -217,7 +217,8 @@ function normalizeTour(input = {}, { partial = false } = {}) {
     if (!partial || 'currency' in data) data.currency = 'USD';
     if (typeof data.title === 'string') data.title = data.title.trim();
     if (typeof data.location === 'string') data.location = data.location.trim();
-    if ('price' in data) data.price = Number(data.price);
+    if ('price' in data) data.price = Number(data.price) || 0;
+    if (!partial && !data.duration) data.duration = { days: 1 };
     if (data.duration) {
         const days = Math.max(1, Math.round(Number(data.duration.days) || 1));
         const rawNights = data.duration.nights;
@@ -286,12 +287,12 @@ exports.createTour = async (req, res) => {
 // PUT /tours/:id
 exports.updateTour = async (req, res) => {
     try {
-        const tour = await TravelDestination.findByIdAndUpdate(
-            req.params.id,
-            { ...normalizeTour(req.body, { partial: true }), updatedBy: req.user._id },
-            { new: true, runValidators: true }
-        ).populate('updatedBy', 'displayName');
+        // Loaded and saved as a document, so "required once live" rules see the tour's real status
+        const tour = await TravelDestination.findById(req.params.id);
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
+        tour.set({ ...normalizeTour(req.body, { partial: true }), updatedBy: req.user._id });
+        await tour.save();
+        await tour.populate('updatedBy', 'displayName');
         return ResponseHandler.success(res, { tour }, 'Tour updated successfully');
     } catch (err) {
         if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationMessage(err));
@@ -384,6 +385,26 @@ exports.bulkTourAction = async (req, res) => {
         }
         const update = BULK_ACTIONS[action];
         if (!update) return ResponseHandler.fail(res, 400, 'Unknown action.');
+
+        // Publishing checks each tour has what a live listing needs
+        if (action === 'active') {
+            const tours = await TravelDestination.find({ _id: { $in: ids } });
+            const incomplete = [];
+            let affected = 0;
+            for (const tour of tours) {
+                if (tour.status === 'active') continue;
+                tour.set({ status: 'active', updatedBy: req.user._id });
+                const err = tour.validateSync();
+                if (err) { incomplete.push({ _id: tour._id, title: tour.title, error: validationMessage(err) }); continue; }
+                await tour.save();
+                affected += 1;
+            }
+            const message = incomplete.length
+                ? `Published ${affected}. ${incomplete.length} still need details: ${incomplete.map((t) => t.title).join(', ')}.`
+                : `Published ${affected} tour(s).`;
+            return ResponseHandler.success(res, { affected, skipped: incomplete.length, incomplete }, message);
+        }
+
         const result = await TravelDestination.updateMany({ _id: { $in: ids } }, { ...update, updatedBy: req.user._id });
         return ResponseHandler.success(res, { affected: result.modifiedCount, skipped: 0 }, `Updated ${result.modifiedCount} tour(s).`);
     } catch (err) {

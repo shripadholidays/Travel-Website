@@ -119,11 +119,14 @@ exports.getSettings = async (req, res) => {
 };
 
 // PUT /admin/settings  — generic partial update for all top-level fields
-const CONTENT_KEYS = ['offerBar', 'heroSlides', 'promoSlides', 'planTrip', 'testimonials', 'supportSection', 'faqs', 'aboutPage'];
+// Page content, including the menu and footer links, belongs to content editors
+const CONTENT_KEYS = [
+    'offerBar', 'heroSlides', 'promoSlides', 'planTrip', 'testimonials', 'supportSection', 'faqs', 'aboutPage',
+    'navLinks', 'footerExploreLinks', 'footerCompanyLinks',
+];
 const SYSTEM_KEYS = [
     'companyName', 'contactEmail', 'contactPhone', 'address',
-    'socialLinks', 'footer', 'footerExploreLinks', 'footerCompanyLinks',
-    'navLinks', 'features', 'travelMarkup',
+    'socialLinks', 'footer', 'features', 'travelMarkup',
 ];
 const UPDATABLE = [...SYSTEM_KEYS, ...CONTENT_KEYS];
 

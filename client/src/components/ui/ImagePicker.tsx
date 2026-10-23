@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Upload, Link, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUploadFile } from '@/hooks/use-upload';
@@ -17,13 +17,26 @@ export function ImagePicker({ value, onChange, label = 'Image', className }: Ima
     const fileRef = useRef<HTMLInputElement>(null);
     const upload = useUploadFile();
 
+    // Follow the saved value (a tour loading, or a list item moving into this slot)
+    useEffect(() => setUrlInput(value || ''), [value]);
+
     const handleUrlApply = () => {
-        onChange(urlInput.trim());
+        const url = urlInput.trim();
+        if (url && !/^(https?:\/\/|\/)/i.test(url)) {
+            toast.error('Use a full image address starting with https://');
+            return;
+        }
+        if (url !== value) onChange(url);
     };
 
     const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error('That image is over 10 MB. Please use a smaller one.');
+            e.target.value = '';
+            return;
+        }
         try {
             const result = await upload.mutateAsync(file);
             onChange(result.url);
@@ -70,12 +83,13 @@ export function ImagePicker({ value, onChange, label = 'Image', className }: Ima
                         value={urlInput}
                         onChange={(e) => setUrlInput(e.target.value)}
                         onBlur={handleUrlApply}
-                        onKeyDown={(e) => e.key === 'Enter' && handleUrlApply()}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleUrlApply(); } }}
+                        aria-label={label ? `${label} address` : 'Image address'}
                         placeholder="https://example.com/image.jpg"
                         className="flex-1 h-9 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
                     />
                     {value && (
-                        <button type="button" onClick={handleClear} className="text-slate-400 hover:text-red-500 transition-colors">
+                        <button type="button" onClick={handleClear} aria-label="Remove image" className="text-slate-400 hover:text-red-500 transition-colors">
                             <X className="w-4 h-4" />
                         </button>
                     )}
@@ -108,6 +122,7 @@ export function ImagePicker({ value, onChange, label = 'Image', className }: Ima
                     <button
                         type="button"
                         onClick={handleClear}
+                        aria-label="Remove image"
                         className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-red-500 text-white rounded-full flex items-center justify-center transition-colors"
                     >
                         <X className="w-3 h-3" />

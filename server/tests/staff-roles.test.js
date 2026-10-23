@@ -141,6 +141,25 @@ describe('listing tours', () => {
         expect(res.body.message).toMatch(/at least \$1/);
     });
 
+    it('saves an unfinished draft, but only publishes a complete tour', async () => {
+        const draft = await request(app).post('/api/v1/tours').set(as(editor)).send({ title: 'Idea: Lofoten', location: 'Lofoten, Norway', status: 'draft' });
+        expect(draft.status).toBe(200);
+        const id = draft.body.data.tour._id;
+
+        const publish = await request(app).put(`/api/v1/tours/${id}`).set(as(editor)).send({ status: 'active' });
+        expect(publish.status).toBe(400);
+        expect(publish.body.message).toMatch(/cover image/);
+
+        const bulk = await request(app).post('/api/v1/tours/bulk-action').set(as(editor)).send({ ids: [id], action: 'active' });
+        expect(bulk.body.data).toMatchObject({ affected: 0, skipped: 1 });
+
+        const finished = await request(app).put(`/api/v1/tours/${id}`).set(as(editor)).send({
+            status: 'active', price: 1200, imageURL: 'https://example.com/l.jpg', overview: { about: 'Fjords and fishing villages.', gallery: [] },
+        });
+        expect(finished.status).toBe(200);
+        expect(finished.body.data.tour.updatedBy.displayName).toBe(editor.displayName);
+    });
+
     it('will not delete a booked tour, and removes deleted tours from collections', async () => {
         const booked = await tour();
         const spare = await tour({ title: 'Spare' });

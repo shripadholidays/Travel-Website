@@ -29,6 +29,7 @@ import { OfferBar } from '@/components/ui/OfferBar';
 import { useEnabledFeatures } from '@/hooks/use-feature';
 import { withFeatureLinks } from '@/lib/feature-links';
 import { rememberReturnTo } from '@/lib/return-to';
+import { adminHome, hasPermission, isStaff } from '@/lib/admin-access';
 
 const DEFAULT_NAV = [
     { label: 'Destinations', path: '/destinations', order: 0 },
@@ -65,8 +66,7 @@ export const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showOffer, setShowOffer] = useState(true);
     const { currency, setCurrency } = useCurrency();
-    const { user, logout, isAdmin } = useAuth();
-    const isModerator = user?.role === 'moderator';
+    const { user, logout } = useAuth();
     const location = useLocation();
     const { data: settingsData } = usePublicSettings();
     const settingsNavLinks = settingsData?.settings?.navLinks;
@@ -138,7 +138,9 @@ export const Navbar = () => {
         { to: '/dashboard?tab=articles', label: 'My articles', icon: FileText },
         { to: '/dashboard?tab=settings', label: 'Settings', icon: Settings },
     ];
-    const adminLink = isAdmin ? '/admin/dashboard' : isModerator ? '/admin/blog' : null;
+    const adminLink = isStaff(user) ? adminHome(user) : null;
+    // Moderators only review articles, so name the link after what they do there
+    const adminLabel = hasPermission(user, 'dashboard.view') ? 'Admin Panel' : 'Review articles';
 
     return (
         <div className={cn(
@@ -262,7 +264,7 @@ export const Navbar = () => {
                                             ))}
                                             {adminLink && (
                                                 <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-brand-light/60">
-                                                    <Link to={adminLink}><ShieldCheck className="w-4 h-4 mr-2.5 text-brand-orange" /> {isAdmin ? 'Admin Panel' : 'Review articles'}</Link>
+                                                    <Link to={adminLink}><ShieldCheck className="w-4 h-4 mr-2.5 text-brand-orange" /> {adminLabel}</Link>
                                                 </DropdownMenuItem>
                                             )}
                                             <DropdownMenuSeparator className="bg-slate-200/60" />
@@ -378,7 +380,7 @@ export const Navbar = () => {
                                             </Link>
                                             {adminLink && (
                                                 <Link to={adminLink} className="flex items-center gap-3 p-3 rounded-2xl text-brand-blue font-medium hover:bg-brand-light/50">
-                                                    <ShieldCheck className="w-4 h-4 text-brand-orange" /> {isAdmin ? 'Admin Panel' : 'Review articles'}
+                                                    <ShieldCheck className="w-4 h-4 text-brand-orange" /> {adminLabel}
                                                 </Link>
                                             )}
                                             <Button variant="ghost" className="mt-2 w-full gap-2 text-red-600 hover:text-red-600 hover:bg-red-50" onClick={() => { logout(); setIsMobileMenuOpen(false); }}>

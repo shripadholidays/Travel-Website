@@ -1,4 +1,6 @@
 import { lazy, Suspense } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { adminHome } from '@/lib/admin-access';
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { Home } from '@/pages/Home';
@@ -60,6 +62,7 @@ const AdminSubscribers = lazy(() => import('@/pages/admin/AdminSubscribers').the
 const AdminReviews = lazy(() => import('@/pages/admin/AdminReviews').then((m) => ({ default: m.AdminReviews })));
 const AdminPayments = lazy(() => import('@/pages/admin/AdminPayments').then((m) => ({ default: m.AdminPayments })));
 const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then((m) => ({ default: m.AdminCoupons })));
+const AdminActivity = lazy(() => import('@/pages/admin/AdminActivity').then((m) => ({ default: m.AdminActivity })));
 const AdminTravelOrders = lazy(() => import('@/pages/admin/AdminTravelOrders').then((m) => ({ default: m.AdminTravelOrders })));
 
 const PageFallback = () => (
@@ -81,6 +84,11 @@ const RootLayout = () => {
             </CurrencyProvider>
         </AuthProvider>
     );
+};
+
+const AdminHomeRedirect = () => {
+    const { user } = useAuth();
+    return <Navigate to={adminHome(user)} replace />;
 };
 
 const router = createBrowserRouter([
@@ -174,6 +182,9 @@ const router = createBrowserRouter([
 
                             // System
                             { path: "settings", element: <AdminSettings /> },
+                            { path: "activity", element: <AdminActivity /> },
+                            // /admin on its own: the right first page for the role
+                            { index: true, element: <AdminHomeRedirect /> },
                         ]
                     },
                 ]

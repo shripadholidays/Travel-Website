@@ -50,6 +50,7 @@ export function ListEditor<T>({
                             type="button"
                             disabled={i === 0}
                             onClick={() => move(i, i - 1)}
+                            aria-label={`Move item ${i + 1} up`}
                             className="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:text-slate-700 disabled:opacity-20 hover:bg-slate-100"
                         >
                             <ChevronUp className="w-3.5 h-3.5" />
@@ -58,6 +59,7 @@ export function ListEditor<T>({
                             type="button"
                             disabled={i === items.length - 1}
                             onClick={() => move(i, i + 1)}
+                            aria-label={`Move item ${i + 1} down`}
                             className="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:text-slate-700 disabled:opacity-20 hover:bg-slate-100"
                         >
                             <ChevronDown className="w-3.5 h-3.5" />
@@ -73,6 +75,7 @@ export function ListEditor<T>({
                     <button
                         type="button"
                         onClick={() => remove(i)}
+                        aria-label={`Remove item ${i + 1}`}
                         className="mt-1 shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors"
                     >
                         <Trash2 className="w-4 h-4" />

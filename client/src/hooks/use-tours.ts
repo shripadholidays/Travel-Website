@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { api } from '@/services/api';
-import type { Tour, PaginatedData } from '@/types';
+import type { Tour, PaginatedData, Pagination } from '@/types';
+import { toQuery } from '@/hooks/use-admin';
 
 interface TourFilters {
     page?: number;
@@ -31,6 +32,38 @@ export function useTours(filters: TourFilters = {}, options: { enabled?: boolean
         queryKey: ['tours', filters],
         queryFn: () => api.get<PaginatedData<Tour>>(`/tours${query ? `?${query}` : ''}`),
         enabled: options.enabled ?? true,
+    });
+}
+
+export type TourStatus = NonNullable<Tour['status']>;
+
+/** The admin catalog list: every status, with counts for the status tabs. */
+export function useAdminTours(filters: { search?: string; status?: string; sort?: string; page?: number; limit?: number }) {
+    return useQuery({
+        queryKey: ['tours', 'admin', filters],
+        queryFn: () => api.get<{ tours: Tour[]; statusCounts: Partial<Record<TourStatus, number>>; pagination: Pagination }>(
+            `/tours${toQuery({ scope: 'admin', ...filters })}`,
+        ),
+        placeholderData: keepPreviousData,
+    });
+}
+
+export function useDuplicateTour() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => api.post<{ tour: Tour }>(`/tours/${id}/duplicate`),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tours'] }),
+    });
+}
+
+export type BulkTourAction = 'active' | 'draft' | 'inactive' | 'feature' | 'unfeature' | 'delete';
+
+export function useBulkTourAction() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ ids, action }: { ids: string[]; action: BulkTourAction }) =>
+            api.post<{ affected: number; skipped: number; incomplete?: { _id: string; title: string; error: string }[] }>('/tours/bulk-action', { ids, action }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tours'] }),
     });
 }
 
@@ -89,7 +122,7 @@ export function useBulkCreateTours() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (tours: Partial<Tour>[]) =>
-            api.post<{ tours: Tour[] }>('/tours/bulk', { tours }),
+            api.post<{ created: number; failed: { row: number; title: string; error: string }[]; tours: Tour[] }>('/tours/bulk', { tours }),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tours'] }),
     });
 }

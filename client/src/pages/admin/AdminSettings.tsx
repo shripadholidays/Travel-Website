@@ -10,6 +10,11 @@ import { useSiteSettings, useUpdateSiteSettings } from "@/hooks/use-settings";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingServicesCard } from "@/components/admin/BookingServicesCard";
+import { PageHeader } from "@/components/admin/AdminUI";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+
+const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const isUrl = (v: string) => !v || /^https?:\/\/\S+\.\S+/.test(v);
 
 export const AdminSettings = () => {
     const { data, isLoading } = useSiteSettings();
@@ -27,6 +32,8 @@ export const AdminSettings = () => {
     const [showQuickLinks, setShowQuickLinks] = useState(true);
     const [showNewsletter, setShowNewsletter] = useState(true);
     const [copyrightText, setCopyrightText] = useState("");
+    const [savedCompany, setSavedCompany] = useState("");
+    const [savedFooter, setSavedFooter] = useState("");
 
     useEffect(() => {
         if (settings) {
@@ -40,29 +47,41 @@ export const AdminSettings = () => {
             setShowQuickLinks(settings.footer.showQuickLinks);
             setShowNewsletter(settings.footer.showNewsletter);
             setCopyrightText(settings.footer.copyrightText);
+            setSavedCompany(JSON.stringify([settings.companyName, settings.contactEmail, settings.contactPhone, settings.address]));
+            setSavedFooter(JSON.stringify([settings.socialLinks.facebook, settings.socialLinks.instagram, settings.socialLinks.twitter, settings.footer.showQuickLinks, settings.footer.showNewsletter, settings.footer.copyrightText]));
         }
     }, [settings]);
 
+    const companyDirty = !!savedCompany && JSON.stringify([companyName, contactEmail, contactPhone, address]) !== savedCompany;
+    const footerDirty = !!savedFooter && JSON.stringify([facebook, instagram, twitter, showQuickLinks, showNewsletter, copyrightText]) !== savedFooter;
+    const leaveGuard = useUnsavedChanges(companyDirty || footerDirty);
+
     const handleSaveCompany = async () => {
+        if (!companyName.trim()) { toast.error("Add the company name."); return; }
+        if (!isEmail(contactEmail.trim())) { toast.error("The contact email doesn't look right."); return; }
         const toastId = toast.loading("Saving company details...");
         try {
-            await updateSettings.mutateAsync({ companyName, contactEmail, contactPhone, address });
+            await updateSettings.mutateAsync({ companyName: companyName.trim(), contactEmail: contactEmail.trim(), contactPhone: contactPhone.trim(), address: address.trim() });
+            setSavedCompany(JSON.stringify([companyName.trim(), contactEmail.trim(), contactPhone.trim(), address.trim()]));
             toast.success("Company details saved", { id: toastId });
-        } catch {
-            toast.error("Failed to save", { id: toastId });
+        } catch (err) {
+            toast.error((err as Error).message || "Failed to save", { id: toastId });
         }
     };
 
     const handleSaveFooter = async () => {
+        const bad = [["Facebook", facebook], ["Instagram", instagram], ["Twitter", twitter]].filter(([, v]) => !isUrl(v.trim())).map(([n]) => n);
+        if (bad.length) { toast.error(`Use full links starting with https:// for ${bad.join(", ")}.`); return; }
         const toastId = toast.loading("Saving footer settings...");
         try {
             await updateSettings.mutateAsync({
                 socialLinks: { facebook, instagram, twitter },
                 footer: { showQuickLinks, showNewsletter, copyrightText },
             });
+            setSavedFooter(JSON.stringify([facebook, instagram, twitter, showQuickLinks, showNewsletter, copyrightText]));
             toast.success("Footer settings saved", { id: toastId });
-        } catch {
-            toast.error("Failed to save", { id: toastId });
+        } catch (err) {
+            toast.error((err as Error).message || "Failed to save", { id: toastId });
         }
     };
 
@@ -78,10 +97,8 @@ export const AdminSettings = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Settings</h2>
-                <p className="text-muted-foreground">Manage your website's global configurations and footer details.</p>
-            </div>
+            {leaveGuard.dialog}
+            <PageHeader title="Settings" description="Company details shown across the site, footer options, and which booking services are switched on." />
 
             <div className="grid gap-6">
                 <BookingServicesCard settings={settings} />
@@ -99,11 +116,11 @@ export const AdminSettings = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Public Contact Email</Label>
-                                <Input id="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+                                <Input id="email" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="phone">Contact Phone</Label>
-                                <Input id="phone" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
+                                <Input id="phone" type="tel" placeholder="+1 555 010 0100" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
                             </div>
                         </div>
                         <div className="grid gap-2">
@@ -112,7 +129,7 @@ export const AdminSettings = () => {
                         </div>
                     </CardContent>
                     <CardFooter className="border-t px-6 py-4">
-                        <Button onClick={handleSaveCompany} disabled={updateSettings.isPending} className="ml-auto gap-2 bg-brand-blue">
+                        <Button onClick={handleSaveCompany} disabled={updateSettings.isPending || !companyDirty} className="ml-auto gap-2 bg-brand-blue">
                             {updateSettings.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             Save Changes
                         </Button>
@@ -167,7 +184,7 @@ export const AdminSettings = () => {
                         </div>
                     </CardContent>
                     <CardFooter className="border-t px-6 py-4">
-                        <Button onClick={handleSaveFooter} disabled={updateSettings.isPending} className="ml-auto gap-2 bg-brand-blue">
+                        <Button onClick={handleSaveFooter} disabled={updateSettings.isPending || !footerDirty} className="ml-auto gap-2 bg-brand-blue">
                             {updateSettings.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             Update Footer
                         </Button>

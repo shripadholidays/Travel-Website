@@ -28,11 +28,18 @@ const itineraryDaySchema = new mongoose.Schema({
     location: { type: String, required: true },
 });
 
+// Required only once a tour is live (works for documents and update queries)
+function isLive() {
+    const status = this instanceof mongoose.Query ? (this.getUpdate()?.status ?? this.getUpdate()?.$set?.status) : this.status;
+    return (status ?? 'active') === 'active';
+}
+
 // Main schema for Travel Destination
 const travelDestinationSchema = new mongoose.Schema({
     title: { type: String, required: [true, 'Title is required'], trim: true, index: true }, // Indexed for text search
     location: { type: String, required: [true, 'Location is required'], trim: true, index: true }, // Indexed for country filtering
-    price: { type: Number, required: [true, 'Price is required'], min: [1, 'Price must be at least $1'], index: true }, // Indexed for range filtering
+    // Drafts may be saved half-finished; a live tour needs a price, a cover image and a description
+    price: { type: Number, default: 0, required: [isLive, 'Price is required'], validate: { validator(v) { return !isLive.call(this) || v >= 1; }, message: 'Price must be at least $1' }, index: true }, // Indexed for range filtering
     // Prices are in US dollars: checkout charges tour.price in USD (see BookingController)
     currency: { type: String, required: true, default: 'USD' },
     duration: {
@@ -42,12 +49,12 @@ const travelDestinationSchema = new mongoose.Schema({
     validity: { type: Date, required: [true, 'The last available date is required'], index: true }, // Can filter by date range
     inclusions: [inclusionSchema],
     itinerary: [itineraryDaySchema],
-    imageURL: { type: String, required: [true, 'A cover image is required'] },
+    imageURL: { type: String, required: [isLive, 'A cover image is required'] },
     images: [String],
     categories: { type: [String], index: true }, // Indexed for theme filtering
     emi: { type: String },   // short card highlight, e.g. "Best seller" (never a price claim)
     overview: {
-        about: { type: String, required: [true, 'The "About this tour" description is required'] },
+        about: { type: String, required: [isLive, 'The "About this tour" description is required'] },
         gallery: [gallerySchema],
     },
     reviews: {

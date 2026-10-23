@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminTravelOrders, useUpdateAdminTravelOrder } from '@/hooks/use-travel';
 import { useEnabledFeatures } from '@/hooks/use-feature';
+import { PageHeader } from '@/components/admin/AdminUI';
 import type { AdminTravelOrder, FlightOffer, HotelOffer, TravelKind, TravelOrderStatus } from '@/types/travel';
 
 const STATUS_VARIANT: Record<TravelOrderStatus, 'success' | 'secondary' | 'destructive' | 'outline'> = {
@@ -60,13 +61,10 @@ export const AdminTravelOrders = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Travel Orders</h2>
-                <p className="text-muted-foreground">
-                    Flight and hotel bookings. Visible here even when a service is switched off
-                    (flights {features.flights ? 'on' : 'off'}, hotels {features.hotels ? 'on' : 'off'} on the public site).
-                </p>
-            </div>
+            <PageHeader
+                title="Flight & Hotel Orders"
+                description={<>Flight and hotel bookings. Listed here even when a service is switched off (flights {features.flights ? 'on' : 'off'}, hotels {features.hotels ? 'on' : 'off'} on the public site).</>}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card><CardContent className="p-5">

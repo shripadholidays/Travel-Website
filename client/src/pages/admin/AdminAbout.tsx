@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
+import { PageHeader } from '@/components/admin/AdminUI';
 import { toast } from 'sonner';
 import { Save, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -17,9 +19,9 @@ const ICON_OPTIONS = [
     'Map', 'Camera', 'Compass', 'Plane', 'Coffee', 'Headphones', 'MessageCircle',
 ];
 
-function SaveBtn({ onClick, loading }: { onClick: () => void; loading: boolean }) {
+function SaveBtn({ onClick, loading, disabled }: { onClick: () => void; loading: boolean; disabled?: boolean }) {
     return (
-        <Button onClick={onClick} disabled={loading} className="ml-auto gap-2 bg-brand-blue hover:bg-brand-blue/90">
+        <Button onClick={onClick} disabled={loading || disabled} className="ml-auto gap-2 bg-brand-blue hover:bg-brand-blue/90">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Changes
         </Button>
@@ -44,6 +46,7 @@ export const AdminAbout = () => {
     const [ctaBtn1Link, setCtaBtn1Link] = useState('');
     const [ctaBtn2Label, setCtaBtn2Label] = useState('');
     const [ctaBtn2Link, setCtaBtn2Link] = useState('');
+    const [saved, setSaved] = useState('');
 
     useEffect(() => {
         if (!about) return;
@@ -60,6 +63,15 @@ export const AdminAbout = () => {
         setCtaBtn1Link(about.ctaBtn1Link || '');
         setCtaBtn2Label(about.ctaBtn2Label || '');
         setCtaBtn2Link(about.ctaBtn2Link || '');
+        setSaved(JSON.stringify({
+            aboutPage: {
+                heroImage: about.heroImage || '', heroHeadline: about.heroHeadline || '', heroSubtext: about.heroSubtext || '',
+                storyParagraph1: about.storyParagraph1 || '', storyParagraph2: about.storyParagraph2 || '',
+                stats: about.stats || [], values: about.values || [],
+                ctaHeading: about.ctaHeading || '', ctaSubtext: about.ctaSubtext || '',
+                ctaBtn1Label: about.ctaBtn1Label || '', ctaBtn1Link: about.ctaBtn1Link || '', ctaBtn2Label: about.ctaBtn2Label || '', ctaBtn2Link: about.ctaBtn2Link || '',
+            },
+        }));
     }, [about]);
 
     const buildPayload = () => ({
@@ -72,13 +84,18 @@ export const AdminAbout = () => {
         },
     });
 
+    const dirty = !!saved && JSON.stringify(buildPayload()) !== saved;
+    const leaveGuard = useUnsavedChanges(dirty);
+
     const save = async () => {
         const id = toast.loading('Saving about page…');
         try {
-            await update.mutateAsync(buildPayload());
+            const payload = buildPayload();
+            await update.mutateAsync(payload);
+            setSaved(JSON.stringify(payload));
             toast.success('About page saved', { id });
-        } catch {
-            toast.error('Failed to save', { id });
+        } catch (err) {
+            toast.error((err as Error).message || 'Failed to save', { id });
         }
     };
 
@@ -91,10 +108,15 @@ export const AdminAbout = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">About Page</h2>
-                <p className="text-muted-foreground">Edit the About Us page hero, story, stats, values, and CTA.</p>
-            </div>
+            {leaveGuard.dialog}
+            <PageHeader
+                title="About Page"
+                description="The About Us page: hero, story, numbers, values and the closing call to action."
+                actions={<>
+                    <Button variant="ghost" size="sm" asChild><a href="/about" target="_blank" rel="noopener noreferrer">View page</a></Button>
+                    <SaveBtn onClick={save} loading={update.isPending} disabled={!dirty} />
+                </>}
+            />
 
             {/* Hero Section */}
             <Card>
@@ -235,7 +257,7 @@ export const AdminAbout = () => {
                     </div>
                 </CardContent>
                 <CardFooter className="border-t px-6 py-4">
-                    <SaveBtn onClick={save} loading={update.isPending} />
+                    <SaveBtn onClick={save} loading={update.isPending} disabled={!dirty} />
                 </CardFooter>
             </Card>
         </div>

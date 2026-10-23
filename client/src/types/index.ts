@@ -1,12 +1,25 @@
 // === Shared API Types ===
 
+export type StaffRole = 'moderator' | 'support' | 'editor' | 'manager' | 'admin';
+
+export type Permission =
+    | 'dashboard.view' | 'catalog.manage' | 'content.manage' | 'bookings.manage' | 'finance.view'
+    | 'marketing.manage' | 'community.manage' | 'articles.review' | 'users.manage' | 'settings.manage' | 'activity.view';
+
 export interface User {
     _id: string;
     googleId: string;
     displayName: string;
     email: string;
     profilePicture?: string;
-    role: 'user' | 'moderator' | 'admin';
+    role: StaffRole | 'user';
+    /** e.g. "Catalog editor" */
+    roleLabel?: string;
+    /** What this person may do in the admin area (sent by the server) */
+    permissions?: Permission[];
+    isSuspended?: boolean;
+    /** Admin user list only */
+    bookingCount?: number;
     isEmailVerified?: boolean;
     authProvider?: 'local' | 'google';
     createdAt: string;
@@ -49,6 +62,8 @@ export interface Tour {
     isFeatured?: boolean;
     status?: 'active' | 'inactive' | 'draft';
     coordinates?: { lat: number | null; lng: number | null };
+    /** Admin views only */
+    updatedBy?: { _id: string; displayName: string } | string;
     createdAt: string;
     updatedAt: string;
 }
@@ -82,8 +97,8 @@ export interface Booking {
 
 export interface Review {
     _id: string;
-    tour: string;
-    user: Pick<User, '_id' | 'displayName' | 'profilePicture'>;
+    tour: string | { _id: string; title: string };
+    user: Pick<User, '_id' | 'displayName' | 'profilePicture'> & { email?: string };
     rating: number;
     title?: string;
     content: string;
@@ -102,7 +117,7 @@ export interface Destination {
     images: string[];
     highlights?: { title: string; text: string }[];
     bestTimeToVisit?: string;
-    coordinates: { lat: number; lng: number };
+    coordinates?: { lat: number; lng: number };
     tourCount: number;
     rating: number;
     isActive: boolean;
@@ -168,13 +183,15 @@ export type PaginatedData<T, K extends string = 'tours'> = {
     [P in K]: T[];
 };
 
+/** What the dashboard shows depends on the role, so most parts are optional */
 export interface DashboardStats {
-    totalUsers: number;
-    totalBookings: number;
+    totalUsers?: number;
+    totalBookings?: number;
     totalTours: number;
-    totalReviews: number;
-    totalRevenue: number;
-    attention?: { pendingArticles: number; newInquiries: number; pendingBookings: number; draftTours: number };
-    recentBookings: Booking[];
-    bookingsByStatus: { _id: string; count: number }[];
+    totalReviews?: number;
+    totalRevenue?: number;
+    attention: { pendingArticles?: number; newInquiries?: number; pendingBookings?: number; draftTours?: number };
+    catalogHealth?: { noGallery: number; noItinerary: number; expiringSoon: number };
+    recentBookings?: Booking[];
+    bookingsByStatus?: { _id: string; count: number }[];
 }

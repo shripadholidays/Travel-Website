@@ -30,7 +30,8 @@ export const TourDetails = () => {
 
     // Track this tour as recently viewed once loaded
     useEffect(() => {
-        if (tour) addToRecentlyViewed(tour);
+        // A staff preview of an unpublished tour is not a traveller's visit
+        if (tour && (tour.status ?? 'active') === 'active') addToRecentlyViewed(tour);
     }, [tour?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (isLoading) {
@@ -90,6 +91,14 @@ export const TourDetails = () => {
                         : {}),
                 }}
             />
+            {tour.status && tour.status !== 'active' && (
+                <div className="sticky top-0 z-40 bg-amber-100 border-b border-amber-300 text-amber-900 text-sm" role="status">
+                    <Container className="flex flex-wrap items-center justify-between gap-2 py-2">
+                        <span><strong>Staff preview.</strong> This tour is {tour.status === 'draft' ? 'a draft' : 'hidden'}, so travellers can't see or book it.</span>
+                        <Link to={`/admin/tours/${tour._id}/edit`} className="font-semibold underline">Edit tour</Link>
+                    </Container>
+                </div>
+            )}
             {/* Hero Gallery */}
             <div className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
                 <Image src={image} alt={tour.title} className="w-full h-full object-cover" />

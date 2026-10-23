@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,11 +10,13 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ConfirmDialog } from '@/components/ui/alert-dialog';
-import { Plus, MoreHorizontal, Search, Loader2, Layers } from 'lucide-react';
+import { Plus, MoreHorizontal, Search, Loader2, Layers, Eye, Pencil, Trash2 } from 'lucide-react';
 import { ImagePicker } from '@/components/ui/ImagePicker';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminCollections, useCreateCollection, useUpdateCollection, useDeleteCollection } from '@/hooks/use-collections';
-import { useTours } from '@/hooks/use-tours';
+import { useAdminTours } from '@/hooks/use-tours';
+import { EmptyState, PageHeader, SearchField, StatusPill } from '@/components/admin/AdminUI';
+import { TOUR_STATUS } from '@/lib/tour-status';
 import { toast } from 'sonner';
 import type { Collection, Tour } from '@/types';
 
@@ -44,7 +45,8 @@ export const AdminCollections = () => {
     const [tourSearch, setTourSearch] = useState('');
 
     const { data, isLoading } = useAdminCollections();
-    const { data: toursData } = useTours({ limit: 200 });
+    // Every tour, drafts included, so a collection can be prepared before its tours go live
+    const { data: toursData } = useAdminTours({ limit: 200, sort: 'title' });
     const collections = (data?.collections ?? []).filter(c =>
         c.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -87,7 +89,9 @@ export const AdminCollections = () => {
     };
 
     const handleSave = async () => {
-        if (!form.name.trim()) { toast.error('Name is required'); return; }
+        if (!form.name.trim()) { toast.error('Give the collection a name.'); return; }
+        if (!form.description.trim()) { toast.error('Add a short description; it is shown on the Collections page.'); return; }
+        if (!form.coverImage) { toast.error('Add a cover image.'); return; }
         const payload: Partial<Collection> = {
             name: form.name,
             slug: editing?.slug || slugify(form.name),
@@ -129,30 +133,15 @@ export const AdminCollections = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Collections</h2>
-                    <p className="text-muted-foreground">Curated groups of tours shown on the Collections page.</p>
-                </div>
-                <Button className="bg-brand-orange hover:bg-brand-orange/90 gap-2" onClick={openCreate}>
-                    <Plus className="w-4 h-4" /> Add Collection
-                </Button>
-            </div>
+            <PageHeader
+                title="Collections"
+                description="Hand-picked groups of tours, shown on the Collections page in the order below. Only live tours appear to travellers."
+                actions={<Button className="bg-brand-orange hover:bg-brand-orange/90 gap-2" onClick={openCreate}><Plus className="w-4 h-4" /> Add collection</Button>}
+            />
 
             <Card>
                 <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                        <CardTitle>All Collections</CardTitle>
-                        <div className="relative w-64">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                type="search" placeholder="Search collections…"
-                                className="pl-9 h-9"
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                            />
-                        </div>
-                    </div>
+                    <SearchField value={search} onChange={setSearch} placeholder="Search collections…" />
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
@@ -172,9 +161,8 @@ export const AdminCollections = () => {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Collection</TableHead>
-                                    <TableHead>Slug</TableHead>
                                     <TableHead>Tours</TableHead>
-                                    <TableHead>Order</TableHead>
+                                    <TableHead className="hidden md:table-cell">Order</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
@@ -197,33 +185,35 @@ export const AdminCollections = () => {
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-xs font-mono text-slate-500">{c.slug}</TableCell>
-                                        <TableCell>{Array.isArray(c.tours) ? c.tours.length : 0}</TableCell>
-                                        <TableCell>{c.displayOrder}</TableCell>
+                                        <TableCell className="tabular-nums">
+                                            {(() => {
+                                                const list = Array.isArray(c.tours) ? c.tours : [];
+                                                const live = list.filter((t) => typeof t === 'object' && t.status === 'active').length;
+                                                return <>{live}{live !== list.length && <span className="text-xs text-muted-foreground"> live of {list.length}</span>}</>;
+                                            })()}
+                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell tabular-nums">{c.displayOrder}</TableCell>
                                         <TableCell>
-                                            <Badge variant={c.isActive ? 'success' : 'secondary'}>
-                                                {c.isActive ? 'Active' : 'Inactive'}
-                                            </Badge>
+                                            <StatusPill tone={c.isActive ? 'green' : 'slate'}>{c.isActive ? 'Live' : 'Hidden'}</StatusPill>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Actions for ${c.name}`}>
                                                         <MoreHorizontal className="w-4 h-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onClick={() => openEdit(c)}>Edit</DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-red-600" onClick={() => setDeleteTarget(c)}>Delete</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => openEdit(c)}><Pencil className="w-4 h-4 mr-2" /> Edit</DropdownMenuItem>
+                                                    <DropdownMenuItem asChild><a href={`/collections/${c.slug}`} target="_blank" rel="noopener noreferrer"><Eye className="w-4 h-4 mr-2" /> View on site</a></DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => setDeleteTarget(c)}><Trash2 className="w-4 h-4 mr-2" /> Delete</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 )) : (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
-                                            No collections found.
-                                        </TableCell>
+                                        <TableCell colSpan={5}><EmptyState icon={Layers} title={search ? 'No collections match' : 'No collections yet'} description="Group tours by theme, like Beach Escapes or Honeymoons." /></TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -247,17 +237,17 @@ export const AdminCollections = () => {
                             <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Beach Escapes" />
                         </div>
                         <div className="space-y-1.5">
-                            <Label>Description</Label>
+                            <Label>Description *</Label>
                             <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Sun, sand, and sea — our best beach packages." />
                         </div>
-                        <ImagePicker label="Cover Image" value={form.coverImage} onChange={url => setForm(p => ({ ...p, coverImage: url }))} />
+                        <ImagePicker label="Cover image *" value={form.coverImage} onChange={url => setForm(p => ({ ...p, coverImage: url }))} />
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <Label>Display Order</Label>
+                                <Label>Position on the page</Label>
                                 <Input type="number" value={form.displayOrder} onChange={e => setForm(p => ({ ...p, displayOrder: Number(e.target.value) }))} min={0} />
                             </div>
                             <div className="flex items-center justify-between rounded-xl border p-3 mt-5">
-                                <Label>Active</Label>
+                                <Label>Live</Label>
                                 <Switch checked={form.isActive} onCheckedChange={v => setForm(p => ({ ...p, isActive: v }))} />
                             </div>
                         </div>
@@ -301,10 +291,11 @@ export const AdminCollections = () => {
                                             {tour.imageURL && (
                                                 <img src={tour.imageURL} alt="" className="w-8 h-8 rounded object-cover shrink-0" />
                                             )}
-                                            <div className="min-w-0">
+                                            <div className="min-w-0 flex-1">
                                                 <p className="text-sm font-medium truncate">{tour.title}</p>
                                                 <p className="text-xs text-muted-foreground truncate">{tour.location}</p>
                                             </div>
+                                            {tour.status !== 'active' && <StatusPill tone={TOUR_STATUS[tour.status ?? 'active'].tone}>{TOUR_STATUS[tour.status ?? 'active'].label}</StatusPill>}
                                         </label>
                                     ))}
                                 </div>

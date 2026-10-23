@@ -15,6 +15,7 @@ import { useWriteEligibility } from "@/hooks/use-write-eligibility";
 import { cn } from "@/lib/utils";
 
 import { Container } from "@/components/ui/container";
+import { hasPermission } from "@/lib/admin-access";
 
 export const WriteArticle = () => {
     const { user } = useAuth();
@@ -51,7 +52,7 @@ export const WriteArticle = () => {
     const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
     // Editors publish straight away; everyone else's articles go to an editor first
-    const isEditor = user?.role === "admin" || user?.role === "moderator";
+    const isEditor = hasPermission(user, "articles.review");
     const post = existing?.post;
     const editingOthers = isEdit && !!post && post.author?._id !== user?._id && !isEditor;
 

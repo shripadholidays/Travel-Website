@@ -34,3 +34,6 @@ server/uploads/*
 
 # One-time admin bootstrap script (contains a hardcoded password)
 server/create-admin.js
+
+# Local test staff accounts (generated passwords, never committed)
+*.local.json

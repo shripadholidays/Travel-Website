@@ -18,9 +18,9 @@ interface JsonCsvImporterProps {
     title?: string;
 }
 
-type ParseResult = { ok: true; rows: Record<string, unknown>[] } | { ok: false; error: string };
+export type ParseResult = { ok: true; rows: Record<string, unknown>[] } | { ok: false; error: string };
 
-function parseRaw(raw: string): ParseResult {
+export function parseRaw(raw: string): ParseResult {
     const trimmed = raw.trim();
     if (!trimmed) return { ok: false, error: 'Nothing to parse — paste some JSON or CSV content.' };
 

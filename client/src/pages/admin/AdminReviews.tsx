@@ -1,21 +1,25 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { Star, Trash2, BadgeCheck } from 'lucide-react';
 import { api } from '@/services/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/alert-dialog';
-import { Search, Star, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
-import { format } from 'date-fns';
-import type { Review } from '@/types';
+import { EmptyState, PageHeader, SearchField, StatusTabs, TableFooter } from '@/components/admin/AdminUI';
+import { toQuery } from '@/hooks/use-admin';
+import { useDebounced } from '@/hooks/use-debounced';
+import type { Pagination, Review } from '@/types';
 
-function useAdminReviews() {
+function useAdminReviews(params: { search: string; rating: string; page: number }) {
     return useQuery({
-        queryKey: ['admin', 'reviews'],
-        queryFn: () => api.get<{ reviews: Review[] }>('/admin/reviews'),
+        queryKey: ['admin', 'reviews', params],
+        queryFn: () => api.get<{ reviews: Review[]; pagination: Pagination }>(`/admin/reviews${toQuery(params)}`),
+        placeholderData: keepPreviousData,
     });
 }
 
@@ -23,120 +27,116 @@ function useDeleteReview() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (id: string) => api.delete(`/admin/reviews/${id}`),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'reviews'] }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ['admin', 'reviews'] });
+            // The tour's rating is recalculated
+            qc.invalidateQueries({ queryKey: ['tours'] });
+        },
     });
 }
 
 export const AdminReviews = () => {
+    const [params, setParams] = useSearchParams();
+    const rating = params.get('rating') ?? 'all';
+    const page = Number(params.get('page') || 1);
     const [search, setSearch] = useState('');
-    const [deleteTarget, setDeleteTarget] = useState<Review | null>(null);
-    const { data, isLoading } = useAdminReviews();
-    const deleteReview = useDeleteReview();
+    const debounced = useDebounced(search, 300);
+    const setParam = (key: string, value: string) => {
+        const next = new URLSearchParams(params);
+        if (value && value !== 'all' && !(key === 'page' && value === '1')) next.set(key, value); else next.delete(key);
+        if (key !== 'page') next.delete('page');
+        setParams(next, { replace: true });
+    };
 
-    const reviews = (data?.reviews ?? []).filter(r =>
-        (r.user?.displayName || '').toLowerCase().includes(search.toLowerCase()) ||
-        r.content.toLowerCase().includes(search.toLowerCase())
-    );
+    const [deleteTarget, setDeleteTarget] = useState<Review | null>(null);
+    const { data, isLoading } = useAdminReviews({ search: debounced, rating, page });
+    const deleteReview = useDeleteReview();
+    const reviews = data?.reviews ?? [];
 
     const handleDelete = async () => {
         if (!deleteTarget) return;
-        const toastId = toast.loading('Deleting review…');
+        const toastId = toast.loading('Removing review…');
         try {
             await deleteReview.mutateAsync(deleteTarget._id);
-            toast.success('Review deleted', { id: toastId });
+            toast.success('Review removed. The tour rating has been updated.', { id: toastId });
             setDeleteTarget(null);
-        } catch {
-            toast.error('Failed to delete', { id: toastId });
+        } catch (err) {
+            toast.error((err as Error).message || 'Failed to remove the review', { id: toastId });
         }
     };
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Reviews</h2>
-                <p className="text-muted-foreground">Moderate customer reviews across all tours.</p>
-            </div>
+            <PageHeader title="Reviews" description="What travellers say about each tour. Remove only reviews that break the rules (spam, abuse, private details); low ratings are honest feedback." />
 
             <Card>
-                <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between gap-3">
-                        <CardTitle>All Reviews ({(data?.reviews ?? []).length})</CardTitle>
-                        <div className="relative w-56">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="Search reviews…" className="pl-9 h-9" value={search} onChange={e => setSearch(e.target.value)} />
-                        </div>
-                    </div>
+                <CardHeader className="pb-3 space-y-4">
+                    <StatusTabs value={rating} onChange={(v) => setParam('rating', v)} label="Filter by rating" options={[
+                        { id: 'all', label: 'All ratings', count: rating === 'all' ? data?.pagination.total : undefined },
+                        ...['5', '4', '3', '2', '1'].map((r) => ({ id: r, label: `${r} ★` })),
+                    ]} />
+                    <SearchField value={search} onChange={(v) => { setSearch(v); setParam('page', '1'); }} placeholder="Text, traveller or tour…" className="sm:w-80" />
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
-                        <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-14 w-full" />)}</div>
+                        <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
+                    ) : reviews.length === 0 ? (
+                        <EmptyState icon={Star} title="No reviews found" description={debounced || rating !== 'all' ? 'Try another search or rating.' : 'Reviews appear once travellers rate their tours.'} />
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Author</TableHead>
-                                    <TableHead>Rating</TableHead>
-                                    <TableHead>Review</TableHead>
-                                    <TableHead>Tour</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {reviews.length > 0 ? reviews.map(review => (
-                                    <TableRow key={review._id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                {review.user?.profilePicture && (
-                                                    <img src={review.user.profilePicture} alt="" className="w-7 h-7 rounded-full object-cover" />
-                                                )}
-                                                <span className="font-medium text-sm">{review.user?.displayName || 'Unknown'}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-0.5">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200'}`} />
-                                                ))}
-                                                <span className="ml-1 text-xs font-bold">{review.rating}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p className="text-sm line-clamp-2 max-w-[250px]">{review.content}</p>
-                                        </TableCell>
-                                        <TableCell className="text-xs text-muted-foreground font-mono truncate max-w-[80px]">
-                                            {typeof review.tour === 'string' ? review.tour.slice(-8) : ''}
-                                        </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground">
-                                            {format(new Date(review.createdAt), 'MMM d, yyyy')}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button
-                                                variant="ghost" size="icon"
-                                                className="h-8 w-8 text-slate-300 hover:text-red-500"
-                                                onClick={() => setDeleteTarget(review)}
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                )) : (
+                        <>
+                            <Table>
+                                <TableHeader>
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">No reviews found.</TableCell>
+                                        <TableHead>Review</TableHead>
+                                        <TableHead className="hidden md:table-cell">Tour</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Date</TableHead>
+                                        <TableHead className="text-right"><span className="sr-only">Actions</span></TableHead>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {reviews.map((review) => {
+                                        const tour = typeof review.tour === 'object' && review.tour ? review.tour : null;
+                                        return (
+                                            <TableRow key={review._id}>
+                                                <TableCell className="max-w-md">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="inline-flex items-center gap-0.5" aria-label={`${review.rating} out of 5`}>
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
+                                                            ))}
+                                                        </span>
+                                                        <span className="text-sm font-medium truncate">{review.user?.displayName || 'Deleted account'}</span>
+                                                        {review.isVerifiedBooking && <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" aria-label="Booked this tour" />}
+                                                    </div>
+                                                    {review.title && <p className="mt-1 text-sm font-semibold">{review.title}</p>}
+                                                    <p className="mt-0.5 text-sm text-slate-600 line-clamp-3">{review.content}</p>
+                                                </TableCell>
+                                                <TableCell className="hidden md:table-cell text-sm">
+                                                    {tour ? <Link to={`/tour/${tour._id}`} target="_blank" className="hover:text-brand-orange line-clamp-2">{tour.title}</Link> : <span className="text-muted-foreground">Tour removed</span>}
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell text-sm text-muted-foreground whitespace-nowrap">{format(new Date(review.createdAt), 'd MMM yyyy')}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500" onClick={() => setDeleteTarget(review)} aria-label={`Remove review by ${review.user?.displayName ?? 'traveller'}`}>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                            <TableFooter pagination={data?.pagination} onPageChange={(p) => setParam('page', String(p))} noun="reviews" />
+                        </>
                     )}
                 </CardContent>
             </Card>
 
             <ConfirmDialog
                 open={!!deleteTarget}
-                onOpenChange={o => !o && setDeleteTarget(null)}
-                title="Delete review?"
-                description="This review will be permanently removed from the tour."
-                confirmLabel="Delete"
+                onOpenChange={(o) => !o && setDeleteTarget(null)}
+                title="Remove this review?"
+                description="It is permanently removed from the tour and the tour's rating is recalculated."
+                confirmLabel="Remove"
                 destructive
                 loading={deleteReview.isPending}
                 onConfirm={handleDelete}

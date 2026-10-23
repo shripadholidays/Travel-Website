@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
+import { PageHeader } from '@/components/admin/AdminUI';
 import { toast } from 'sonner';
 import { Save, Loader2, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -17,19 +19,31 @@ export const AdminFAQ = () => {
     const [faqs, setFaqs] = useState<FAQ[]>([]);
     const [importOpen, setImportOpen] = useState(false);
 
+    const [saved, setSaved] = useState('');
+    const strip = (list: FAQ[]) => JSON.stringify(list.map((f) => ({ question: f.question, answer: f.answer })));
+
     useEffect(() => {
-        if (data?.settings?.faqs) setFaqs(data.settings.faqs);
+        if (data?.settings?.faqs) {
+            setFaqs(data.settings.faqs);
+            setSaved(strip(data.settings.faqs));
+        }
     }, [data]);
 
+    const dirty = !!saved && strip(faqs) !== saved;
+    const leaveGuard = useUnsavedChanges(dirty);
+
     const save = async () => {
-        // Ensure orders are correct
-        const ordered = faqs.map((f, i) => ({ ...f, order: i }));
+        // Empty rows are dropped; order follows the list
+        const ordered = faqs.filter((f) => f.question.trim() && f.answer.trim()).map((f, i) => ({ ...f, order: i }));
+        if (ordered.length < faqs.length) toast.info(`${faqs.length - ordered.length} empty question(s) were left out.`);
         const toastId = toast.loading('Saving FAQs…');
         try {
             await update.mutateAsync({ faqs: ordered });
+            setFaqs(ordered);
+            setSaved(strip(ordered));
             toast.success('FAQs saved', { id: toastId });
-        } catch {
-            toast.error('Failed to save', { id: toastId });
+        } catch (err) {
+            toast.error((err as Error).message || 'Failed to save', { id: toastId });
         }
     };
 
@@ -42,10 +56,8 @@ export const AdminFAQ = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">FAQ</h2>
-                <p className="text-muted-foreground">Manage frequently asked questions shown on the homepage and FAQ page.</p>
-            </div>
+            {leaveGuard.dialog}
+            <PageHeader title="FAQ" description="Questions shown on the FAQ page. The homepage shows the first 5." />
 
             <Card>
                 <CardHeader>
@@ -92,7 +104,7 @@ export const AdminFAQ = () => {
                     />
                 </CardContent>
                 <CardFooter className="border-t px-6 py-4">
-                    <Button onClick={save} disabled={update.isPending} className="ml-auto gap-2 bg-brand-blue hover:bg-brand-blue/90">
+                    <Button onClick={save} disabled={update.isPending || !dirty} className="ml-auto gap-2 bg-brand-blue hover:bg-brand-blue/90">
                         {update.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Save FAQs
                     </Button>

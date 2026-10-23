@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, ReactNode 
 import { useNavigate } from 'react-router-dom';
 import { api, API_BASE_URL } from '@/services/api';
 import type { User } from '@/types';
+import { isStaff as isStaffUser } from '@/lib/admin-access';
 
 interface AuthContextType {
     user: User | null;
@@ -15,6 +16,8 @@ interface AuthContextType {
     refreshUser: () => Promise<void>;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    /** Has any admin-area permission */
+    isStaff: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -113,6 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             refreshUser,
             isAuthenticated: !!user,
             isAdmin: user?.role === 'admin',
+            isStaff: isStaffUser(user),
         }}>
             {children}
         </AuthContext.Provider>

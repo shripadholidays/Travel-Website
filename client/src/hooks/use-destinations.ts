@@ -10,6 +10,14 @@ export function useDestinations(options: { enabled?: boolean } = {}) {
     });
 }
 
+/** Every destination, including switched-off ones (catalog staff only). */
+export function useAdminDestinations() {
+    return useQuery({
+        queryKey: ['destinations', 'admin'],
+        queryFn: () => api.get<{ destinations: Destination[] }>('/destinations?scope=admin'),
+    });
+}
+
 export function useDestination(slug: string) {
     return useQuery({
         queryKey: ['destinations', slug],

@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
+import { PageHeader } from '@/components/admin/AdminUI';
 import { toast } from 'sonner';
 import { Save, Loader2, Download } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -38,6 +40,11 @@ const COLOR_OPTIONS = [
     { label: 'Amber',  value: 'from-amber-600/80' },
     { label: 'Cyan',   value: 'from-cyan-600/80' },
 ];
+
+const SECTION_NAMES: Record<string, string> = {
+    offerBar: 'Offer bar', heroSlides: 'Hero slides', promoSlides: 'Promo deals', planTrip: 'Plan your trip',
+    testimonials: 'Testimonials', supportSection: 'Support', navLinks: 'Navigation', footerExploreLinks: 'Footer (Explore)', footerCompanyLinks: 'Footer (Company)',
+};
 
 // ── Save button ──────────────────────────────────────────────────────────────
 function SaveBtn({ onClick, loading }: { onClick: () => void; loading: boolean }) {
@@ -89,9 +96,16 @@ export const AdminHomepage = () => {
     const [footerExploreLinks, setFooterExploreLinks] = useState<FooterLink[]>(settings?.footerExploreLinks ?? []);
     const [footerCompanyLinks, setFooterCompanyLinks] = useState<FooterLink[]>(settings?.footerCompanyLinks ?? []);
 
-    // Sync when data loads
+    // What was last loaded or saved, per section, to spot unsaved edits
+    const [saved, setSaved] = useState<Record<string, string>>({});
+    const loaded = useRef(false);
+    const snapshot = (v: unknown) => JSON.stringify(v ?? null);
+
+    // Fill the editors once when the settings arrive. Saving one section must not reset
+    // the others, so later refetches do not overwrite what is being edited.
     useEffect(() => {
-        if (!settings) return;
+        if (!settings || loaded.current) return;
+        loaded.current = true;
         setOfferBar(settings.offerBar);
         setHeroSlides(settings.heroSlides);
         setPromoSlides(settings.promoSlides);
@@ -101,15 +115,28 @@ export const AdminHomepage = () => {
         setNavLinks(settings.navLinks);
         setFooterExploreLinks(settings.footerExploreLinks);
         setFooterCompanyLinks(settings.footerCompanyLinks);
+        setSaved({
+            offerBar: snapshot(settings.offerBar), heroSlides: snapshot(settings.heroSlides), promoSlides: snapshot(settings.promoSlides),
+            planTrip: snapshot(settings.planTrip), testimonials: snapshot(settings.testimonials), supportSection: snapshot(settings.supportSection),
+            navLinks: snapshot(settings.navLinks), footerExploreLinks: snapshot(settings.footerExploreLinks), footerCompanyLinks: snapshot(settings.footerCompanyLinks),
+        });
     }, [settings]);
+
+    const current: Record<string, unknown> = {
+        offerBar, heroSlides, promoSlides, planTrip, testimonials, supportSection: support, navLinks, footerExploreLinks, footerCompanyLinks,
+    };
+    const unsaved = loaded.current ? Object.keys(current).filter((k) => saved[k] !== undefined && snapshot(current[k]) !== saved[k]) : [];
+    const leaveGuard = useUnsavedChanges(unsaved.length > 0, 'Some sections have changes that were not saved. Each tab has its own Save button.');
 
     const save = async (payload: Parameters<typeof update.mutateAsync>[0], label = 'Saved') => {
         const id = toast.loading('Saving…');
         try {
             await update.mutateAsync(payload);
+            setSaved((prev) => ({ ...prev, ...Object.fromEntries(Object.entries(payload).map(([k, v]) => [k, snapshot(v)])) }));
+            if ('navLinks' in payload) setNavLinks(payload.navLinks as NavLink[]);
             toast.success(label, { id });
-        } catch {
-            toast.error('Failed to save', { id });
+        } catch (err) {
+            toast.error((err as Error).message || 'Failed to save', { id });
         }
     };
 
@@ -122,10 +149,16 @@ export const AdminHomepage = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Homepage Content</h2>
-                <p className="text-muted-foreground">Manage all homepage sections — slides, offers, testimonials, steps, and more.</p>
-            </div>
+            {leaveGuard.dialog}
+            <PageHeader
+                title="Homepage"
+                description="Every section of the homepage, plus the site menu and footer links. Each tab saves on its own."
+            />
+            {unsaved.length > 0 && (
+                <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800" role="status">
+                    Unsaved changes in: {unsaved.map((k) => SECTION_NAMES[k] ?? k).join(', ')}.
+                </p>
+            )}
 
             <Tabs defaultValue="offer">
                 <TabsList className="flex flex-wrap gap-1 h-auto bg-slate-100 p-1 rounded-xl mb-2">

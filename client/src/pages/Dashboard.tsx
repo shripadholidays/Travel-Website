@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { Tour, Booking, BlogPost } from "@/types";
+import { adminHome, isStaff as isStaffUser, roleLabel } from '@/lib/admin-access';
 
 const linkedBookingId = (order: TravelOrder) =>
     order.linkedBooking && typeof order.linkedBooking === 'object' ? order.linkedBooking._id : order.linkedBooking ?? null;
@@ -48,7 +49,7 @@ const ARTICLE_STATUS: Record<BlogPost['status'], { label: string; className: str
 export const Dashboard = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { user, logout } = useAuth();
-    const isStaff = user?.role === 'admin' || user?.role === 'moderator';
+    const isStaff = isStaffUser(user);
 
     // Flights/Hotels tabs exist only while the admin has those services switched on
     const travelFeatures = useEnabledFeatures();
@@ -247,10 +248,10 @@ export const Dashboard = () => {
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-brand-blue/10 bg-white p-4 shadow-sm">
                         <LayoutDashboard className="w-5 h-5 text-brand-blue shrink-0" />
                         <p className="flex-1 text-sm text-slate-700">
-                            You're signed in as {user?.role === 'admin' ? 'an admin' : 'a moderator'}. Tours, bookings, articles and messages are managed in the admin area.
+                            You're signed in as staff ({roleLabel(user)}). Your admin work is in the admin area.
                         </p>
                         <Button size="sm" variant="brand" className="rounded-full" asChild>
-                            <Link to={user?.role === 'admin' ? '/admin/dashboard' : '/admin/blog'}>Open admin <ArrowRight className="w-4 h-4 ml-1" /></Link>
+                            <Link to={adminHome(user)}>Open admin <ArrowRight className="w-4 h-4 ml-1" /></Link>
                         </Button>
                     </div>
                 )}
