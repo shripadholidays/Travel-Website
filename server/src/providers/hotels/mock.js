@@ -9,13 +9,31 @@ const {
 
 const OFFER_TTL_MS = 20 * 60 * 1000;
 
+// Hotel photos; hotels in the same city always get different ones
 const IMAGES = [
     'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=1600&auto=format&fit=crop',
 ];
+
+// A photo of the place itself, shown in each hotel's gallery
+const CITY_IMAGES = {
+    Bali: '1537996194471-e657df975ab4',
+    Dubai: '1512453979798-5ea266f8880c',
+    Jaipur: '1477587458883-47145ed94245',
+    Paris: '1502602898657-3e91760cbb34',
+    Singapore: '1525625293386-3f8f99389edd',
+    Bangkok: '1508009603885-50cf7c579365',
+    Goa: '1512343879784-a960bf40e7f2',
+    Mumbai: '1566552881560-0be862a7c445',
+};
 
 const ROOMS = [
     { code: 'DLX', name: 'Deluxe Room', mult: 1, refundable: true },
@@ -24,8 +42,11 @@ const ROOMS = [
 ];
 
 function imagesFor(hotel) {
-    const start = hashString(hotel.id) % IMAGES.length;
-    return [0, 1, 2].map((i) => IMAGES[(start + i) % IMAGES.length]);
+    const sameCity = hotels.filter((h) => h.city === hotel.city);
+    const start = (hashString(hotel.city) + sameCity.findIndex((h) => h.id === hotel.id) * 3) % IMAGES.length;
+    const own = [0, 1, 2].map((i) => IMAGES[(start + i) % IMAGES.length]);
+    const city = CITY_IMAGES[hotel.city];
+    return city ? [own[0], own[1], `https://images.unsplash.com/photo-${city}?q=80&w=1600&auto=format&fit=crop`] : own;
 }
 
 function summary(hotel) {

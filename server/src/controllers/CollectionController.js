@@ -6,7 +6,7 @@ const logger = require('../utils/logger');
 exports.getCollections = async (req, res) => {
     try {
         const collections = await Collection.find({ isActive: true })
-            .populate('tours', 'title imageURL location price reviews.rating')
+            .populate({ path: 'tours', select: 'title imageURL location price reviews.rating', match: { status: 'active' } })
             .sort({ displayOrder: 1 });
         return ResponseHandler.success(res, { collections }, 'Collections fetched successfully');
     } catch (err) {
@@ -31,8 +31,9 @@ exports.getAllCollections = async (req, res) => {
 // GET /collections/:slug
 exports.getCollectionBySlug = async (req, res) => {
     try {
-        const collection = await Collection.findOne({ slug: req.params.slug })
-            .populate('tours');
+        // Hidden collections and non-live tours are not shown to travellers
+        const collection = await Collection.findOne({ slug: req.params.slug, isActive: true })
+            .populate({ path: 'tours', match: { status: 'active' } });
         if (!collection) return ResponseHandler.fail(res, 404, 'Collection not found');
         return ResponseHandler.success(res, { collection }, 'Collection fetched successfully');
     } catch (err) {

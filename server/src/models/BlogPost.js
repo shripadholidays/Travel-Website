@@ -31,11 +31,18 @@ const blogPostSchema = new mongoose.Schema({
         required: true
     },
     tags: [String],
+    // draft → pending (submitted by a writer) → published, or rejected with a note
     status: {
         type: String,
-        enum: ['draft', 'published'],
+        enum: ['draft', 'pending', 'published', 'rejected'],
         default: 'draft',
         index: true
+    },
+    // The editor's note when an article is sent back for changes
+    reviewNote: {
+        type: String,
+        maxlength: 1000,
+        default: ''
     },
     publishedAt: {
         type: Date

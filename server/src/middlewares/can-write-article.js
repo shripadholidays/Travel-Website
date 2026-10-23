@@ -1,6 +1,7 @@
 const Review = require('../models/Review');
 const Booking = require('../models/Booking');
 const ResponseHandler = require('../utils/response-handler');
+const { completePastBookings } = require('../services/booking-service');
 
 const REQUIRED_REVIEWS = 5;
 const REQUIRED_ACCOUNT_AGE_DAYS = 30;
@@ -17,6 +18,7 @@ module.exports = async function canWriteArticle(req, res, next) {
         return ResponseHandler.fail(res, 403, `Your account must be at least ${REQUIRED_ACCOUNT_AGE_DAYS} days old to write articles. (${Math.floor(accountAgeDays)} days so far)`);
     }
 
+    await completePastBookings({ user: user._id });
     const [reviewCount, completedBookings] = await Promise.all([
         Review.countDocuments({ user: user._id }),
         Booking.countDocuments({ user: user._id, status: 'completed' }),

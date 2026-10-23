@@ -44,7 +44,7 @@ const travelDestinationSchema = new mongoose.Schema({
     imageURL: { type: String, required: true },
     images: [String],
     categories: { type: [String], index: true }, // Indexed for theme filtering
-    emi: { type: String },
+    emi: { type: String },   // short card highlight, e.g. "Best seller" (never a price claim)
     overview: {
         about: { type: String, required: true },
         gallery: [gallerySchema],

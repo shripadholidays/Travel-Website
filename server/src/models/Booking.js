@@ -60,6 +60,14 @@ const bookingSchema = new mongoose.Schema({
     },
     specialRequests: {
         type: String
+    },
+    cancelledAt: {
+        type: Date
+    },
+    // What went back to the traveller's card when the booking was cancelled
+    refundedAmount: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

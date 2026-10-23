@@ -32,6 +32,9 @@ function publicUser(user) {
         email: user.email,
         profilePicture: user.profilePicture,
         role: user.role,
+        authProvider: user.authProvider,
+        isEmailVerified: !!user.isEmailVerified || user.authProvider === 'google',
+        createdAt: user.createdAt,
     };
 }
 
@@ -140,7 +143,7 @@ exports.googleCallback = async (req, res) => {
 
         let user = await User.findOne({ email });
         if (!user) {
-            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google' });
+            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
         }
 
         const cookieOpts = {
@@ -184,7 +187,7 @@ exports.exchangeToken = async (req, res) => {
 
         let user = await User.findOne({ email });
         if (!user) {
-            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google' });
+            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
         }
 
         const cookieOpts = {
@@ -224,7 +227,7 @@ exports.googleOneTap = async (req, res) => {
 
         let user = await User.findOne({ email });
         if (!user) {
-            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google' });
+            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
         }
 
         res.cookie(cookieName, credential, {
@@ -318,6 +321,30 @@ exports.resetPassword = async (req, res) => {
 };
 
 // GET /auth/verify-email/:token
+// POST /auth/resend-verification — a fresh link for the signed-in, unverified account
+exports.resendVerification = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return ResponseHandler.fail(res, 404, 'Account not found.');
+        if (user.isEmailVerified || user.authProvider === 'google') {
+            return ResponseHandler.success(res, { alreadyVerified: true }, 'Your email is already verified.');
+        }
+
+        user.emailVerificationToken = crypto.randomBytes(32).toString('hex');
+        user.emailVerificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        await user.save();
+
+        const isProd = config.app.nodeEnv === 'production';
+        const frontendOrigin = isProd ? config.cors.productionOrigin : config.cors.localOrigin;
+        await sendVerificationEmail(user.email, `${frontendOrigin}/verify-email/${user.emailVerificationToken}`);
+
+        return ResponseHandler.success(res, { sent: true }, `We've sent a new verification link to ${user.email}.`);
+    } catch (err) {
+        logger.error('Resend verification failed', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Could not send the verification email. Please try again.');
+    }
+};
+
 exports.verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;

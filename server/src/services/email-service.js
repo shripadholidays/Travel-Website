@@ -134,4 +134,24 @@ const sendAdminAlert = async (subject, rows) => {
     });
 };
 
-module.exports = { sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail, sendAdminAlert };
+// Tells a writer their article was published, or sent back with the editor's note
+const sendArticleReviewEmail = async (to, { title, approved, note, url }) => {
+    return sendEmail({
+        from: `"${fromName}" <${fromAddress}>`,
+        to,
+        subject: approved ? `Your article is live: ${title}` : `Your article needs a few changes: ${title}`,
+        html: emailLayout(`
+            <div style="padding: 32px; background: #fff;">
+                <h2 style="color: ${brandColor}; margin-top: 0;">${approved ? 'Your article is published!' : 'A few changes before we publish'}</h2>
+                <p><strong>${escapeHtml(title)}</strong></p>
+                ${note ? `<p style="background: #F8FAFC; padding: 16px; border-radius: 8px;">${escapeHtml(note)}</p>` : ''}
+                <p style="text-align: center; margin: 32px 0;">
+                    <a href="${url}" style="display: inline-block; background: ${accentColor}; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: bold;">
+                        ${approved ? 'Read it on the site' : 'Edit your article'}
+                    </a>
+                </p>
+            </div>`),
+    });
+};
+
+module.exports = { sendArticleReviewEmail, sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail, sendAdminAlert };

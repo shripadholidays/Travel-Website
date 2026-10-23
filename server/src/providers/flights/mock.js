@@ -12,12 +12,12 @@ const CABINS = { economy: 1, premium_economy: 1.65, business: 3.1 };
 
 const AIRLINES = [
     { code: '6E', name: 'IndiGo', domestic: true, international: true, hub: 'DEL' },
-    { code: 'AI', name: 'Air India', domestic: true, international: true, hub: 'DEL' },
+    { code: 'AI', name: 'Air India', domestic: true, international: true, hub: 'DEL', longHaul: true },
     { code: 'QP', name: 'Akasa Air', domestic: true, international: false, hub: 'BOM' },
     { code: 'SG', name: 'SpiceJet', domestic: true, international: false, hub: 'DEL' },
-    { code: 'EK', name: 'Emirates', domestic: false, international: true, hub: 'DXB' },
-    { code: 'QR', name: 'Qatar Airways', domestic: false, international: true, hub: 'DOH' },
-    { code: 'SQ', name: 'Singapore Airlines', domestic: false, international: true, hub: 'SIN' },
+    { code: 'EK', name: 'Emirates', domestic: false, international: true, hub: 'DXB', longHaul: true },
+    { code: 'QR', name: 'Qatar Airways', domestic: false, international: true, hub: 'DOH', longHaul: true },
+    { code: 'SQ', name: 'Singapore Airlines', domestic: false, international: true, hub: 'SIN', longHaul: true },
 ];
 
 const byCode = new Map(airports.map((a) => [a.code, a]));
@@ -59,12 +59,29 @@ function normalize(params) {
     return { from, to, departDate: params.departDate, returnDate, adults, cabin };
 }
 
+// Big connecting airports; a one-stop flight changes planes at one of these
+const CONNECTING_HUBS = ['DEL', 'BOM', 'BLR', 'DXB', 'DOH', 'AUH', 'SIN', 'IST', 'FRA', 'LHR', 'BKK', 'KUL', 'HKG'];
+// A connection is believable when it adds at most this share to the direct distance
+const MAX_DETOUR = 1.3;
+
+/** How much longer the trip gets when connecting at `hubCode` (1 = no detour). */
+function detourRatio(fromAp, toAp, hubCode) {
+    const hub = byCode.get(hubCode);
+    if (!hub || hubCode === fromAp.code || hubCode === toAp.code) return Infinity;
+    return (distanceKm(fromAp, hub) + distanceKm(hub, toAp)) / Math.max(distanceKm(fromAp, toAp), 1);
+}
+
+/** The airline's own hub when it is roughly on the way, otherwise the most direct big hub. */
+function connectionFor(airline, fromAp, toAp) {
+    if (detourRatio(fromAp, toAp, airline.hub) <= MAX_DETOUR) return airline.hub;
+    return CONNECTING_HUBS.reduce((best, code) =>
+        (detourRatio(fromAp, toAp, code) < detourRatio(fromAp, toAp, best) ? code : best), CONNECTING_HUBS[0]);
+}
+
 function buildSlice(rng, airline, fromAp, toAp, date, km, stops) {
-    // Connect at the airline's hub, or at the first big hub that isn't an endpoint.
-    const via = stops
-        ? [airline.hub, 'BOM', 'DEL', 'DXB', 'DOH'].find((code) => code !== fromAp.code && code !== toAp.code)
-        : null;
-    const durationMinutes = Math.round(km / 780 * 60 + 35) + (stops ? 90 + Math.floor(rng() * 120) : 0);
+    const via = stops ? connectionFor(airline, fromAp, toAp) : null;
+    const flownKm = via ? km * Math.min(detourRatio(fromAp, toAp, via), 2) : km;
+    const durationMinutes = Math.round(flownKm / 780 * 60 + 35) + (stops ? 90 + Math.floor(rng() * 120) : 0);
     const depart = Math.floor(rng() * 288) * 5; // 5-minute grid across the day
     const arrive = depart + durationMinutes;
     return {
@@ -89,7 +106,11 @@ function generate(p) {
     const domesticIndia = fromAp.country === 'IN' && toAp.country === 'IN';
     const km = distanceKm(fromAp, toAp);
     const rng = seededRandom(hashString(`${p.from}|${p.to}|${p.departDate}|${p.returnDate}|${p.cabin}|${p.adults}`));
-    const eligible = AIRLINES.filter((a) => (domesticIndia ? a.domestic : a.international));
+    // Foreign carriers only sell a route that touches their hub or connects there without a big detour
+    const servesRoute = (a) => a.domestic || a.hub === fromAp.code || a.hub === toAp.code
+        || detourRatio(fromAp, toAp, a.hub) <= MAX_DETOUR;
+    const candidates = AIRLINES.filter((a) => (domesticIndia ? a.domestic : a.international));
+    const eligible = candidates.filter(servesRoute).length ? candidates.filter(servesRoute) : candidates;
     const count = 8 + Math.floor(rng() * 5);
 
     const offers = [];
@@ -99,6 +120,8 @@ function generate(p) {
         const touchesHub = airline.hub === fromAp.code || airline.hub === toAp.code;
         let stops;
         if (!airline.domestic) stops = touchesHub ? 0 : 1;
+        // Narrow-body airlines can't fly very long routes without stopping
+        else if (km > 5000 && !airline.longHaul) stops = 1;
         else stops = rng() < (domesticIndia ? 0.8 : 0.5) ? 0 : 1;
         const slices = [buildSlice(rng, airline, fromAp, toAp, p.departDate, km, stops)];
         if (p.returnDate) slices.push(buildSlice(rng, airline, toAp, fromAp, p.returnDate, km, stops));

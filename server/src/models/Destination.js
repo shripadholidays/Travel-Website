@@ -30,6 +30,13 @@ const destinationSchema = new mongoose.Schema({
         required: true
     },
     images: [String],
+    // "Why visit" cards written for this destination; empty = built from its tours
+    highlights: [{
+        _id: false,
+        title: { type: String, trim: true, maxlength: 80 },
+        text: { type: String, trim: true, maxlength: 300 },
+    }],
+    bestTimeToVisit: { type: String, trim: true, maxlength: 120, default: '' },
     coordinates: {
         lat: { type: Number },
         lng: { type: Number }

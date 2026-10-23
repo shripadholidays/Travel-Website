@@ -28,6 +28,7 @@ const initializePassport = (passportInstance) => {
                         email: profile.emails[0].value,
                         profilePicture: profile.photos[0].value,
                         authProvider: 'google',
+                        isEmailVerified: true, // Google has already verified this address
                     }).save();
                     logger.info('New user registered via Google', { user: currentUser.displayName });
                 }

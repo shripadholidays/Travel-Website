@@ -2,17 +2,16 @@ const Destination = require('../models/Destination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const TravelDestination = require('../models/TravelDestination');
-
-const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const { destinationPatterns, tourMatchesDestination } = require('../services/destination-match');
 
 // Tour counts and ratings are worked out from the tours we actually sell
 // (matched on location/title), never from hand-entered numbers.
 async function withLiveStats(destinations) {
-    const tours = await TravelDestination.find({ status: { $ne: 'draft' } }, 'title location reviews').lean();
+    const tours = await TravelDestination.find({ status: 'active' }, 'title location reviews').lean();
     return destinations.map((doc) => {
         const dest = doc.toObject ? doc.toObject() : doc;
-        const names = [dest.name, dest.country].filter(Boolean).map((n) => new RegExp(`\\b${escapeRegex(n)}\\b`, 'i'));
-        const matching = tours.filter((t) => names.some((re) => re.test(t.location) || re.test(t.title)));
+        const patterns = destinationPatterns(dest);
+        const matching = tours.filter((t) => tourMatchesDestination(t, patterns));
         const rated = matching.filter((t) => t.reviews?.basedOn > 0);
         const rating = rated.length ? Math.round((rated.reduce((s, t) => s + t.reviews.rating, 0) / rated.length) * 10) / 10 : 0;
         return { ...dest, tourCount: matching.length, rating };

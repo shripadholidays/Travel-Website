@@ -3,7 +3,7 @@ const Payment = require('../models/Payment');
 const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
-const { BookingError, parseTravelDate, priceBooking, confirmBooking } = require('../services/booking-service');
+const { completePastBookings, BookingError, parseTravelDate, priceBooking, confirmBooking, cancelBooking: cancelBookingWithRefund } = require('../services/booking-service');
 const { stripeClient } = require('../services/travel-order-service');
 const config = require('../config');
 
@@ -21,7 +21,8 @@ exports.createBooking = async (req, res) => {
         const date = parseTravelDate(travelDate);
 
         const tour = await TravelDestination.findById(tourId);
-        if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
+        // Draft and hidden tours cannot be booked
+        if (!tour || tour.status !== 'active') return ResponseHandler.fail(res, 404, 'Tour not found');
 
         // Prices, add-ons and coupons are all worked out here, never trusted from the client.
         const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode });
@@ -105,6 +106,7 @@ exports.getUserBookings = async (req, res) => {
         const { page = 1, limit = config.pagination.defaultLimit, status } = req.query;
         const query = { user: req.user._id };
         if (status) query.status = status;
+        await completePastBookings({ user: req.user._id });
 
         const bookings = await Booking.find(query)
             .populate('tour', 'title imageURL location price duration')
@@ -155,15 +157,13 @@ exports.cancelBooking = async (req, res) => {
             return ResponseHandler.fail(res, 403, 'Access denied');
         }
 
-        if (booking.status === 'cancelled') {
-            return ResponseHandler.fail(res, 400, 'Booking is already cancelled');
-        }
-
-        booking.status = 'cancelled';
-        await booking.save();
-
-        return ResponseHandler.success(res, { booking }, 'Booking cancelled successfully');
+        await cancelBookingWithRefund(booking, { byAdmin: req.user.role === 'admin' });
+        const message = booking.refundedAmount
+            ? `Booking cancelled. $${booking.refundedAmount} will be refunded to your card.`
+            : 'Booking cancelled successfully';
+        return ResponseHandler.success(res, { booking }, message);
     } catch (err) {
+        if (err instanceof BookingError) return ResponseHandler.fail(res, err.status, err.message);
         logger.error('Error cancelling booking', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to cancel booking');
     }
@@ -175,6 +175,7 @@ exports.getAllBookings = async (req, res) => {
         const { page = 1, limit = config.pagination.adminDefaultLimit, status } = req.query;
         const query = {};
         if (status) query.status = status;
+        await completePastBookings();
 
         const bookings = await Booking.find(query)
             .populate('tour', 'title location price')
@@ -204,17 +205,26 @@ exports.updateBookingStatus = async (req, res) => {
             return ResponseHandler.fail(res, 400, 'Invalid status');
         }
 
-        const booking = await Booking.findByIdAndUpdate(
-            req.params.id,
-            { status },
-            { new: true }
-        ).populate('tour', 'title location price')
-         .populate('user', 'displayName email');
-
+        const booking = await Booking.findById(req.params.id);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
+
+        // Cancelling refunds and confirming sends the confirmation, same as the traveller's own flow
+        if (status === 'cancelled') {
+            await cancelBookingWithRefund(booking, { byAdmin: true });
+        } else if (status === 'confirmed' && booking.status === 'pending') {
+            await confirmBooking(booking);
+        } else {
+            booking.status = status;
+            await booking.save();
+        }
+        await booking.populate([
+            { path: 'tour', select: 'title location price' },
+            { path: 'user', select: 'displayName email' },
+        ]);
 
         return ResponseHandler.success(res, { booking }, 'Booking status updated successfully');
     } catch (err) {
+        if (err instanceof BookingError) return ResponseHandler.fail(res, err.status, err.message);
         logger.error('Error updating booking status', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update booking status');
     }

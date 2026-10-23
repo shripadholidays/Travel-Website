@@ -31,6 +31,17 @@ const TOUR_IMAGES = {
     thailand: `${PLACEHOLDER}1528181304800-259b08848526?w=800`,
 };
 
+// Extra photos for tour galleries
+const EXTRA_IMAGES = {
+    himalaya: [`${PLACEHOLDER}1464822759023-fed622ff2c3b?w=1200`],
+    bali: [`${PLACEHOLDER}1584132967334-10e028bd69f7?w=1200`],
+    paris: [`${PLACEHOLDER}1431274172761-fca41d930114?w=1200`],
+    dubai: [`${PLACEHOLDER}1512453979798-5ea266f8880c?w=1200`, `${PLACEHOLDER}1509316975850-ff9c5deb0cd9?w=1200`],
+    maldives: [`${PLACEHOLDER}1507525428034-b723cf961d3e?w=1200`],
+    switzerland: [`${PLACEHOLDER}1464822759023-fed622ff2c3b?w=1200`],
+    thailand: [`${PLACEHOLDER}1508009603885-50cf7c579365?w=1200`],
+};
+
 const DEST_IMAGES = {
     india: `${PLACEHOLDER}1524492412937-b28074a5d7da?w=800`,
     indonesia: `${PLACEHOLDER}1537996194471-e657df975ab4?w=800`,
@@ -61,9 +72,8 @@ const tours = [
         duration: { days: 7, nights: 6 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.himalaya,
-        images: [TOUR_IMAGES.himalaya],
+        images: [TOUR_IMAGES.himalaya, ...EXTRA_IMAGES.himalaya],
         categories: ['Adventure', 'Trekking', 'Nature'],
-        emi: 'EMI from $142/mo',
         inclusions: [
             { title: 'Professional mountain guide', included: true },
             { title: 'All meals during trek', included: true },
@@ -95,9 +105,8 @@ const tours = [
         duration: { days: 5, nights: 4 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.bali,
-        images: [TOUR_IMAGES.bali],
+        images: [TOUR_IMAGES.bali, ...EXTRA_IMAGES.bali],
         categories: ['Beach', 'Relaxation', 'Culture'],
-        emi: 'EMI from $200/mo',
         inclusions: [
             { title: 'Luxury villa accommodation', included: true },
             { title: 'Daily breakfast & 2 dinners', included: true },
@@ -126,7 +135,7 @@ const tours = [
         duration: { days: 4, nights: 3 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.paris,
-        images: [TOUR_IMAGES.paris],
+        images: [TOUR_IMAGES.paris, ...EXTRA_IMAGES.paris],
         categories: ['City', 'Romance', 'Culture'],
         inclusions: [
             { title: 'Boutique hotel near Champs-Élysées', included: true },
@@ -155,9 +164,8 @@ const tours = [
         duration: { days: 5, nights: 4 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.dubai,
-        images: [TOUR_IMAGES.dubai],
+        images: [TOUR_IMAGES.dubai, ...EXTRA_IMAGES.dubai],
         categories: ['Luxury', 'City', 'Adventure'],
-        emi: 'EMI from $417/mo',
         inclusions: [
             { title: '5-star hotel accommodation', included: true },
             { title: 'Desert safari with BBQ dinner', included: true },
@@ -187,9 +195,8 @@ const tours = [
         duration: { days: 6, nights: 5 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.maldives,
-        images: [TOUR_IMAGES.maldives],
+        images: [TOUR_IMAGES.maldives, ...EXTRA_IMAGES.maldives],
         categories: ['Beach', 'Luxury', 'Honeymoon'],
-        emi: 'EMI from $533/mo',
         inclusions: [
             { title: 'Overwater villa accommodation', included: true },
             { title: 'All-inclusive meals', included: true },
@@ -285,9 +292,8 @@ const tours = [
         duration: { days: 6, nights: 5 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.switzerland,
-        images: [TOUR_IMAGES.switzerland],
+        images: [TOUR_IMAGES.switzerland, ...EXTRA_IMAGES.switzerland],
         categories: ['Adventure', 'Nature', 'Scenic'],
-        emi: 'EMI from $367/mo',
         inclusions: [
             { title: 'Mountain hotel accommodation', included: true },
             { title: 'Swiss Travel Pass (6 days)', included: true },
@@ -409,7 +415,7 @@ const tours = [
         duration: { days: 7, nights: 6 },
         validity: new Date('2027-12-31'),
         imageURL: TOUR_IMAGES.thailand,
-        images: [TOUR_IMAGES.thailand],
+        images: [TOUR_IMAGES.thailand, ...EXTRA_IMAGES.thailand],
         categories: ['Beach', 'Adventure', 'Budget'],
         inclusions: [
             { title: 'Beach resort accommodation', included: true },
@@ -614,17 +620,10 @@ async function seed() {
         await SiteSettings.create({
             companyName: 'Wandeazy Travels',
             contactEmail: 'hello@wandeazy.com',
-            contactPhone: '+1 (555) 000-0000',
-            address: '123 Adventure Lane, Wanderlust City, WL 99999',
-            socialLinks: {
-                facebook: 'https://facebook.com/wandeazy',
-                instagram: 'https://instagram.com/wandeazy',
-                twitter: 'https://twitter.com/wandeazy',
-            },
+            // Phone, address and social links stay empty until the real ones are entered in Admin → Settings
             footer: {
                 showQuickLinks: true,
                 showNewsletter: true,
-                copyrightText: '© 2025 Wandeazy Inc. All rights reserved.',
             },
             contentSections: [
                 { sectionId: 'hero', name: 'Hero Banner', description: 'Main banner section on the homepage with call-to-action.', isVisible: true },

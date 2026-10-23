@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Booking = require('../models/Booking');
 const TravelDestination = require('../models/TravelDestination');
 const Review = require('../models/Review');
+const BlogPost = require('../models/BlogPost');
 const { recomputeTourRating } = require('../services/rating-service');
 const UserInquiry = require('../models/UserInquiry');
 const NewsletterSubscriber = require('../models/NewsletterSubscriber');
@@ -13,11 +14,15 @@ const config = require('../config');
 // GET /admin/stats
 exports.getDashboardStats = async (req, res) => {
     try {
-        const [totalUsers, totalBookings, totalTours, totalReviews] = await Promise.all([
+        const [totalUsers, totalBookings, totalTours, totalReviews, draftTours, pendingArticles, newInquiries, pendingBookings] = await Promise.all([
             User.countDocuments(),
             Booking.countDocuments(),
-            TravelDestination.countDocuments(),
-            Review.countDocuments()
+            TravelDestination.countDocuments({ status: 'active' }),
+            Review.countDocuments(),
+            TravelDestination.countDocuments({ status: { $ne: 'active' } }),
+            BlogPost.countDocuments({ status: 'pending' }),
+            UserInquiry.countDocuments({ status: 'new' }),
+            Booking.countDocuments({ status: 'pending' }),
         ]);
 
         const revenueResult = await Booking.aggregate([
@@ -42,6 +47,8 @@ exports.getDashboardStats = async (req, res) => {
             totalTours,
             totalReviews,
             totalRevenue,
+            // Work waiting for the team
+            attention: { pendingArticles, newInquiries, pendingBookings, draftTours },
             recentBookings,
             bookingsByStatus
         }, 'Dashboard stats fetched successfully');

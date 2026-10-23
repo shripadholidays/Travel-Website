@@ -12,21 +12,38 @@ const userInquirySchema = new mongoose.Schema({
     // Basic email validation using a regular expression
     match: [/.+@.+\..+/, 'Please enter a valid email address'],
   },
-  // The phone number of the user
+  // The phone number of the user (optional: plenty of people prefer email)
   phoneNumber: {
     type: String,
-    required: true,
+    trim: true,
   },
-  // The user's preferred travel date
+  // The user's preferred travel date (optional: dates are often flexible)
   preferredTravelDate: {
     type: Date,
-    required: true,
   },
   // The number of travelers
   numberOfTravelers: {
     type: Number,
-    required: true,
+    default: 1,
     min: [1, 'Number of travelers must be at least 1'],
+  },
+  // What the inquiry is about, so general questions do not need trip details
+  topic: {
+    type: String,
+    enum: ["trip", "booking", "question", "other"],
+    default: "trip",
+  },
+  // The tour, destination or search the traveller was looking at
+  context: {
+    type: String,
+    trim: true,
+    maxlength: 200,
+  },
+  // Where on the site the inquiry was sent from
+  source: {
+    type: String,
+    enum: ["contact", "chat", "no-results", "tour", "destination"],
+    default: "contact",
   },
   // An optional message from the user
   message: {

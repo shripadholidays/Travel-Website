@@ -1,4 +1,8 @@
 const SiteSettings = require('../models/SiteSettings');
+const TravelDestination = require('../models/TravelDestination');
+const Booking = require('../models/Booking');
+const Review = require('../models/Review');
+const User = require('../models/User');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const { clearTravelConfigCache } = require('../services/travel-config');
@@ -44,6 +48,61 @@ exports.getPublicSettings = async (req, res) => {
     } catch (err) {
         logger.error('Failed to fetch public settings', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to fetch settings');
+    }
+};
+
+// GET /settings/highlights (public)
+// Numbers and quotes worked out from real data, for the About page and homepage
+// testimonials, so nothing has to be typed in (or made up) by hand.
+exports.getHighlights = async (req, res) => {
+    try {
+        // Reviews by our own staff are not testimonials
+        const staffIds = await User.find({ role: { $in: ['admin', 'moderator'] } }).distinct('_id');
+        const travellerReviews = { user: { $nin: staffIds } };
+        const [tours, bookingTotals, reviewTotals, reviews] = await Promise.all([
+            TravelDestination.find({ status: 'active' }, 'location').lean(),
+            Booking.aggregate([
+                { $match: { status: { $in: ['confirmed', 'completed'] } } },
+                { $group: { _id: null, travellers: { $sum: '$numberOfTravelers' } } },
+            ]),
+            Review.aggregate([{ $match: travellerReviews }, { $group: { _id: null, count: { $sum: 1 }, avg: { $avg: '$rating' } } }]),
+            Review.find({ ...travellerReviews, rating: { $gte: 4 }, content: { $exists: true, $ne: '' } })
+                .sort({ rating: -1, createdAt: -1 })
+                .limit(6)
+                .populate('user', 'displayName profilePicture')
+                .populate({ path: 'tour', select: 'title location status' })
+                .lean(),
+        ]);
+
+        // One destination per country/place a live tour goes to ("Tokyo, Japan" → "Japan")
+        const places = new Set(tours.map((t) => (t.location || '').split(',').pop().trim().toLowerCase()).filter(Boolean));
+
+        return ResponseHandler.success(res, {
+            stats: {
+                tours: tours.length,
+                destinations: places.size,
+                travellers: bookingTotals[0]?.travellers ?? 0,
+                reviews: reviewTotals[0]?.count ?? 0,
+                rating: reviewTotals[0]?.avg ? Math.round(reviewTotals[0].avg * 10) / 10 : 0,
+            },
+            reviews: reviews
+                .filter((r) => r.user && r.tour && r.tour.status === 'active')
+                .map((r) => ({
+                    _id: r._id,
+                    name: r.user.displayName,
+                    image: r.user.profilePicture || '',
+                    rating: r.rating,
+                    title: r.title || '',
+                    quote: r.content,
+                    tourId: r.tour._id,
+                    tourTitle: r.tour.title,
+                    location: r.tour.location,
+                    verified: !!r.isVerifiedBooking,
+                })),
+        });
+    } catch (err) {
+        logger.error('Failed to fetch highlights', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to fetch highlights');
     }
 };
 

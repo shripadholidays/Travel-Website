@@ -1,4 +1,6 @@
 const TravelDestination = require('../models/TravelDestination');
+const Destination = require('../models/Destination');
+const { destinationTourQuery } = require('../services/destination-match');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const config = require('../config');
@@ -38,7 +40,8 @@ exports.getTours = async (req, res) => {
             search,
             sort: sortParam,
             isFeatured,
-            status
+            status,
+            place
         } = req.query;
 
         const query = {};
@@ -48,6 +51,10 @@ exports.getTours = async (req, res) => {
         }
         if (country) {
             query.location = { $in: country.split(',') };
+        }
+        // A whole place name inside the location ("Japan" matches "Tokyo, Japan")
+        if (place) {
+            query.location = { $regex: `\\b${escapeRegex(String(place))}\\b`, $options: 'i' };
         }
         if (minPrice || maxPrice) {
             query.price = {};
@@ -70,11 +77,24 @@ exports.getTours = async (req, res) => {
         if (search) {
             Object.assign(query, buildSearchQuery(search));
         }
+        // Specific tours by id (e.g. a visitor's recently viewed list), always with current data
+        if (req.query.ids) {
+            const ids = String(req.query.ids).split(',').filter((id) => /^[a-f0-9]{24}$/i.test(id)).slice(0, 50);
+            query._id = { $in: ids };
+        }
+        // The tours of one destination, by the same rule as its tour count
+        if (req.query.destination) {
+            const destination = await Destination.findOne({ slug: String(req.query.destination) }).lean();
+            query.$and = [...(query.$and || []), destination ? destinationTourQuery(destination) : { _id: null }];
+        }
         if (isFeatured === 'true') {
             query.isFeatured = true;
         }
-        if (status) {
-            query.status = status;
+        // Travellers only ever see live tours; admins can list drafts and hidden ones too
+        if (req.user?.role === 'admin') {
+            if (status) query.status = status;
+        } else {
+            query.status = 'active';
         }
 
         let sortOptions = { 'reviews.rating': -1, price: 1 };
@@ -115,7 +135,7 @@ exports.getRecommendedTours = async (req, res) => {
             .sort({ 'reviews.rating': -1 })
             .limit(config.tours.recommendedFeaturedLimit);
         if (tours.length === 0) {
-            tours = await TravelDestination.find({ status: { $ne: 'draft' } })
+            tours = await TravelDestination.find({ status: 'active' })
                 .sort({ 'reviews.rating': -1 })
                 .limit(config.tours.recommendedFallbackLimit);
         }
@@ -126,11 +146,38 @@ exports.getRecommendedTours = async (req, res) => {
     }
 };
 
+// GET /tours/facets
+// The categories and places live tours actually cover, with counts, for the search filters
+exports.getTourFacets = async (req, res) => {
+    try {
+        const tours = await TravelDestination.find({ status: 'active' }, 'categories location').lean();
+        const tally = (values) => {
+            const counts = new Map();
+            for (const v of values) {
+                const key = String(v || '').trim();
+                if (key) counts.set(key, (counts.get(key) || 0) + 1);
+            }
+            return [...counts].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+        };
+        return ResponseHandler.success(res, {
+            categories: tally(tours.flatMap((t) => t.categories || [])),
+            // "Tokyo, Japan" → "Japan": the country (or the place itself when there is no comma)
+            places: tally(tours.map((t) => (t.location || '').split(',').pop())),
+        }, 'Tour facets fetched successfully');
+    } catch (err) {
+        logger.error('Error fetching tour facets', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to fetch tour facets');
+    }
+};
+
 // GET /tours/:id
 exports.getTourById = async (req, res) => {
     try {
         const tour = await TravelDestination.findById(req.params.id);
-        if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
+        // A draft or hidden tour does not exist for anyone but admins (who preview it)
+        if (!tour || (tour.status !== 'active' && req.user?.role !== 'admin')) {
+            return ResponseHandler.fail(res, 404, 'Tour not found');
+        }
         return ResponseHandler.success(res, { tour }, 'Tour fetched successfully');
     } catch (err) {
         logger.error('Error fetching tour', { error: err.message, id: req.params.id });

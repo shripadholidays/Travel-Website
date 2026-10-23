@@ -19,7 +19,8 @@
     "test": "jest --runInBand",
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "ratings:recompute": "node scripts/recompute-ratings.js"
+    "ratings:recompute": "node scripts/recompute-ratings.js",
+    "content:clean": "node scripts/clean-placeholder-content.js"
   },
   "dependencies": {
     "axios": "^1.12.2",

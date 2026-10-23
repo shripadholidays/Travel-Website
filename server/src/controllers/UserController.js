@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Review = require('../models/Review');
 const Booking = require('../models/Booking');
 const ResponseHandler = require('../utils/response-handler');
+const { completePastBookings } = require('../services/booking-service');
 const logger = require('../utils/logger');
 
 const REQUIRED_REVIEWS = 5;
@@ -9,7 +10,10 @@ const REQUIRED_ACCOUNT_AGE_DAYS = 30;
 
 // GET /users/profile
 exports.getProfile = (req, res) => {
-    ResponseHandler.success(res, { user: req.user }, 'Profile data retrieved successfully.');
+    const user = req.user.toObject ? req.user.toObject() : { ...req.user };
+    // Google has already verified these addresses (older accounts were saved without the flag)
+    if (user.authProvider === 'google') user.isEmailVerified = true;
+    ResponseHandler.success(res, { user }, 'Profile data retrieved successfully.');
 };
 
 // GET /users/write-eligibility
@@ -30,6 +34,7 @@ exports.getWriteEligibility = async (req, res) => {
             });
         }
 
+        await completePastBookings({ user: user._id });
         const [reviewCount, completedBookings] = await Promise.all([
             Review.countDocuments({ user: user._id }),
             Booking.countDocuments({ user: user._id, status: 'completed' }),
