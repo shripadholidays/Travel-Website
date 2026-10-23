@@ -292,7 +292,7 @@ export const Dashboard = () => {
                         </div>
 
                         {/* Nav: a scrollable row on phones, a list beside the content from md up */}
-                        <nav aria-label="Dashboard sections" className="bg-white border border-slate-100 rounded-[1.75rem] p-2 md:p-3 shadow-sm flex md:block gap-1 overflow-x-auto md:space-y-1">
+                        <nav aria-label="Dashboard sections" className="bg-white border border-slate-100 rounded-[1.75rem] p-2 md:p-3 shadow-sm flex md:block gap-1 overflow-x-auto md:space-y-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             {tabs.map(tab => {
                                 const Icon = tab.icon;
                                 const active = currentTab === tab.id;

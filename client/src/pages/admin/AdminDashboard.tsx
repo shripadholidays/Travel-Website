@@ -67,7 +67,7 @@ export const AdminDashboard = () => {
                                     {isLoading ? (
                                         <Skeleton className="h-7 w-20 mt-1" />
                                     ) : (
-                                        <p className="text-2xl font-bold font-display text-brand-blue truncate">{stat.value}</p>
+                                        <p className="text-xl xl:text-2xl font-bold font-display text-brand-blue tabular-nums break-words">{stat.value}</p>
                                     )}
                                 </div>
                             </CardContent>

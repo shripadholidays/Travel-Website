@@ -37,7 +37,11 @@ function buildHighlights(destination: Destination, tours: Tour[], shortName: str
     return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([style, n]) => ({
         icon: STYLE_ICONS[style.toLowerCase()] ?? Sparkles,
         title: style,
-        text: `${n} of our ${shortName} ${n === 1 ? "tour focuses" : "tours focus"} on ${style.toLowerCase()}.`,
+        text: n === tours.length
+            ? (n === 1
+                ? `Our ${shortName} tour includes ${style.toLowerCase()} experiences.`
+                : `All ${n} of our ${shortName} tours include ${style.toLowerCase()} experiences.`)
+            : `${n} of our ${tours.length} ${shortName} tours focus on ${style.toLowerCase()}.`,
     }));
 }
 
@@ -151,14 +155,6 @@ export const DestinationDetails = () => {
             <Container className="pt-14 pb-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-14">
-                    {/* About */}
-                    <section>
-                        <SectionHeading>About {shortName}</SectionHeading>
-                        <p className="text-lg text-muted-foreground leading-relaxed">
-                            {destination.description}
-                        </p>
-                    </section>
-
                     {/* Why visit / highlights */}
                     {highlights.length > 0 && (
                     <section>

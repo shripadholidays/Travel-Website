@@ -52,6 +52,8 @@ const SOURCE_LABELS: Record<string, string> = {
 
 function tripSummary(i: Inquiry) {
     if (i.topic && i.topic !== 'trip') return TOPIC_LABELS[i.topic];
+    // The homepage message box asks for no trip details, so don't show the defaults as if they were given
+    if (i.source === 'chat') return i.context || 'Trip idea (message box)';
     const parts = [
         i.preferredTravelDate ? format(new Date(i.preferredTravelDate), 'MMM d, yyyy') : null,
         i.numberOfTravelers ? `${i.numberOfTravelers} traveller${i.numberOfTravelers === 1 ? '' : 's'}` : null,

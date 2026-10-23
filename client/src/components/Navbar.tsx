@@ -49,7 +49,8 @@ function isActivePath(pathname: string, path: string) {
     const base = path.split('?')[0];
     return pathname === base
         || pathname.startsWith(`${base}/`)
-        || (SECTION_ALIASES[base] ?? []).some((prefix) => pathname.startsWith(prefix));
+        // Aliases ending in "/" cover a whole section; others are exact pages ("/book", not "/bookings")
+        || (SECTION_ALIASES[base] ?? []).some((alias) => (alias.endsWith('/') ? pathname.startsWith(alias) : pathname === alias));
 }
 
 const CURRENCIES: { value: Currency; label: string }[] = [
