@@ -37,6 +37,12 @@ const travelOrderSchema = new mongoose.Schema({
         total: { type: Number, required: true },
         currency: { type: String, default: 'USD' },
     },
+    // What the traveller was charged: the total converted into the currency they chose
+    charge: {
+        currency: { type: String },
+        total: { type: Number },
+        rate: { type: Number },
+    },
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
     failureReason: String,
 }, { timestamps: true });
@@ -55,7 +61,7 @@ travelOrderSchema.methods.toPublic = function toPublic() {
         offer: o.offer,
         travellers: o.travellers,
         contact: o.contact,
-        pricing: { total: o.pricing.total, currency: o.pricing.currency },
+        pricing: { total: o.charge?.total ?? o.pricing.total, currency: o.charge?.currency ?? o.pricing.currency },
         linkedBooking: o.linkedBooking,
         createdAt: o.createdAt,
         updatedAt: o.updatedAt,

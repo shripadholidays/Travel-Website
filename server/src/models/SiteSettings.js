@@ -225,6 +225,21 @@ const siteSettingsSchema = new mongoose.Schema({
         flights: { type: Boolean, default: false },
         hotels:  { type: Boolean, default: false },
     },
+    // ── Currencies ────────────────────────────────────────────────────────────
+    // base: the currency revenue is reported in and new tours are priced in.
+    // enabled: what travellers can pick (and be charged in). rates: units per 1 USD.
+    currency: {
+        base: { type: String, enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'], default: 'INR' },
+        enabled: { type: [String], default: ['INR', 'USD', 'EUR', 'GBP', 'AED'] },
+        rates: {
+            USD: { type: Number, default: 1 },
+            INR: { type: Number, default: 83.5, min: 0.000001 },
+            EUR: { type: Number, default: 0.92, min: 0.000001 },
+            GBP: { type: Number, default: 0.79, min: 0.000001 },
+            AED: { type: Number, default: 3.67, min: 0.000001 },
+        },
+        ratesUpdatedAt: { type: Date, default: null },
+    },
     travelMarkup: {
         flightPct: { type: Number, default: 5, min: 0, max: 50 },
         hotelPct:  { type: Number, default: 8, min: 0, max: 50 },

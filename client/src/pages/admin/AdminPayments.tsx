@@ -40,7 +40,7 @@ const money = (amount: number, currency = 'USD') =>
 function usePayments(params: { status: string; search: string; page: number }) {
     return useQuery({
         queryKey: ['admin', 'payments', params],
-        queryFn: () => api.get<{ payments: Payment[]; summary: Summary; pagination: Pagination }>(`/admin/payments${toQuery(params)}`),
+        queryFn: () => api.get<{ payments: Payment[]; summary: Summary; summaryCurrency: string; pagination: Pagination }>(`/admin/payments${toQuery(params)}`),
         placeholderData: keepPreviousData,
     });
 }
@@ -64,14 +64,14 @@ export const AdminPayments = () => {
     const totalCount = Object.values(s).reduce((n, x) => n + (x?.count ?? 0), 0);
 
     const cards = [
-        { label: 'Collected', value: money(s.completed?.amount ?? 0), sub: `${s.completed?.count ?? 0} payments`, icon: TrendingUp, accent: true },
-        { label: 'Refunded', value: money(s.refunded?.amount ?? 0), sub: `${s.refunded?.count ?? 0} payments`, icon: RotateCcw },
+        { label: 'Collected', value: money(s.completed?.amount ?? 0, data?.summaryCurrency), sub: `${s.completed?.count ?? 0} payments`, icon: TrendingUp, accent: true },
+        { label: 'Refunded', value: money(s.refunded?.amount ?? 0, data?.summaryCurrency), sub: `${s.refunded?.count ?? 0} payments`, icon: RotateCcw },
         { label: 'Failed or pending', value: String((s.failed?.count ?? 0) + (s.pending?.count ?? 0)), sub: 'not charged', icon: AlertCircle },
     ];
 
     return (
         <div className="space-y-6">
-            <PageHeader title="Payments" description="Every card payment for tours, flights and hotels, as recorded from Stripe. Amounts are in US dollars." />
+            <PageHeader title="Payments" description={`Every card payment for tours, flights and hotels, in the currency it was taken in. Totals above are converted to ${data?.summaryCurrency ?? 'the base currency'} at today's rates.`} />
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {cards.map(({ label, value, sub, icon: Icon, accent }) => (

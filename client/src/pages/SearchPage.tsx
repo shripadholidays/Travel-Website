@@ -19,8 +19,11 @@ import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 import { Container } from '@/components/ui/container';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const PAGE_SIZE = 9;
+// The price slider works in US dollars (the server compares each tour's USD price);
+// labels are shown in the traveller's currency
 const MAX_PRICE = 5000;
 
 // Maps a duration bucket to a min/max day range (backend supports minDays/maxDays).
@@ -37,6 +40,7 @@ const RATING_OPTIONS = [4, 3, 2];
 const FILTER_PARAMS = ['max', 'days', 'rating', 'category', 'place'] as const;
 
 export const SearchPage = () => {
+    const { formatPrice } = useCurrency();
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Every filter lives in the URL, so Back/Forward, refresh and shared links keep them.
@@ -220,13 +224,13 @@ export const SearchPage = () => {
                             <div className="flex items-center justify-between mb-4">
                                 <span className="text-sm text-muted-foreground">Up to</span>
                                 <span className="text-sm font-bold text-brand-blue bg-brand-light px-3 py-1 rounded-xl">
-                                    {maxPrice >= MAX_PRICE ? 'Any price' : `$${maxPrice.toLocaleString()}`}
+                                    {maxPrice >= MAX_PRICE ? 'Any price' : formatPrice(maxPrice)}
                                 </span>
                             </div>
                             <PriceSlider value={maxPrice} onCommit={setMaxPrice} />
                             <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-                                <span>$0</span>
-                                <span>${MAX_PRICE.toLocaleString()}+</span>
+                                <span>{formatPrice(0)}</span>
+                                <span>{formatPrice(MAX_PRICE)}+</span>
                             </div>
                         </div>
                     </AccordionContent>
@@ -417,6 +421,7 @@ export const SearchPage = () => {
 
 /** Moves freely while dragging and only updates the URL (and the search) on release. */
 const PriceSlider = ({ value, onCommit }: { value: number; onCommit: (v: number) => void }) => {
+    const { formatPrice } = useCurrency();
     const [draft, setDraft] = useState(value);
     useEffect(() => setDraft(value), [value]);
     return (
@@ -432,7 +437,7 @@ const PriceSlider = ({ value, onCommit }: { value: number; onCommit: (v: number)
             onBlur={() => draft !== value && onCommit(draft)}
             className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-secondary accent-brand-orange"
             aria-label="Maximum price"
-            aria-valuetext={draft >= MAX_PRICE ? 'Any price' : `Up to $${draft}`}
+            aria-valuetext={draft >= MAX_PRICE ? 'Any price' : `Up to ${formatPrice(draft)}`}
         />
     );
 };

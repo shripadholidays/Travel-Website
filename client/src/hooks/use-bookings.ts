@@ -12,6 +12,8 @@ interface CreateBookingPayload {
         email: string;
         phone: string;
     };
+    /** What the traveller pays in (falls back to the site's base currency) */
+    currency?: string;
     // Add-ons and coupons are priced by the server
     addons?: { name: string }[];
     couponCode?: string;

@@ -10,6 +10,7 @@ const { toPublicOffer, sendProviderError } = require('../providers/public');
 const { getMarkupPct, isKindEnabled, enabledKinds } = require('../services/travel-config');
 const { getProvider, finalizeOrder, refundPayment, stripeClient } = require('../services/travel-order-service');
 const { notFound } = require('../middlewares/require-feature');
+const { getCurrencyConfig, convert, rateBetween } = require('../services/currency');
 
 const KINDS = ['flight', 'hotel'];
 const STATUSES = ['pending', 'confirmed', 'cancelled', 'failed'];
@@ -44,7 +45,7 @@ async function loadOwnOrder(req, res) {
 // POST /travel-orders
 exports.createOrder = async (req, res) => {
     try {
-        const { kind, offerId, travellers, contact, linkedBooking, quotedTotal, acceptPriceChange } = req.body;
+        const { kind, offerId, travellers, contact, linkedBooking, quotedTotal, acceptPriceChange, currency: requestedCurrency } = req.body;
         if (!KINDS.includes(kind)) return ResponseHandler.fail(res, 400, 'Unknown booking type.');
         if (!offerId) return ResponseHandler.fail(res, 400, 'An offer is required.');
         if (!contact?.email) return ResponseHandler.fail(res, 400, 'A contact email is required.');
@@ -68,6 +69,11 @@ exports.createOrder = async (req, res) => {
             if (!owned) return ResponseHandler.fail(res, 400, 'The linked trip was not found.');
         }
 
+        // Suppliers quote in their own currency; the traveller pays in the one they picked
+        const { base, enabled, rates } = await getCurrencyConfig();
+        const pay = enabled.includes(String(requestedCurrency || '').toUpperCase()) ? String(requestedCurrency).toUpperCase() : base;
+        const charge = { currency: pay, total: convert(pricing.total, pricing.currency, pay, rates), rate: rateBetween(pricing.currency, pay, rates) };
+
         const order = await TravelOrder.create({
             user: req.user._id,
             kind,
@@ -78,6 +84,7 @@ exports.createOrder = async (req, res) => {
             travellers,
             contact,
             pricing,
+            charge,
         });
 
         const stripe = stripeClient();
@@ -90,8 +97,8 @@ exports.createOrder = async (req, res) => {
         let paymentIntent;
         try {
             paymentIntent = await stripe.paymentIntents.create({
-                amount: Math.round(pricing.total * 100),
-                currency: pricing.currency.toLowerCase(),
+                amount: Math.round(charge.total * 100),
+                currency: charge.currency.toLowerCase(),
                 metadata: { travelOrderId: order._id.toString(), userId: req.user._id.toString() },
             });
         } catch (stripeErr) {
@@ -104,8 +111,8 @@ exports.createOrder = async (req, res) => {
         const payment = await Payment.create({
             order: order._id,
             user: req.user._id,
-            amount: pricing.total,
-            currency: pricing.currency,
+            amount: charge.total,
+            currency: charge.currency,
             method: 'stripe',
             stripePaymentIntentId: paymentIntent.id,
             status: 'pending',

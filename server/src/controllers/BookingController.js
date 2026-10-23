@@ -7,6 +7,7 @@ const logger = require('../utils/logger');
 const { completePastBookings, BookingError, parseTravelDate, priceBooking, confirmBooking, cancelBooking: cancelBookingWithRefund } = require('../services/booking-service');
 const { stripeClient } = require('../services/travel-order-service');
 const config = require('../config');
+const { formatMoney } = require('../services/currency');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 
 const handlesBookings = (user) => hasPermission(user, PERMISSIONS.BOOKINGS);
@@ -16,7 +17,7 @@ exports.createBooking = async (req, res) => {
     try {
         const {
             tour: tourField, tourId: tourIdField, travelDate, numberOfTravelers,
-            contactInfo, addons, specialRequests, couponCode
+            contactInfo, addons, specialRequests, couponCode, currency: requestedCurrency
         } = req.body;
 
         // Accept either `tour` or `tourId` from the client.
@@ -36,8 +37,8 @@ exports.createBooking = async (req, res) => {
         }
 
         // Prices, add-ons and coupons are all worked out here, never trusted from the client.
-        const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode });
-        const currency = config.stripe.defaultCurrency;
+        const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode, currency: requestedCurrency });
+        const { currency } = pricing;
 
         const booking = await Booking.create({
             user: req.user._id,
@@ -50,6 +51,11 @@ exports.createBooking = async (req, res) => {
             coupon: pricing.coupon || undefined,
             totalAmount: pricing.totalAmount,
             currency,
+            unitPrice: pricing.unitPrice,
+            tourCurrency: pricing.tourCurrency,
+            exchangeRate: pricing.exchangeRate,
+            baseCurrency: pricing.baseCurrency,
+            baseAmount: pricing.baseAmount,
             specialRequests,
             status: 'pending'
         });
@@ -170,7 +176,7 @@ exports.cancelBooking = async (req, res) => {
 
         await cancelBookingWithRefund(booking, { byAdmin: handlesBookings(req.user) });
         const message = booking.refundedAmount
-            ? `Booking cancelled. $${booking.refundedAmount} will be refunded to your card.`
+            ? `Booking cancelled. ${formatMoney(booking.refundedAmount, booking.currency)} will be refunded to your card.`
             : 'Booking cancelled successfully';
         return ResponseHandler.success(res, { booking }, message);
     } catch (err) {

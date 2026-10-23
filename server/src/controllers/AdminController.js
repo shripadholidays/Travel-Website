@@ -12,6 +12,7 @@ const Payment = require('../models/Payment');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const config = require('../config');
+const { getCurrencyConfig, convert, round2 } = require('../services/currency');
 const { ROLES, ROLE_NAMES, STAFF_ROLES, PERMISSIONS: P, hasPermission, permissionsFor } = require('../config/permissions');
 
 const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -64,11 +65,17 @@ exports.getDashboardStats = async (req, res) => {
         if (totalReviews !== null) data.totalReviews = totalReviews;
         if (totalUsers !== null) data.totalUsers = totalUsers;
         if (can(P.FINANCE)) {
-            const revenue = await Booking.aggregate([
+            // Bookings are charged in many currencies: add them up in the base currency.
+            // Each booking keeps its base amount from the day it was made; older ones are converted now.
+            const { base, rates } = await getCurrencyConfig();
+            const rows = await Booking.aggregate([
                 { $match: { status: { $in: ['confirmed', 'completed'] } } },
-                { $group: { _id: null, total: { $sum: '$totalAmount' } } },
+                { $group: { _id: { currency: '$currency', baseCurrency: '$baseCurrency' }, total: { $sum: '$totalAmount' }, baseTotal: { $sum: '$baseAmount' } } },
             ]);
-            data.totalRevenue = revenue[0]?.total || 0;
+            data.totalRevenue = round2(rows.reduce((sum, r) => sum + (r._id.baseCurrency === base && r.baseTotal
+                ? r.baseTotal
+                : convert(r.total, r._id.currency || 'USD', base, rates)), 0));
+            data.revenueCurrency = base;
         }
         if (can(P.CATALOG)) {
             // Live tours missing what travellers look for first
@@ -310,10 +317,17 @@ exports.getPayments = async (req, res) => {
                 .skip(pg.skip)
                 .limit(pg.limit),
             Payment.countDocuments(query),
-            Payment.aggregate([{ $group: { _id: '$status', count: { $sum: 1 }, amount: { $sum: '$amount' } } }]),
+            Payment.aggregate([{ $group: { _id: { status: '$status', currency: '$currency' }, count: { $sum: 1 }, amount: { $sum: '$amount' } } }]),
         ]);
-        const summary = Object.fromEntries(totals.map((t) => [t._id, { count: t.count, amount: Math.round(t.amount * 100) / 100 }]));
-        return ResponseHandler.success(res, { payments, summary, pagination: pageInfo(total, pg) });
+        // Totals per status in the base currency (payments are taken in several currencies)
+        const { base, rates } = await getCurrencyConfig();
+        const summary = {};
+        for (const t of totals) {
+            const row = summary[t._id.status] || (summary[t._id.status] = { count: 0, amount: 0 });
+            row.count += t.count;
+            row.amount = round2(row.amount + convert(t.amount, (t._id.currency || 'USD').toUpperCase(), base, rates));
+        }
+        return ResponseHandler.success(res, { payments, summary, summaryCurrency: base, pagination: pageInfo(total, pg) });
     } catch (err) {
         logger.error('Error fetching payments', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to fetch payments');

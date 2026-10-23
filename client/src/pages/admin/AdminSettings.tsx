@@ -10,6 +10,7 @@ import { useSiteSettings, useUpdateSiteSettings } from "@/hooks/use-settings";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingServicesCard } from "@/components/admin/BookingServicesCard";
+import { CurrencySettingsCard } from "@/components/admin/CurrencySettingsCard";
 import { PageHeader } from "@/components/admin/AdminUI";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
@@ -101,6 +102,7 @@ export const AdminSettings = () => {
             <PageHeader title="Settings" description="Company details shown across the site, footer options, and which booking services are switched on." />
 
             <div className="grid gap-6">
+                <CurrencySettingsCard value={settings?.currency} />
                 <BookingServicesCard settings={settings} />
 
                 <Card>

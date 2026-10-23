@@ -8,6 +8,10 @@ const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const config = require('../config');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
+const { getCurrencyConfig, convert, isSupported, normalizeCode } = require('../services/currency');
+
+// The tour's price in USD at today's rates, for filters and sorting across currencies
+const priceInUSD = (tour, rates) => convert(tour.price || 0, tour.currency || 'USD', 'USD', rates);
 
 // Catalog staff can list and preview tours that are not live yet
 const canSeeAll = (user) => hasPermission(user, PERMISSIONS.CATALOG);
@@ -63,10 +67,13 @@ exports.getTours = async (req, res) => {
         if (place) {
             query.location = { $regex: `\\b${escapeRegex(String(place))}\\b`, $options: 'i' };
         }
+        // Price filters arrive in USD (or ?priceCurrency=) and are compared on the USD price index
         if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
+            const { rates } = await getCurrencyConfig();
+            const from = isSupported(req.query.priceCurrency) ? String(req.query.priceCurrency).toUpperCase() : 'USD';
+            query.priceUSD = {};
+            if (minPrice) query.priceUSD.$gte = convert(Number(minPrice), from, 'USD', rates);
+            if (maxPrice) query.priceUSD.$lte = convert(Number(maxPrice), from, 'USD', rates);
         }
         if (minDays || maxDays) {
             query['duration.days'] = {};
@@ -105,9 +112,9 @@ exports.getTours = async (req, res) => {
             query.status = 'active';
         }
 
-        let sortOptions = { 'reviews.rating': -1, price: 1 };
-        if (sortParam === 'price_low') sortOptions = { price: 1 };
-        else if (sortParam === 'price_high') sortOptions = { price: -1 };
+        let sortOptions = { 'reviews.rating': -1, priceUSD: 1 };
+        if (sortParam === 'price_low') sortOptions = { priceUSD: 1 };
+        else if (sortParam === 'price_high') sortOptions = { priceUSD: -1 };
         else if (sortParam === 'rating') sortOptions = { 'reviews.rating': -1 };
         else if (sortParam === 'newest') sortOptions = { createdAt: -1 };
         else if (sortParam === 'updated') sortOptions = { updatedAt: -1 };
@@ -206,7 +213,7 @@ exports.getTourById = async (req, res) => {
 };
 
 // Turns an editor's form (or an import row) into a clean tour document
-function normalizeTour(input = {}, { partial = false } = {}) {
+function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {}) {
     const data = { ...input };
     // Ratings come from real reviews and the audit fields from the session, never from the form
     delete data.reviews;
@@ -214,7 +221,12 @@ function normalizeTour(input = {}, { partial = false } = {}) {
     delete data.updatedBy;
     delete data._id;
 
-    if (!partial || 'currency' in data) data.currency = 'USD';
+    // Codes only; a missing or unknown currency falls back to the site's base currency
+    if ('currency' in data || !partial) {
+        const code = normalizeCode(data.currency);
+        data.currency = isSupported(code) ? code : baseCurrency;
+    }
+    delete data.priceUSD;
     if (typeof data.title === 'string') data.title = data.title.trim();
     if (typeof data.location === 'string') data.location = data.location.trim();
     if ('price' in data) data.price = Number(data.price) || 0;
@@ -275,7 +287,9 @@ function validationMessage(err) {
 // POST /tours
 exports.createTour = async (req, res) => {
     try {
-        const tour = await TravelDestination.create({ ...normalizeTour(req.body), createdBy: req.user._id, updatedBy: req.user._id });
+        const { base, rates } = await getCurrencyConfig();
+        const data = normalizeTour(req.body, { baseCurrency: base });
+        const tour = await TravelDestination.create({ ...data, priceUSD: priceInUSD(data, rates), createdBy: req.user._id, updatedBy: req.user._id });
         return ResponseHandler.success(res, { tour }, 'Tour created successfully');
     } catch (err) {
         if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationMessage(err));
@@ -290,7 +304,9 @@ exports.updateTour = async (req, res) => {
         // Loaded and saved as a document, so "required once live" rules see the tour's real status
         const tour = await TravelDestination.findById(req.params.id);
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
-        tour.set({ ...normalizeTour(req.body, { partial: true }), updatedBy: req.user._id });
+        const { base, rates } = await getCurrencyConfig();
+        tour.set({ ...normalizeTour(req.body, { partial: true, baseCurrency: base }), updatedBy: req.user._id });
+        tour.priceUSD = priceInUSD(tour, rates);
         await tour.save();
         await tour.populate('updatedBy', 'displayName');
         return ResponseHandler.success(res, { tour }, 'Tour updated successfully');
@@ -422,10 +438,12 @@ exports.bulkCreateTours = async (req, res) => {
         }
         if (rows.length > 500) return ResponseHandler.fail(res, 400, 'Import at most 500 tours at a time.');
 
+        const { base, rates } = await getCurrencyConfig();
         const valid = [];
         const failed = [];
         rows.forEach((row, index) => {
-            const doc = new TravelDestination({ ...normalizeTour(row), createdBy: req.user._id, updatedBy: req.user._id });
+            const data = normalizeTour(row, { baseCurrency: base });
+            const doc = new TravelDestination({ ...data, priceUSD: priceInUSD(data, rates), createdBy: req.user._id, updatedBy: req.user._id });
             const err = doc.validateSync();
             if (err) failed.push({ row: index + 1, title: row?.title || '(no title)', error: validationMessage(err) });
             else valid.push(doc);

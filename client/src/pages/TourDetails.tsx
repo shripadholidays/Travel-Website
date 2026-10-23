@@ -77,7 +77,7 @@ export const TourDetails = () => {
                     offers: {
                         '@type': 'Offer',
                         price: tour.price,
-                        priceCurrency: 'USD',
+                        priceCurrency: tour.currency || 'USD',
                         availability: 'https://schema.org/InStock',
                     },
                     ...(rating > 0 && reviewCount > 0
@@ -129,7 +129,7 @@ export const TourDetails = () => {
             <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl px-4 py-3 flex items-center gap-3">
                 <div className="flex-1">
                     <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wide">From</p>
-                    <p className="text-xl font-bold font-display text-brand-blue">{formatPrice(tour.price)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
+                    <p className="text-xl font-bold font-display text-brand-blue">{formatPrice(tour.price, tour.currency)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
                 </div>
                 <Button asChild className="h-12 px-7 text-base font-bold bg-brand-orange hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20 rounded-2xl text-white flex-shrink-0">
                     <Link to="/book" state={booking.bookState}>

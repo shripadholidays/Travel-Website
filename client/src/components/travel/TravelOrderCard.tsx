@@ -23,7 +23,7 @@ export const TravelOrderCard = ({ order, onCancel, compact }: {
     onCancel?: (order: TravelOrder) => void;
     compact?: boolean;
 }) => {
-    const { formatPrice } = useCurrency();
+    const { formatMoney } = useCurrency();
     const isFlight = order.kind === 'flight';
     const flight = isFlight ? (order.offer as FlightOffer) : null;
     const hotel = !isFlight ? (order.offer as HotelOffer) : null;
@@ -56,7 +56,7 @@ export const TravelOrderCard = ({ order, onCancel, compact }: {
                 )}
                 <div className="flex flex-wrap gap-2">
                     <span className={cn('text-xs font-bold px-2.5 py-1 rounded-full capitalize', STATUS_STYLES[order.status])}>{order.status}</span>
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">{formatPrice(order.pricing.total)}</span>
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">{formatMoney(order.pricing.total, order.pricing.currency)}</span>
                     {order.providerRef && <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">{order.providerRef}</span>}
                     {trip && !compact && <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-brand-orange/10 text-brand-orange truncate max-w-[220px]">Trip: {trip}</span>}
                 </div>

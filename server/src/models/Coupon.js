@@ -19,6 +19,12 @@ const couponSchema = new mongoose.Schema({
         required: true,
         min: 0,
     },
+    // Flat discounts and the minimum order are in this currency (converted for other checkouts)
+    currency: {
+        type: String,
+        enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'],
+        default: 'USD',
+    },
     minOrderAmount: {
         type: Number,
         default: 0,
@@ -44,11 +50,15 @@ const couponSchema = new mongoose.Schema({
     description: String,
 }, { timestamps: true });
 
+// orderAmount is in the coupon's own currency
 couponSchema.methods.isValid = function (orderAmount = 0) {
     if (!this.isActive) return { valid: false, reason: 'Coupon is inactive.' };
     if (this.expiresAt && this.expiresAt < new Date()) return { valid: false, reason: 'Coupon has expired.' };
     if (this.maxUses !== null && this.usedCount >= this.maxUses) return { valid: false, reason: 'Coupon usage limit reached.' };
-    if (orderAmount < this.minOrderAmount) return { valid: false, reason: `Minimum order amount is $${this.minOrderAmount}.` };
+    if (orderAmount < this.minOrderAmount) {
+        const { formatMoney } = require('../services/currency');
+        return { valid: false, reason: `This code needs an order of at least ${formatMoney(this.minOrderAmount, this.currency || 'USD')}.` };
+    }
     return { valid: true };
 };
 

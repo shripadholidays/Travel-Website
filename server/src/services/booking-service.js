@@ -3,9 +3,10 @@ const Coupon = require('../models/Coupon');
 const Payment = require('../models/Payment');
 const { refundPayment } = require('./travel-order-service');
 const logger = require('../utils/logger');
+const { getCurrencyConfig, convert, rateBetween, formatMoney } = require('./currency');
 const { sendBookingConfirmation, sendAdminAlert } = require('./email-service');
 
-// Add-ons are priced here, never by the client.
+// Add-ons are priced here, never by the client (in US dollars, converted to the checkout currency).
 const ADDON_CATALOG = {
     'Airport Transfer': 50,
     'Travel Insurance': 30,
@@ -32,34 +33,63 @@ function parseTravelDate(value) {
 }
 
 /**
- * Works out what the traveller pays: tour price × travellers, catalogue add-ons,
- * and an optional coupon (re-validated here; the checkout preview is only a preview).
+ * Checks a coupon against an order in any currency. Flat discounts and minimum orders are set
+ * in the coupon's own currency and converted; percentages apply as they are.
  */
-async function priceBooking({ tour, numberOfTravelers, addons = [], couponCode }) {
+function couponDiscount(coupon, subtotal, currency, rates) {
+    const orderInCouponCurrency = convert(subtotal, currency, coupon.currency || 'USD', rates);
+    const { valid, reason } = coupon.isValid(orderInCouponCurrency, currency, rates);
+    if (!valid) return { valid, reason };
+    const discount = coupon.discountType === 'percent'
+        ? round2(subtotal * (coupon.discountValue / 100))
+        : Math.min(subtotal, convert(coupon.discountValue, coupon.currency || 'USD', currency, rates));
+    return { valid: true, discount: round2(discount) };
+}
+
+/**
+ * Works out what the traveller pays, in the currency they chose: tour price converted from the
+ * tour's own currency × travellers, catalogue add-ons, and an optional coupon (re-validated here;
+ * the checkout preview is only a preview). Unsupported or switched-off currencies fall back to
+ * the site's base currency.
+ */
+async function priceBooking({ tour, numberOfTravelers, addons = [], couponCode, currency }) {
     const travellers = Number(numberOfTravelers);
     if (!Number.isInteger(travellers) || travellers < 1) throw new BookingError(400, 'At least one traveler is required.');
+
+    const { base, enabled, rates } = await getCurrencyConfig();
+    const pay = enabled.includes(String(currency || '').toUpperCase()) ? String(currency).toUpperCase() : base;
+    const tourCurrency = rates[tour.currency] ? tour.currency : 'USD';
+    const unitPrice = convert(tour.price, tourCurrency, pay, rates);
 
     const names = [...new Set((addons || []).map((a) => (typeof a === 'string' ? a : a?.name)).filter(Boolean))];
     const unknown = names.filter((n) => !(n in ADDON_CATALOG));
     if (unknown.length) throw new BookingError(400, `Unknown add-on: ${unknown.join(', ')}`);
-    const pricedAddons = names.map((name) => ({ name, price: ADDON_CATALOG[name] }));
+    const pricedAddons = names.map((name) => ({ name, price: convert(ADDON_CATALOG[name], 'USD', pay, rates) }));
 
-    const subtotal = round2(tour.price * travellers + pricedAddons.reduce((s, a) => s + a.price, 0));
+    const subtotal = round2(unitPrice * travellers + pricedAddons.reduce((s, a) => s + a.price, 0));
 
     let coupon = null;
     if (couponCode) {
         const found = await Coupon.findOne({ code: String(couponCode).toUpperCase().trim() });
         if (!found) throw new BookingError(400, 'That coupon code was not found.');
-        const { valid, reason } = found.isValid(subtotal);
-        if (!valid) throw new BookingError(400, reason);
-        coupon = { code: found.code, discount: found.applyDiscount(subtotal) };
+        const result = couponDiscount(found, subtotal, pay, rates);
+        if (!result.valid) throw new BookingError(400, result.reason);
+        coupon = { code: found.code, discount: result.discount };
     }
 
+    const totalAmount = round2(Math.max(0, subtotal - (coupon?.discount ?? 0)));
     return {
+        currency: pay,
+        unitPrice,
+        tourCurrency,
+        exchangeRate: rateBetween(tourCurrency, pay, rates),
         addons: pricedAddons,
         subtotalAmount: subtotal,
         coupon,
-        totalAmount: round2(Math.max(0, subtotal - (coupon?.discount ?? 0))),
+        totalAmount,
+        // Revenue is reported in the base currency, at the rate of the day
+        baseCurrency: base,
+        baseAmount: convert(totalAmount, pay, base, rates),
     };
 }
 
@@ -85,7 +115,7 @@ async function confirmBooking(booking) {
             ['Email', email],
             ['Travel date', new Date(booking.travelDate).toDateString()],
             ['Travellers', booking.numberOfTravelers],
-            ['Total', `${booking.currency} ${booking.totalAmount}`],
+            ['Total', formatMoney(booking.totalAmount, booking.currency)],
             ['Coupon', booking.coupon?.code],
         ]);
     } catch (err) {
@@ -130,7 +160,7 @@ async function cancelBooking(booking, { byAdmin = false } = {}) {
         await sendAdminAlert(`Booking cancelled: ${booking.tour?.title || 'tour'}`, [
             ['Traveller', booking.user?.displayName || booking.user?.email],
             ['Travel date', new Date(booking.travelDate).toDateString()],
-            ['Refunded', booking.refundedAmount ? `$${booking.refundedAmount}` : 'Nothing was charged'],
+            ['Refunded', booking.refundedAmount ? formatMoney(booking.refundedAmount, booking.currency) : 'Nothing was charged'],
             ['Cancelled by', byAdmin ? 'Admin' : 'Traveller'],
         ]);
     } catch (err) {
@@ -158,4 +188,4 @@ async function completePastBookings(filter = {}) {
     return finished.length;
 }
 
-module.exports = { completePastBookings, ADDON_CATALOG, BookingError, FREE_CANCELLATION_HOURS, parseTravelDate, priceBooking, confirmBooking, cancelBooking };
+module.exports = { couponDiscount, completePastBookings, ADDON_CATALOG, BookingError, FREE_CANCELLATION_HOURS, parseTravelDate, priceBooking, confirmBooking, cancelBooking };

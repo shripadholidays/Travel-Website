@@ -138,6 +138,8 @@ export interface AdminTravelOrder extends Omit<TravelOrder, 'pricing'> {
     failureReason?: string;
     user: { _id: string; displayName: string; email: string } | null;
     pricing: { supplierAmount: number; markupPct: number; markupAmount: number; total: number; currency: string };
+    /** What the traveller paid, in their currency */
+    charge?: { currency: string; total: number; rate: number };
 }
 
 export interface CreateTravelOrderPayload {
@@ -148,6 +150,8 @@ export interface CreateTravelOrderPayload {
     linkedBooking?: string;
     quotedTotal?: number;
     acceptPriceChange?: boolean;
+    /** What the traveller pays in (falls back to the site's base currency) */
+    currency?: string;
 }
 
 export type CreateTravelOrderResult =

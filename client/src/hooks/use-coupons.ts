@@ -6,6 +6,8 @@ export interface Coupon {
     code: string;
     discountType: "percent" | "flat";
     discountValue: number;
+    /** Flat discounts and the minimum order are in this currency */
+    currency: "INR" | "USD" | "EUR" | "GBP" | "AED";
     minOrderAmount: number;
     maxUses: number | null;
     usedCount: number;
@@ -57,7 +59,8 @@ export function useDeleteCoupon() {
 // Checkout hook — call this when user tries to apply a coupon code
 export function useValidateCoupon() {
     return useMutation({
-        mutationFn: ({ code, orderAmount }: { code: string; orderAmount: number }) =>
-            api.post<{ coupon: ValidatedCoupon }>("/coupons/validate", { code, orderAmount }),
+        // orderAmount is in `currency`; the discount comes back in it too
+        mutationFn: ({ code, orderAmount, currency }: { code: string; orderAmount: number; currency: string }) =>
+            api.post<{ coupon: ValidatedCoupon }>("/coupons/validate", { code, orderAmount, currency }),
     });
 }

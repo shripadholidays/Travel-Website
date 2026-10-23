@@ -33,6 +33,7 @@ interface Addon {
     description: string;
 }
 
+// Add-on prices are set in US dollars (the server converts them the same way)
 const AVAILABLE_ADDONS: Addon[] = [
     { name: "Airport Transfer", price: 50, description: "Round-trip airport pickup and drop-off" },
     { name: "Travel Insurance", price: 30, description: "Comprehensive coverage for your trip" },
@@ -49,7 +50,10 @@ interface ContactInfo {
 export const BookingPage = () => {
     const location = useLocation();
     const { user } = useAuth();
-    const { formatPrice, formatUSD, isConverted } = useCurrency();
+    const { currency, convert, formatMoney } = useCurrency();
+    // Same rounding as the server, so the total here is exactly what the card is charged
+    const inPay = (amount: number, from = 'USD') => Math.round(convert(amount, from, currency) * 100) / 100;
+    const money = (amount: number) => formatMoney(amount, currency);
     const createBooking = useCreateBooking();
 
     const { tourId, date, guests } = (location.state as { tourId?: string; date?: string; guests?: number }) || {};
@@ -85,14 +89,14 @@ export const BookingPage = () => {
     }, [user]);
 
     // A coupon's discount depends on the subtotal, so re-check it when guests or add-ons change.
-    const tourPrice = tourData?.tour?.price ?? 0;
-    const liveSubtotal = tourPrice * guestCount + selectedAddons.reduce((sum, a) => sum + a.price, 0);
+    const unitInPay = inPay(tourData?.tour?.price ?? 0, tourData?.tour?.currency);
+    const liveSubtotal = Math.round((unitInPay * guestCount + selectedAddons.reduce((sum, a) => sum + inPay(a.price), 0)) * 100) / 100;
     useEffect(() => {
         if (!appliedCoupon) return;
-        validateCoupon.mutateAsync({ code: appliedCoupon.code, orderAmount: liveSubtotal })
+        validateCoupon.mutateAsync({ code: appliedCoupon.code, orderAmount: liveSubtotal, currency })
             .then((r) => setAppliedCoupon(r.coupon))
             .catch((err) => { setAppliedCoupon(null); setCouponError((err as Error).message || "Coupon no longer applies."); });
-    }, [liveSubtotal]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [liveSubtotal, currency]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!tourId) {
         return (
@@ -126,20 +130,19 @@ export const BookingPage = () => {
     }
 
     const numberOfGuests = guestCount;
-    const baseAmount = tour.price * numberOfGuests;
-    const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
-    const subtotal = baseAmount + addonsTotal;
+    const baseAmount = Math.round(unitInPay * numberOfGuests * 100) / 100;
+    const subtotal = liveSubtotal;
     const couponDiscount = appliedCoupon?.discount ?? 0;
-    const totalAmount = Math.max(0, subtotal - couponDiscount);
+    const totalAmount = Math.max(0, Math.round((subtotal - couponDiscount) * 100) / 100);
 
     const handleApplyCoupon = async () => {
         const code = couponCode.trim();
         if (!code) return;
         setCouponError("");
         try {
-            const result = await validateCoupon.mutateAsync({ code, orderAmount: subtotal });
+            const result = await validateCoupon.mutateAsync({ code, orderAmount: subtotal, currency });
             setAppliedCoupon(result.coupon);
-            toast.success(`Coupon "${result.coupon.code}" applied! You saved ${formatPrice(result.coupon.discount)}.`);
+            toast.success(`Coupon "${result.coupon.code}" applied! You saved ${money(result.coupon.discount)}.`);
         } catch (err) {
             setCouponError((err as Error).message || "Invalid coupon.");
             setAppliedCoupon(null);
@@ -173,6 +176,8 @@ export const BookingPage = () => {
                 contactInfo,
                 addons: selectedAddons.map(a => ({ name: a.name })),
                 couponCode: appliedCoupon?.code,
+                // Charged in the currency the traveller is viewing
+                currency,
                 specialRequests: specialRequests || undefined,
             });
 
@@ -388,7 +393,7 @@ export const BookingPage = () => {
                                                         <p className="text-sm text-muted-foreground">{addon.description}</p>
                                                     </div>
                                                 </div>
-                                                <span className="font-bold text-brand-orange">{formatPrice(addon.price)}</span>
+                                                <span className="font-bold text-brand-orange">{money(inPay(addon.price))}</span>
                                             </div>
                                         );
                                     })}
@@ -463,7 +468,7 @@ export const BookingPage = () => {
                                 <p className="text-muted-foreground mb-2 text-lg">Your Wandeazy journey begins now.</p>
                                 <p className="text-muted-foreground mb-8">
                                     We'll email your confirmation to {contactInfo.email}.
-                                    {confirmed && <> Total charged: <span className="font-semibold text-brand-blue">{formatUSD(confirmed.totalAmount)}</span>.</>}
+                                    {confirmed && <> Total charged: <span className="font-semibold text-brand-blue">{formatMoney(confirmed.totalAmount, confirmed.currency)}</span>.</>}
                                 </p>
 
                                 {bookingId && (
@@ -560,13 +565,13 @@ export const BookingPage = () => {
                                 {/* Price breakdown */}
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between text-muted-foreground">
-                                        <span>{formatPrice(tour.price)} × {numberOfGuests}</span>
-                                        <span>{formatPrice(baseAmount)}</span>
+                                        <span>{money(unitInPay)} × {numberOfGuests}</span>
+                                        <span>{money(baseAmount)}</span>
                                     </div>
                                     {selectedAddons.map((addon) => (
                                         <div key={addon.name} className="flex justify-between text-muted-foreground">
                                             <span className="truncate pr-2">+ {addon.name}</span>
-                                            <span>{formatPrice(addon.price)}</span>
+                                            <span>{money(inPay(addon.price))}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -579,7 +584,7 @@ export const BookingPage = () => {
                                         <div className="flex items-center gap-2 text-green-700 text-sm font-medium">
                                             <Tag className="w-3.5 h-3.5" />
                                             <span>{appliedCoupon.code}</span>
-                                            <span className="text-green-600">−{formatPrice(couponDiscount)}</span>
+                                            <span className="text-green-600">−{money(couponDiscount)}</span>
                                         </div>
                                         <button onClick={handleRemoveCoupon} className="text-green-600 hover:text-red-500" aria-label="Remove coupon">
                                             <X className="w-3.5 h-3.5" />
@@ -613,13 +618,11 @@ export const BookingPage = () => {
 
                                 <div className="flex items-center justify-between">
                                     <span className="font-bold text-brand-blue">Total</span>
-                                    <span className="text-2xl font-bold font-display text-brand-orange">{formatPrice(totalAmount)}</span>
+                                    <span className="text-2xl font-bold font-display text-brand-orange">{money(totalAmount)}</span>
                                 </div>
-                                {isConverted && (
-                                    <p className="text-xs text-muted-foreground -mt-2 text-right">
-                                        Shown as an estimate. Your card is charged <span className="font-semibold text-slate-700">{formatUSD(totalAmount)}</span> (USD).
-                                    </p>
-                                )}
+                                <p className="text-xs text-muted-foreground -mt-2 text-right">
+                                    You pay in {currency}.{tour.currency !== currency && ` The tour is priced in ${tour.currency} and converted at today's rate.`}
+                                </p>
 
                                 <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground bg-slate-50 rounded-xl py-2.5">
                                     <ShieldCheck className="w-3.5 h-3.5 text-green-500" />

@@ -32,7 +32,10 @@ const ACTION_LABEL: Record<BookingStatus, string> = {
     pending: "Back to pending",
 };
 
-const usd = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n || 0);
+import { money } from "@/lib/tour-status";
+
+// Every amount on a booking is in the currency it was charged in
+const amount = (n: number, b: Booking) => money(n, b.currency || "USD", 2);
 const ref = (b: Booking) => b._id.slice(-8).toUpperCase();
 const tourOf = (b: Booking) => (typeof b.tour === "object" && b.tour ? (b.tour as Tour) : null);
 
@@ -84,12 +87,12 @@ export const AdminBookings = () => {
                 if (p >= res.pagination.pages) break;
             }
             if (all.length === 0) { toast.error("No bookings to export."); return; }
-            const headers = ["Reference", "Booked on", "Traveller", "Email", "Phone", "Tour", "Travel date", "Travellers", "Add-ons", "Coupon", "Total (USD)", "Refunded (USD)", "Status"];
+            const headers = ["Reference", "Booked on", "Traveller", "Email", "Phone", "Tour", "Travel date", "Travellers", "Add-ons", "Coupon", "Currency", "Total", "Refunded", "Status"];
             const rows = all.map((b) => [
                 ref(b), format(new Date(b.createdAt), "yyyy-MM-dd"),
                 `${b.contactInfo.firstName} ${b.contactInfo.lastName}`, b.contactInfo.email, b.contactInfo.phone,
                 tourOf(b)?.title ?? "", format(new Date(b.travelDate), "yyyy-MM-dd"), b.numberOfTravelers,
-                (b.addons ?? []).map((a) => a.name).join("; "), b.coupon?.code ?? "", b.totalAmount, b.refundedAmount ?? "", STATUS[b.status].label,
+                (b.addons ?? []).map((a) => a.name).join("; "), b.coupon?.code ?? "", b.currency || "USD", b.totalAmount, b.refundedAmount ?? "", STATUS[b.status].label,
             ].map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
             const url = URL.createObjectURL(new Blob([[headers.join(","), ...rows].join("\n")], { type: "text/csv;charset=utf-8;" }));
             const a = document.createElement("a");
@@ -170,8 +173,8 @@ export const AdminBookings = () => {
                                             </TableCell>
                                             <TableCell className="hidden sm:table-cell whitespace-nowrap">{format(new Date(b.travelDate), "d MMM yyyy")}</TableCell>
                                             <TableCell className="text-right tabular-nums font-semibold whitespace-nowrap">
-                                                {usd(b.totalAmount)}
-                                                {!!b.refundedAmount && <span className="block text-xs font-normal text-muted-foreground">refunded {usd(b.refundedAmount)}</span>}
+                                                {amount(b.totalAmount, b)}
+                                                {!!b.refundedAmount && <span className="block text-xs font-normal text-muted-foreground">refunded {amount(b.refundedAmount, b)}</span>}
                                             </TableCell>
                                             <TableCell><StatusPill tone={STATUS[b.status].tone}>{STATUS[b.status].label}</StatusPill></TableCell>
                                             <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
@@ -232,11 +235,14 @@ export const AdminBookings = () => {
                                 <div>
                                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Price</p>
                                     <dl className="space-y-1">
-                                        <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{usd(detail.subtotalAmount ?? detail.totalAmount)}</dd></div>
-                                        {(detail.addons ?? []).map((a) => <div key={a.name} className="flex justify-between text-muted-foreground"><dt>incl. {a.name}</dt><dd className="tabular-nums">{usd(a.price)}</dd></div>)}
-                                        {detail.coupon && <div className="flex justify-between text-emerald-700"><dt>Coupon {detail.coupon.code}</dt><dd className="tabular-nums">−{usd(detail.coupon.discount)}</dd></div>}
-                                        <div className="flex justify-between border-t pt-1 font-semibold"><dt>Total charged</dt><dd className="tabular-nums">{usd(detail.totalAmount)}</dd></div>
-                                        {!!detail.refundedAmount && <div className="flex justify-between text-muted-foreground"><dt>Refunded</dt><dd className="tabular-nums">{usd(detail.refundedAmount)}</dd></div>}
+                                        <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{amount(detail.subtotalAmount ?? detail.totalAmount, detail)}</dd></div>
+                                        {(detail.addons ?? []).map((a) => <div key={a.name} className="flex justify-between text-muted-foreground"><dt>incl. {a.name}</dt><dd className="tabular-nums">{amount(a.price, detail)}</dd></div>)}
+                                        {detail.coupon && <div className="flex justify-between text-emerald-700"><dt>Coupon {detail.coupon.code}</dt><dd className="tabular-nums">−{amount(detail.coupon.discount, detail)}</dd></div>}
+                                        {detail.tourCurrency && detail.tourCurrency !== detail.currency && (
+                                            <p className="text-xs text-muted-foreground">Tour priced at {money(detail.unitPrice && detail.exchangeRate ? detail.unitPrice / detail.exchangeRate : 0, detail.tourCurrency)} per person, charged in {detail.currency} at 1 {detail.tourCurrency} = {detail.exchangeRate?.toFixed(4)} {detail.currency}.</p>
+                                        )}
+                                        <div className="flex justify-between border-t pt-1 font-semibold"><dt>Total charged</dt><dd className="tabular-nums">{amount(detail.totalAmount, detail)}</dd></div>
+                                        {!!detail.refundedAmount && <div className="flex justify-between text-muted-foreground"><dt>Refunded</dt><dd className="tabular-nums">{amount(detail.refundedAmount, detail)}</dd></div>}
                                     </dl>
                                 </div>
                                 {detail.specialRequests && (

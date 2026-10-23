@@ -14,15 +14,18 @@ import { ConfirmDialog } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, PageHeader, StatusPill, type Tone } from "@/components/admin/AdminUI";
 import { useAdminCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, type Coupon } from "@/hooks/use-coupons";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CURRENCY_OPTIONS, money } from "@/lib/tour-status";
 
-type Form = { code: string; discountType: "percent" | "flat"; discountValue: string; minOrderAmount: string; maxUses: string; expiresAt: string; isActive: boolean; description: string };
+type Form = { code: string; discountType: "percent" | "flat"; discountValue: string; currency: Coupon["currency"]; minOrderAmount: string; maxUses: string; expiresAt: string; isActive: boolean; description: string };
 
-const EMPTY: Form = { code: "", discountType: "percent", discountValue: "10", minOrderAmount: "", maxUses: "", expiresAt: "", isActive: true, description: "" };
+const EMPTY: Form = { code: "", discountType: "percent", discountValue: "10", currency: "INR", minOrderAmount: "", maxUses: "", expiresAt: "", isActive: true, description: "" };
 
 const toForm = (c: Coupon): Form => ({
     code: c.code,
     discountType: c.discountType,
     discountValue: String(c.discountValue),
+    currency: c.currency ?? "USD",
     minOrderAmount: c.minOrderAmount ? String(c.minOrderAmount) : "",
     maxUses: c.maxUses ? String(c.maxUses) : "",
     expiresAt: c.expiresAt ? c.expiresAt.slice(0, 10) : "",
@@ -59,9 +62,11 @@ export const AdminCoupons = () => {
     const [deleteTarget, setDeleteTarget] = useState<Coupon | null>(null);
 
     const coupons = data?.coupons ?? [];
+    const { base } = useCurrency();
     const set = <K extends keyof Form>(k: K, v: Form[K]) => { setForm((f) => ({ ...f, [k]: v })); setError(null); };
 
-    const openNew = () => { setEditing(null); setForm(EMPTY); setError(null); setOpen(true); };
+    // New coupons start in the site's base currency
+    const openNew = () => { setEditing(null); setForm({ ...EMPTY, currency: base as Coupon["currency"] }); setError(null); setOpen(true); };
     const openEdit = (c: Coupon) => { setEditing(c); setForm(toForm(c)); setError(null); setOpen(true); };
 
     const submit = async () => {
@@ -71,6 +76,7 @@ export const AdminCoupons = () => {
             code: form.code,
             discountType: form.discountType,
             discountValue: Number(form.discountValue),
+            currency: form.currency,
             minOrderAmount: Number(form.minOrderAmount) || 0,
             maxUses: form.maxUses ? Number(form.maxUses) : null,
             expiresAt: form.expiresAt || null,
@@ -104,7 +110,7 @@ export const AdminCoupons = () => {
         <div className="space-y-6">
             <PageHeader
                 title="Coupons"
-                description="Promo codes travellers enter at checkout. Discounts apply to the tour total in US dollars."
+                description="Promo codes travellers enter at checkout. Percentage discounts work in every currency; fixed amounts and minimum orders are set in the coupon's currency and converted at checkout."
                 actions={<Button onClick={openNew} className="gap-2 bg-brand-orange hover:bg-brand-orange/90"><Plus className="w-4 h-4" /> New coupon</Button>}
             />
 
@@ -139,8 +145,8 @@ export const AdminCoupons = () => {
                                                 </button>
                                                 {c.description && <p className="text-xs text-muted-foreground line-clamp-1 max-w-[220px]">{c.description}</p>}
                                             </TableCell>
-                                            <TableCell className="tabular-nums font-medium">{c.discountType === "percent" ? `${c.discountValue}% off` : `$${c.discountValue} off`}</TableCell>
-                                            <TableCell className="hidden md:table-cell tabular-nums">{c.minOrderAmount ? `$${c.minOrderAmount}` : "None"}</TableCell>
+                                            <TableCell className="tabular-nums font-medium">{c.discountType === "percent" ? `${c.discountValue}% off` : `${money(c.discountValue, c.currency ?? "USD")} off`}</TableCell>
+                                            <TableCell className="hidden md:table-cell tabular-nums">{c.minOrderAmount ? money(c.minOrderAmount, c.currency ?? "USD") : "None"}</TableCell>
                                             <TableCell className="hidden sm:table-cell tabular-nums">{c.usedCount} / {c.maxUses ?? "∞"}</TableCell>
                                             <TableCell className="hidden md:table-cell whitespace-nowrap">{c.expiresAt ? format(new Date(c.expiresAt), "d MMM yyyy") : "Never"}</TableCell>
                                             <TableCell><StatusPill tone={st.tone}>{st.label}</StatusPill></TableCell>
@@ -171,22 +177,30 @@ export const AdminCoupons = () => {
                             <Input id="code" className="font-mono uppercase" placeholder="SUMMER20" value={form.code} maxLength={30}
                                 onChange={(e) => set("code", e.target.value.toUpperCase().replace(/\s+/g, ""))} />
                         </div>
+                        <div className="col-span-2 space-y-1.5">
+                            <Label htmlFor="coupon-currency">Coupon currency</Label>
+                            <Select value={form.currency} onValueChange={(v) => set("currency", v as Form["currency"])}>
+                                <SelectTrigger id="coupon-currency"><SelectValue /></SelectTrigger>
+                                <SelectContent>{CURRENCY_OPTIONS.map((c) => <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>)}</SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Used for a fixed amount off and the minimum order. A traveller paying in another currency gets the converted amount.</p>
+                        </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="type">Discount type</Label>
                             <Select value={form.discountType} onValueChange={(v) => set("discountType", v as Form["discountType"])}>
                                 <SelectTrigger id="type"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="percent">Percentage (%)</SelectItem>
-                                    <SelectItem value="flat">Fixed amount ($)</SelectItem>
+                                    <SelectItem value="flat">Fixed amount</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="value">{form.discountType === "percent" ? "Percent off" : "Dollars off"}</Label>
+                            <Label htmlFor="value">{form.discountType === "percent" ? "Percent off" : `Amount off (${form.currency})`}</Label>
                             <Input id="value" inputMode="decimal" value={form.discountValue} onChange={(e) => set("discountValue", e.target.value.replace(/[^0-9.]/g, ""))} />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="min">Minimum order ($)</Label>
+                            <Label htmlFor="min">Minimum order ({form.currency})</Label>
                             <Input id="min" inputMode="decimal" placeholder="None" value={form.minOrderAmount} onChange={(e) => set("minOrderAmount", e.target.value.replace(/[^0-9.]/g, ""))} />
                         </div>
                         <div className="space-y-1.5">

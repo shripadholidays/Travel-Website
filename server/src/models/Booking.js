@@ -44,10 +44,18 @@ const bookingSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    // What the traveller chose and was charged in; every amount on the booking is in this currency
     currency: {
         type: String,
         default: 'USD'
     },
+    // How the price was converted: the tour's own price per person, its currency and the rate used
+    unitPrice: { type: Number },
+    tourCurrency: { type: String },
+    exchangeRate: { type: Number },
+    // The total in the site's base currency at the day's rate, for revenue reports
+    baseCurrency: { type: String },
+    baseAmount: { type: Number },
     status: {
         type: String,
         enum: ['pending', 'confirmed', 'cancelled', 'completed'],

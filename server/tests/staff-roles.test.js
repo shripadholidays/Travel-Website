@@ -117,16 +117,16 @@ describe('staff accounts', () => {
 });
 
 describe('listing tours', () => {
-    it('saves a half-finished form with sensible defaults and USD prices', async () => {
+    it('saves a half-finished form with sensible defaults and keeps its currency', async () => {
         const res = await request(app).post('/api/v1/tours').set(as(editor)).send(form({
-            currency: 'INR',
+            currency: '₹',
             itinerary: [{ activity: 'Houseboat cruise', location: '' }, { activity: '', location: '' }],
             inclusions: [{ title: 'Meals', included: true }, { title: ' ', included: true }],
             coordinates: { lat: '', lng: '' },
         }));
         expect(res.status).toBe(200);
         const saved = res.body.data.tour;
-        expect(saved.currency).toBe('USD');
+        expect(saved.currency).toBe('INR');
         expect(saved.itinerary).toEqual([expect.objectContaining({ day: 1, activity: 'Houseboat cruise', location: 'Kochi, India' })]);
         expect(saved.inclusions).toHaveLength(1);
         expect(new Date(saved.validity).getTime()).toBeGreaterThan(Date.now());

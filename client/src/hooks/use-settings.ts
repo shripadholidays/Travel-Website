@@ -92,6 +92,16 @@ export interface FooterLink {
 
 // ── Main settings type ────────────────────────────────────────────────────────
 
+export type CurrencyCode = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED';
+export interface CurrencySettings {
+    base: CurrencyCode;
+    enabled: CurrencyCode[];
+    supported?: CurrencyCode[];
+    rates: Record<CurrencyCode, number>;
+    updatedAt?: string | null;
+    ratesUpdatedAt?: string | null;
+}
+
 export interface SiteSettings {
     _id: string;
     companyName: string;
@@ -148,6 +158,8 @@ export interface SiteSettings {
     /** Admin-only switches: when off, that service does not exist on the public site. */
     features: { flights: boolean; hotels: boolean };
     travelMarkup: { flightPct: number; hotelPct: number };
+    /** Currencies travellers can pick, the base currency and rates (units per 1 USD) */
+    currency?: CurrencySettings;
 }
 
 export type TravelFeature = keyof SiteSettings['features'];

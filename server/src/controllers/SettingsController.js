@@ -7,6 +7,8 @@ const ResponseHandler = require('../utils/response-handler');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 const logger = require('../utils/logger');
 const { clearTravelConfigCache } = require('../services/travel-config');
+const { getCurrencyConfig, clearCurrencyCache, fetchLatestRates, SUPPORTED } = require('../services/currency');
+const { refreshTourPriceIndex } = require('../services/tour-price-index');
 
 // Helper: get or create singleton settings doc
 async function getSettings() {
@@ -41,6 +43,8 @@ exports.getPublicSettings = async (req, res) => {
         const settings = await getSettings();
         const pub = {};
         for (const f of PUBLIC_FIELDS) pub[f] = settings[f];
+        // Rates and the currencies travellers can choose, for showing prices
+        pub.currency = await getCurrencyConfig();
         pub.contentSections = (settings.contentSections || []).map(s => ({
             sectionId: s.sectionId,
             isVisible: s.isVisible,
@@ -126,9 +130,40 @@ const CONTENT_KEYS = [
 ];
 const SYSTEM_KEYS = [
     'companyName', 'contactEmail', 'contactPhone', 'address',
-    'socialLinks', 'footer', 'features', 'travelMarkup',
+    'socialLinks', 'footer', 'features', 'travelMarkup', 'currency',
 ];
 const UPDATABLE = [...SYSTEM_KEYS, ...CONTENT_KEYS];
+
+function checkCurrency(c) {
+    if (c.base !== undefined && !SUPPORTED.includes(c.base)) return 'Unknown base currency.';
+    if (c.enabled !== undefined) {
+        if (!Array.isArray(c.enabled) || c.enabled.length === 0) return 'Keep at least one currency switched on.';
+        if (c.enabled.some((x) => !SUPPORTED.includes(x))) return 'Unknown currency in the list.';
+        if (c.base && !c.enabled.includes(c.base)) return 'The base currency must stay switched on.';
+    }
+    if (c.rates) {
+        for (const [code, rate] of Object.entries(c.rates)) {
+            if (!SUPPORTED.includes(code)) return `Unknown currency ${code}.`;
+            if (!(Number(rate) > 0)) return `Enter a rate above 0 for ${code}.`;
+        }
+        c.rates.USD = 1;
+    }
+    return null;
+}
+
+// POST /admin/settings/currency/refresh — pulls today's market rates
+exports.refreshRates = async (req, res) => {
+    try {
+        const rates = await fetchLatestRates();
+        const settings = await getSettings();
+        settings.currency = { ...(settings.currency?.toObject?.() ?? settings.currency ?? {}), rates, ratesUpdatedAt: new Date() };
+        await settings.save();
+        await refreshTourPriceIndex();
+        return ResponseHandler.success(res, { currency: await getCurrencyConfig() }, 'Exchange rates updated');
+    } catch (err) {
+        return ResponseHandler.fail(res, 502, err.message);
+    }
+};
 
 exports.updateSettings = async (req, res) => {
     try {
@@ -137,6 +172,11 @@ exports.updateSettings = async (req, res) => {
         const denied = keys.filter((k) => !hasPermission(req.user, CONTENT_KEYS.includes(k) ? PERMISSIONS.CONTENT : PERMISSIONS.SETTINGS));
         if (denied.length) {
             return ResponseHandler.fail(res, 403, `Your role can't change: ${denied.join(', ')}. Ask an administrator.`);
+        }
+        if (req.body.currency) {
+            const problem = checkCurrency(req.body.currency);
+            if (problem) return ResponseHandler.fail(res, 400, problem);
+            if (req.body.currency.rates) req.body.currency.ratesUpdatedAt = new Date();
         }
         const settings = await getSettings();
         for (const key of UPDATABLE) {
@@ -156,6 +196,9 @@ exports.updateSettings = async (req, res) => {
         }
         await settings.save();
         clearTravelConfigCache();
+        clearCurrencyCache();
+        // Price filters and sorting use each tour's USD price, which depends on the rates
+        if (req.body.currency?.rates) await refreshTourPriceIndex();
         return ResponseHandler.success(res, { settings }, 'Settings updated');
     } catch (err) {
         if (err.name === 'ValidationError') {

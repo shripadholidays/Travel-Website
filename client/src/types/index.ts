@@ -91,6 +91,12 @@ export interface Booking {
     specialRequests?: string;
     cancelledAt?: string;
     refundedAmount?: number;
+    /** How the price was converted at checkout */
+    unitPrice?: number;
+    tourCurrency?: string;
+    exchangeRate?: number;
+    baseCurrency?: string;
+    baseAmount?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -190,6 +196,8 @@ export interface DashboardStats {
     totalTours: number;
     totalReviews?: number;
     totalRevenue?: number;
+    /** The base currency revenue is reported in */
+    revenueCurrency?: string;
     attention: { pendingArticles?: number; newInquiries?: number; pendingBookings?: number; draftTours?: number };
     catalogHealth?: { noGallery: number; noItinerary: number; expiringSoon: number };
     recentBookings?: Booking[];

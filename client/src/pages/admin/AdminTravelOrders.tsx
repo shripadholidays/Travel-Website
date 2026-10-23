@@ -20,7 +20,11 @@ const STATUS_VARIANT: Record<TravelOrderStatus, 'success' | 'secondary' | 'destr
     failed: 'destructive',
 };
 
+// Supplier cost and markup stay in the supplier's currency (USD); travellers may pay in their own
 const usd = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+const charged = (o: AdminTravelOrder) => (o.charge?.currency && o.charge.currency !== o.pricing.currency
+    ? new Intl.NumberFormat(o.charge.currency === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency: o.charge.currency }).format(o.charge.total)
+    : null);
 
 function describe(order: AdminTravelOrder) {
     if (order.kind === 'flight') {
@@ -72,11 +76,11 @@ export const AdminTravelOrders = () => {
                     <p className="text-2xl font-bold">{revenue.length}</p>
                 </CardContent></Card>
                 <Card><CardContent className="p-5">
-                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Booked value</p>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Booked value (USD)</p>
                     <p className="text-2xl font-bold">{usd(revenue.reduce((s, o) => s + o.pricing.total, 0))}</p>
                 </CardContent></Card>
                 <Card className="bg-orange-50 border-orange-100"><CardContent className="p-5">
-                    <p className="text-xs text-orange-700 font-semibold uppercase tracking-wider">Markup earned</p>
+                    <p className="text-xs text-orange-700 font-semibold uppercase tracking-wider">Markup earned (USD)</p>
                     <p className="text-2xl font-bold text-orange-700">{usd(margin)}</p>
                 </CardContent></Card>
             </div>
@@ -124,7 +128,7 @@ export const AdminTravelOrders = () => {
                                     <TableHead>Traveller</TableHead>
                                     <TableHead>Reference</TableHead>
                                     <TableHead className="text-right">Supplier</TableHead>
-                                    <TableHead className="text-right">Total</TableHead>
+                                    <TableHead className="text-right">Total (USD)</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Created</TableHead>
                                     <TableHead><span className="sr-only">Actions</span></TableHead>
@@ -153,7 +157,10 @@ export const AdminTravelOrders = () => {
                                                 <span className="block text-muted-foreground font-sans">{o.provider}</span>
                                             </TableCell>
                                             <TableCell className="text-right tabular-nums text-muted-foreground">{usd(o.pricing.supplierAmount)}</TableCell>
-                                            <TableCell className="text-right tabular-nums font-semibold">{usd(o.pricing.total)}</TableCell>
+                                            <TableCell className="text-right tabular-nums font-semibold">
+                                                {usd(o.pricing.total)}
+                                                {charged(o) && <span className="block text-xs font-normal text-muted-foreground">paid {charged(o)}</span>}
+                                            </TableCell>
                                             <TableCell>
                                                 <Badge variant={STATUS_VARIANT[o.status]} className="capitalize">{o.status}</Badge>
                                                 {o.failureReason && <p className="mt-1 text-xs text-red-600 max-w-[180px]">{o.failureReason}</p>}

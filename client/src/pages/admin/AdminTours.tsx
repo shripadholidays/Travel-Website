@@ -20,7 +20,7 @@ import {
     useAdminTours, useDeleteTour, useDuplicateTour, useBulkTourAction, useUpdateTour, type BulkTourAction,
 } from "@/hooks/use-tours";
 import { useDebounced } from "@/hooks/use-debounced";
-import { TOUR_STATUS, usd, type TourStatus } from "@/lib/tour-status";
+import { TOUR_STATUS, money, type TourStatus } from "@/lib/tour-status";
 import type { Tour } from "@/types";
 
 const SORTS = [
@@ -261,7 +261,7 @@ export const AdminTours = () => {
                                                             </Link>
                                                             <p className="text-xs text-muted-foreground truncate">
                                                                 {tour.location}
-                                                                <span className="md:hidden"> · {usd(tour.price)}</span>
+                                                                <span className="md:hidden"> · {money(tour.price, tour.currency)}</span>
                                                             </p>
                                                             <StatusPill tone={st.tone} className="sm:hidden mt-1 mr-1">{st.label}</StatusPill>
                                                             {tour.isFeatured && (
@@ -272,7 +272,7 @@ export const AdminTours = () => {
                                                         </div>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="hidden md:table-cell tabular-nums font-medium">{usd(tour.price)}</TableCell>
+                                                <TableCell className="hidden md:table-cell tabular-nums font-medium">{money(tour.price, tour.currency)}</TableCell>
                                                 <TableCell className="hidden lg:table-cell whitespace-nowrap text-muted-foreground">
                                                     {tour.duration.days} days · {tour.duration.nights} nights
                                                 </TableCell>

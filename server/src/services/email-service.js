@@ -60,7 +60,7 @@ const sendBookingConfirmation = async (booking, userEmail) => {
                     <p><strong>Booking ID:</strong> ${booking._id}</p>
                     <p><strong>Travel Date:</strong> ${new Date(booking.travelDate).toLocaleDateString()}</p>
                     <p><strong>Travelers:</strong> ${booking.numberOfTravelers}</p>
-                    <p><strong>Total:</strong> $${booking.totalAmount}</p>
+                    <p><strong>Total:</strong> ${escapeHtml(require('./currency').formatMoney(booking.totalAmount, booking.currency))}</p>
                 </div>
                 <p>We'll send you more details as your travel date approaches.</p>
             </div>`),

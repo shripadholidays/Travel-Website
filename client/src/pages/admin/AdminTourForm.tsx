@@ -19,7 +19,8 @@ import { ListEditor } from '@/components/ui/ListEditor';
 import { StatusPill, timeAgo } from '@/components/admin/AdminUI';
 import { useTour, useCreateTour, useUpdateTour, useTourFacets, useDuplicateTour } from '@/hooks/use-tours';
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
-import { TOUR_STATUS, type TourStatus } from '@/lib/tour-status';
+import { TOUR_STATUS, CURRENCY_OPTIONS, money, type TourStatus } from '@/lib/tour-status';
+import { useCurrency } from '@/context/CurrencyContext';
 import { cn } from '@/lib/utils';
 import type { Tour } from '@/types';
 
@@ -38,6 +39,7 @@ interface FormState {
     title: string;
     location: string;
     price: string;
+    currency: string;
     days: string;
     nights: string;
     validity: string;
@@ -58,7 +60,7 @@ interface FormState {
 const inAYear = () => new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10);
 
 const EMPTY: FormState = {
-    title: '', location: '', price: '', days: '5', nights: '4', validity: inAYear(), maxGroupSize: '', emi: '',
+    title: '', location: '', price: '', currency: '', days: '5', nights: '4', validity: inAYear(), maxGroupSize: '', emi: '',
     imageURL: '', gallery: [], categories: [], inclusions: [], itinerary: [], about: '',
     isFeatured: false, status: 'draft', lat: '', lng: '',
 };
@@ -73,6 +75,7 @@ function fromTour(t: Tour): FormState {
         title: t.title ?? '',
         location: t.location ?? '',
         price: t.price ? String(t.price) : '',
+        currency: ({ '$': 'USD', '₹': 'INR', '€': 'EUR', '£': 'GBP' } as Record<string, string>)[t.currency] ?? t.currency ?? '',
         days: String(t.duration?.days ?? 1),
         nights: String(t.duration?.nights ?? 0),
         validity: t.validity ? t.validity.slice(0, 10) : inAYear(),
@@ -97,6 +100,8 @@ function toPayload(f: FormState): Partial<Tour> {
         title: f.title.trim(),
         location: f.location.trim(),
         price: Number(f.price) || 0,
+        // Empty only before the site's base currency has loaded; the server then uses the base currency
+        ...(f.currency ? { currency: f.currency } : {}),
         duration: { days: Number(f.days) || 1, nights: Number(f.nights) || 0 },
         validity: f.validity,
         maxGroupSize: f.maxGroupSize ? Number(f.maxGroupSize) : null,
@@ -138,7 +143,7 @@ function validate(f: FormState, publishing: boolean): Errors {
         if (f.lat === '' || Number.isNaN(lat) || lat < -90 || lat > 90) e.lat = 'Latitude is a number from -90 to 90.';
         if (f.lng === '' || Number.isNaN(lng) || lng < -180 || lng > 180) e.lng = 'Longitude is a number from -180 to 180.';
     }
-    if (f.price !== '' && !(Number(f.price) >= 0)) e.price = 'Enter the price in US dollars.';
+    if (f.price !== '' && !(Number(f.price) >= 0)) e.price = 'Enter the price per person as a number.';
     if (publishing) {
         if (!(Number(f.price) >= 1)) e.price = 'A live tour needs a price per person.';
         if (!f.imageURL) e.imageURL = 'A live tour needs a cover image.';
@@ -171,7 +176,15 @@ export const AdminTourForm = () => {
     const [errors, setErrors] = useState<Errors>({});
     const [styleInput, setStyleInput] = useState('');
     const [nightsTouched, setNightsTouched] = useState(false);
+    const { base, currencies, convert } = useCurrency();
     const tour = tourData?.tour;
+
+    // New tours start in the site's base currency
+    useEffect(() => {
+        if (isEdit) return;
+        setForm((f) => (f.currency ? f : { ...f, currency: base }));
+        setSaved((prev) => { const p = JSON.parse(prev); return p.currency ? prev : JSON.stringify({ ...p, currency: base }); });
+    }, [base, isEdit]);
 
     useEffect(() => {
         if (!tour) return;
@@ -393,11 +406,17 @@ export const AdminTourForm = () => {
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div className="space-y-1.5 col-span-2 md:col-span-1">
-                                        <Label htmlFor="price">Price per person (USD) {form.status === 'active' && '*'}</Label>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
-                                            <Input id="price" inputMode="decimal" className="pl-6 tabular-nums" value={form.price} onChange={(e) => set('price', e.target.value.replace(/[^0-9.]/g, ''))} placeholder="1200" aria-invalid={!!errors.price} />
-                                        </div>
+                                        <Label htmlFor="currency">Currency</Label>
+                                        <Select value={form.currency || base} onValueChange={(v) => set('currency', v)}>
+                                            <SelectTrigger id="currency"><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                {CURRENCY_OPTIONS.map((c) => <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-1.5 col-span-2 md:col-span-1">
+                                        <Label htmlFor="price">Price per person {form.status === 'active' && '*'}</Label>
+                                        <Input id="price" inputMode="decimal" className="tabular-nums" value={form.price} onChange={(e) => set('price', e.target.value.replace(/[^0-9.]/g, ''))} placeholder={(form.currency || base) === 'INR' ? '45000' : '1200'} aria-invalid={!!errors.price} />
                                         <FieldError message={errors.price} />
                                     </div>
                                     <div className="space-y-1.5">
@@ -411,13 +430,18 @@ export const AdminTourForm = () => {
                                         <Input id="nights" type="number" min={0} value={form.nights} aria-invalid={!!errors.nights} onChange={(e) => { setNightsTouched(true); set('nights', e.target.value); }} />
                                         <FieldError message={errors.nights} />
                                     </div>
-                                    <div className="space-y-1.5 col-span-2 md:col-span-1">
+                                    <div className="space-y-1.5">
                                         <Label htmlFor="group">Max group size</Label>
                                         <Input id="group" type="number" min={1} value={form.maxGroupSize} onChange={(e) => set('maxGroupSize', e.target.value)} placeholder="No limit" aria-invalid={!!errors.maxGroupSize} />
                                         <FieldError message={errors.maxGroupSize} />
                                     </div>
                                 </div>
-                                <p className="-mt-2 text-xs text-muted-foreground">Checkout charges this price in US dollars. Travellers can view converted estimates in their own currency.</p>
+                                {Number(form.price) > 0 && (
+                                    <p className="-mt-2 text-xs text-muted-foreground">
+                                        Travellers see and pay this in the currency they choose, at today's rates:{' '}
+                                        {currencies.filter((c) => c !== (form.currency || base)).map((c) => money(convert(Number(form.price), form.currency || base, c), c)).join(' · ')}
+                                    </p>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-1.5">

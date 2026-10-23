@@ -54,18 +54,17 @@ function isActivePath(pathname: string, path: string) {
         || (SECTION_ALIASES[base] ?? []).some((alias) => (alias.endsWith('/') ? pathname.startsWith(alias) : pathname === alias));
 }
 
-const CURRENCIES: { value: Currency; label: string }[] = [
-    { value: 'USD', label: 'USD ($)' },
-    { value: 'INR', label: 'INR (₹)' },
-    { value: 'EUR', label: 'EUR (€)' },
-    { value: 'GBP', label: 'GBP (£)' },
-];
+const CURRENCY_LABELS: Record<Currency, string> = {
+    INR: 'INR (₹)', USD: 'USD ($)', EUR: 'EUR (€)', GBP: 'GBP (£)', AED: 'AED (د.إ)',
+};
 
 export const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showOffer, setShowOffer] = useState(true);
-    const { currency, setCurrency } = useCurrency();
+    const { currency, setCurrency, currencies } = useCurrency();
+    // Only the currencies switched on in Admin → Settings
+    const CURRENCIES = currencies.map((value) => ({ value, label: CURRENCY_LABELS[value] ?? value }));
     const { user, logout } = useAuth();
     const location = useLocation();
     const { data: settingsData } = usePublicSettings();

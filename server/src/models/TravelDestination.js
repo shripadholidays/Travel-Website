@@ -40,8 +40,10 @@ const travelDestinationSchema = new mongoose.Schema({
     location: { type: String, required: [true, 'Location is required'], trim: true, index: true }, // Indexed for country filtering
     // Drafts may be saved half-finished; a live tour needs a price, a cover image and a description
     price: { type: Number, default: 0, required: [isLive, 'Price is required'], validate: { validator(v) { return !isLive.call(this) || v >= 1; }, message: 'Price must be at least $1' }, index: true }, // Indexed for range filtering
-    // Prices are in US dollars: checkout charges tour.price in USD (see BookingController)
-    currency: { type: String, required: true, default: 'USD' },
+    // The currency the operator priced the tour in; travellers see and pay in their own (converted at checkout)
+    currency: { type: String, required: true, enum: { values: ['INR', 'USD', 'EUR', 'GBP', 'AED'], message: 'Pick a supported currency' }, default: 'INR' },
+    // The price in US dollars at current rates, so filters and sorting compare like with like (kept up to date by the server)
+    priceUSD: { type: Number, default: 0, index: true },
     duration: {
         days: { type: Number, required: true, index: true }, // Indexed for filtering
         nights: { type: Number, required: true, index: true },
@@ -76,6 +78,19 @@ const travelDestinationSchema = new mongoose.Schema({
 
 // Create text index for full-text search on title and overview
 travelDestinationSchema.index({ title: 'text', 'overview.about': 'text' });
+
+
+// Codes only (older data used symbols), and the USD price index follows the price
+const SYMBOLS = { '$': 'USD', '₹': 'INR', '€': 'EUR', '£': 'GBP' };
+travelDestinationSchema.pre('validate', async function syncCurrency() {
+    if (SYMBOLS[this.currency]) this.currency = SYMBOLS[this.currency];
+    if (this.isNew || this.isModified('price') || this.isModified('currency')) {
+        // Required here to avoid a load-order cycle with the settings model
+        const { getCurrencyConfig, convert } = require('../services/currency');
+        const { rates } = await getCurrencyConfig();
+        this.priceUSD = convert(this.price || 0, rates[this.currency] ? this.currency : 'USD', 'USD', rates);
+    }
+});
 
 const TravelDestination = mongoose.model('Travel_Destination', travelDestinationSchema);
 module.exports = TravelDestination;

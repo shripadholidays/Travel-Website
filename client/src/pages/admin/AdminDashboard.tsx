@@ -12,7 +12,7 @@ import { hasPermission, roleLabel } from "@/lib/admin-access";
 import { cn } from "@/lib/utils";
 import type { Booking } from "@/types";
 
-const usd = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+import { money } from "@/lib/tour-status";
 
 export const AdminDashboard = () => {
     const { data: stats, isLoading } = useDashboardStats();
@@ -21,7 +21,7 @@ export const AdminDashboard = () => {
 
     // Only the numbers this role works with
     const statCards = [
-        can("finance.view") && { label: "Revenue (USD)", value: stats?.totalRevenue !== undefined ? usd(stats.totalRevenue) : "—", icon: DollarSign, to: "/admin/payments" },
+        can("finance.view") && { label: `Revenue (${stats?.revenueCurrency ?? "base currency"})`, value: stats?.totalRevenue !== undefined ? money(stats.totalRevenue, stats.revenueCurrency) : "—", icon: DollarSign, to: "/admin/payments" },
         can("bookings.manage") && { label: "Bookings", value: stats?.totalBookings?.toString() ?? "—", icon: Calendar, to: "/admin/bookings" },
         { label: "Live tours", value: stats?.totalTours?.toString() ?? "—", icon: Map, to: can("catalog.manage") ? "/admin/tours?status=active" : undefined },
         stats?.totalUsers !== undefined && { label: "Registered users", value: stats.totalUsers.toString(), icon: Users, to: can("users.manage") ? "/admin/users" : undefined },
@@ -171,7 +171,7 @@ export const AdminDashboard = () => {
                                                     <p className="text-xs text-muted-foreground truncate">{booking.contactInfo.firstName} {booking.contactInfo.lastName}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-medium tabular-nums">{usd(booking.totalAmount)}</p>
+                                                    <p className="font-medium tabular-nums">{money(booking.totalAmount, booking.currency)}</p>
                                                     <StatusPill tone={booking.status === "confirmed" ? "green" : booking.status === "pending" ? "amber" : booking.status === "completed" ? "blue" : "slate"} className="capitalize">{booking.status}</StatusPill>
                                                 </div>
                                             </div>

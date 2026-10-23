@@ -13,7 +13,7 @@ const {
     getPayments, getActivity,
 } = require('../controllers/AdminController');
 const { getAllBookings, updateBookingStatus } = require('../controllers/BookingController');
-const { getSettings, updateSettings, toggleSection } = require('../controllers/SettingsController');
+const { getSettings, updateSettings, toggleSection, refreshRates } = require('../controllers/SettingsController');
 const { getAllCollections, createCollection, updateCollection, deleteCollection } = require('../controllers/CollectionController');
 const { listCoupons, createCoupon, updateCoupon, deleteCoupon } = require('../controllers/CouponController');
 const { adminList: listTravelOrders, adminUpdate: updateTravelOrder } = require('../controllers/TravelOrderController');
@@ -48,6 +48,7 @@ router.patch('/travel-orders/:id', can(P.BOOKINGS), activity('travel order', (re
 // Settings: content editors manage page content; admins manage company details and services
 router.get('/settings', can(P.SETTINGS, P.CONTENT, P.MARKETING), getSettings);
 router.put('/settings', can(P.SETTINGS, P.CONTENT), activity('site settings', (req) => ({ label: Object.keys(req.body || {}).join(', ') })), updateSettings);
+router.post('/settings/currency/refresh', can(P.SETTINGS), activity('exchange rates', () => ({ action: 'update', label: 'latest market rates' })), refreshRates);
 router.patch('/settings/sections/:sectionId', can(P.CONTENT), activity('homepage section', (req) => ({ label: req.params.sectionId, detail: req.body?.isVisible ? 'shown' : 'hidden' })), toggleSection);
 
 // Inquiries

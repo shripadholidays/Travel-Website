@@ -365,7 +365,7 @@ export const AdminHomepage = () => {
                                                 <Input value={slide.title} onChange={e => onChange({ ...slide, title: e.target.value })} placeholder="The Garden City Awaits" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">From Price (USD)</Label>
+                                                <Label className="text-xs">From price (USD, shown in each traveller's currency)</Label>
                                                 <Input type="number" value={slide.fromPrice} onChange={e => onChange({ ...slide, fromPrice: Number(e.target.value) })} />
                                             </div>
                                             <div className="space-y-1 md:col-span-2">

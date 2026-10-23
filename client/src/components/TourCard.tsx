@@ -127,7 +127,7 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
 
                             <div className="flex items-baseline gap-1.5">
                                 <span className="text-[26px] leading-none font-bold font-display text-brand-blue">
-                                    {formatPrice(tour.price)}
+                                    {formatPrice(tour.price, tour.currency)}
                                 </span>
                                 <span className="text-xs text-muted-foreground font-medium">/ person</span>
                             </div>

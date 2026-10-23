@@ -52,7 +52,7 @@ describe('payment model', () => {
 describe('creating orders (no Stripe configured)', () => {
     it('books immediately and hides supplier pricing', async () => {
         const offer = await firstFlight();
-        const res = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact, quotedTotal: offer.price });
+        const res = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact, quotedTotal: offer.price, currency: 'USD' });
         expect(res.status).toBe(200);
         const { order } = res.body.data;
         expect(order.status).toBe('confirmed');

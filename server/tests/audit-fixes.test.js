@@ -67,7 +67,7 @@ describe('tour bookings', () => {
     beforeEach(async () => { t = await tour(); });
 
     const book = (body) => request(app).post('/api/v1/bookings').set('Cookie', cookie)
-        .send({ tour: t._id, travelDate: future(20), numberOfTravelers: 2, contactInfo, ...body });
+        .send({ tour: t._id, travelDate: future(20), numberOfTravelers: 2, contactInfo, currency: 'USD', ...body });
 
     it('prices add-ons from the server catalogue, ignoring client prices', async () => {
         const res = await book({ addons: [{ name: 'Airport Transfer', price: -5000 }] });

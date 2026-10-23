@@ -31,7 +31,7 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
             <div className={cn("flex items-center justify-between border-b border-slate-100", compact ? "pb-5" : "pb-6")}>
                 <div>
                     <span className="text-sm font-medium text-muted-foreground">Price per person</span>
-                    <div className="text-3xl font-bold font-display text-brand-blue">{formatPrice(tour.price)}</div>
+                    <div className="text-3xl font-bold font-display text-brand-blue">{formatPrice(tour.price, tour.currency)}</div>
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -122,12 +122,12 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
                 {/* Total Price Section */}
                 <div className="bg-brand-light/30 p-4 rounded-2xl border border-brand-light/60 space-y-2">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{formatPrice(tour.price)} × {guests} {guests === 1 ? 'guest' : 'guests'}</span>
-                        <span className="tabular-nums">{formatPrice(totalPrice)}</span>
+                        <span>{formatPrice(tour.price, tour.currency)} × {guests} {guests === 1 ? 'guest' : 'guests'}</span>
+                        <span className="tabular-nums">{formatPrice(totalPrice, tour.currency)}</span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-brand-light/60">
                         <span className="font-bold text-brand-blue">Total</span>
-                        <span className="text-2xl font-bold font-display text-brand-orange tabular-nums">{formatPrice(totalPrice)}</span>
+                        <span className="text-2xl font-bold font-display text-brand-orange tabular-nums">{formatPrice(totalPrice, tour.currency)}</span>
                     </div>
                 </div>
             </div>

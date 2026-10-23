@@ -104,7 +104,9 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
     const [sp] = useSearchParams();
     const linkedBooking = sp.get('linkedBooking') || undefined;
     const { user } = useAuth();
-    const { formatPrice, formatUSD, isConverted } = useCurrency();
+    const { formatPrice, formatMoney, convert, currency } = useCurrency();
+    // Offers are quoted in US dollars; the card is charged in the traveller's currency (same rounding as the server)
+    const charged = (usdAmount: number) => formatMoney(Math.round(convert(usdAmount, 'USD', currency) * 100) / 100, currency);
     const flightQuery = useFlightOffer(offerId, kind === 'flight');
     const hotelQuery = useHotelOffer(offerId, kind === 'hotel');
     const query = kind === 'flight' ? flightQuery : hotelQuery;
@@ -137,7 +139,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
         if (!offer || price === null) return;
         try {
             const result = await createOrder.mutateAsync({
-                kind, offerId: offer.id, travellers, contact, linkedBooking, quotedTotal: price, acceptPriceChange,
+                kind, offerId: offer.id, travellers, contact, linkedBooking, quotedTotal: price, acceptPriceChange, currency,
             });
             if (result.priceChanged) {
                 setNewPrice(result.newTotal);
@@ -268,7 +270,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
                                     <section className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 md:p-7" aria-label="Payment">
                                         <h2 className="text-2xl font-display font-bold text-brand-blue mb-5">Payment</h2>
                                         <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
-                                            <StripePaymentForm onSuccess={onPaid} isSubmitting={confirmOrder.isPending} submitLabel={`Pay ${isConverted ? formatUSD(displayPrice) : formatPrice(displayPrice)}`} />
+                                            <StripePaymentForm onSuccess={onPaid} isSubmitting={confirmOrder.isPending} submitLabel={`Pay ${charged(displayPrice)}`} />
                                         </Elements>
                                     </section>
                                 )}
@@ -319,9 +321,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Total</span>
                                 <AnimatedPrice value={displayPrice} className="text-4xl font-display font-bold text-brand-orange tabular-nums" />
                             </div>
-                            {isConverted && (
-                                <p className="text-xs text-slate-300 text-right -mt-2">Estimate. Your card is charged {formatUSD(displayPrice)} (USD).</p>
-                            )}
+                            <p className="text-xs text-slate-300 text-right -mt-2">You pay {charged(displayPrice)} in {currency}.</p>
                             {step === 0 && (
                                 <button
                                     type="button"

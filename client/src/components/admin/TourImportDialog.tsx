@@ -5,12 +5,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { parseRaw } from "@/components/ui/JsonCsvImporter";
 import { useBulkCreateTours } from "@/hooks/use-tours";
-import { usd } from "@/lib/tour-status";
+import { useCurrency } from "@/context/CurrencyContext";
+import { money } from "@/lib/tour-status";
 import type { Tour } from "@/types";
 
 const TEMPLATE = [
-    "title,location,price,days,nights,imageURL,categories,status,isFeatured,about,validity,maxGroupSize,images",
-    '"Manali Snow Trek","Manali, India",450,5,4,https://images.unsplash.com/photo-1626621341517-bbf3d9990a23,"Adventure, Mountain",draft,false,"Five days of snow trails above Manali.",2027-12-31,12,',
+    "title,location,price,currency,days,nights,imageURL,categories,status,isFeatured,about,validity,maxGroupSize,images",
+    '"Manali Snow Trek","Manali, India",24999,INR,5,4,https://images.unsplash.com/photo-1626621341517-bbf3d9990a23,"Adventure, Mountain",draft,false,"Five days of snow trails above Manali.",2027-12-31,12,',
 ].join("\n");
 
 const text = (v: unknown) => (v === undefined || v === null ? "" : String(v).trim());
@@ -28,6 +29,8 @@ export function rowToTour(r: Record<string, unknown>): Partial<Tour> {
         title: text(get("title", "name")),
         location: text(get("location", "place")),
         price: Number(text(get("price")).replace(/[^0-9.]/g, "")),
+        // Empty means the site's base currency (set by the server)
+        ...(text(get("currency")) ? { currency: text(get("currency")).toUpperCase() } : {}),
         duration: { days, nights: Number(get("duration.nights", "nights") ?? duration.nights ?? Math.max(0, days - 1)) },
         imageURL: text(get("imageURL", "image", "cover")),
         images: list(get("images")),
@@ -49,6 +52,7 @@ export function TourImportDialog({ open, onOpenChange }: { open: boolean; onOpen
     const [report, setReport] = useState<Report | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     const bulkCreate = useBulkCreateTours();
+    const { base } = useCurrency();
 
     const parsed = raw.trim() ? parseRaw(raw) : null;
     const rows = parsed?.ok ? parsed.rows.map(rowToTour) : [];
@@ -87,7 +91,7 @@ export function TourImportDialog({ open, onOpenChange }: { open: boolean; onOpen
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2"><FileSpreadsheet className="w-5 h-5 text-brand-orange" /> Import tours</DialogTitle>
                     <DialogDescription>
-                        Upload a CSV from a spreadsheet, or paste CSV or JSON. Prices are in US dollars per person.
+                        Upload a CSV from a spreadsheet, or paste CSV or JSON. Prices are per person, in the row's currency column (INR, USD, EUR, GBP or AED), or the site's base currency when it is empty.
                         Rows without a status are imported as drafts so you can check them before they go live.
                     </DialogDescription>
                 </DialogHeader>
@@ -125,7 +129,7 @@ export function TourImportDialog({ open, onOpenChange }: { open: boolean; onOpen
                                 <Button type="button" variant="ghost" size="sm" className="gap-1.5" onClick={downloadTemplate}>
                                     <Download className="w-3.5 h-3.5" /> Download template
                                 </Button>
-                                <span className="text-xs text-muted-foreground">Columns: title, location, price, days, nights, imageURL, categories, status, about…</span>
+                                <span className="text-xs text-muted-foreground">Columns: title, location, price, currency, days, nights, imageURL, categories, status, about…</span>
                             </div>
                             <textarea
                                 value={raw}
@@ -156,7 +160,7 @@ export function TourImportDialog({ open, onOpenChange }: { open: boolean; onOpen
                                                         <tr key={i}>
                                                             <td className="px-3 py-1.5 font-medium">{t.title || "—"}</td>
                                                             <td className="px-3 py-1.5">{t.location || "—"}</td>
-                                                            <td className="px-3 py-1.5 tabular-nums">{Number(t.price) > 0 ? usd(Number(t.price)) : "—"}</td>
+                                                            <td className="px-3 py-1.5 tabular-nums">{Number(t.price) > 0 ? money(Number(t.price), t.currency || base) : "—"}</td>
                                                             <td className="px-3 py-1.5 tabular-nums">{t.duration?.days}</td>
                                                             <td className="px-3 py-1.5">{t.status === "active" ? "Live" : t.status === "inactive" ? "Hidden" : "Draft"}</td>
                                                             <td className="px-3 py-1.5 text-xs">
