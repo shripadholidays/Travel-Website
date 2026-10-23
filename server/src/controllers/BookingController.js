@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Payment = require('../models/Payment');
 const TravelDestination = require('../models/TravelDestination');
@@ -6,6 +7,9 @@ const logger = require('../utils/logger');
 const { completePastBookings, BookingError, parseTravelDate, priceBooking, confirmBooking, cancelBooking: cancelBookingWithRefund } = require('../services/booking-service');
 const { stripeClient } = require('../services/travel-order-service');
 const config = require('../config');
+const { hasPermission, PERMISSIONS } = require('../config/permissions');
+
+const handlesBookings = (user) => hasPermission(user, PERMISSIONS.BOOKINGS);
 
 // POST /bookings - Create booking + payment intent
 exports.createBooking = async (req, res) => {
@@ -23,6 +27,13 @@ exports.createBooking = async (req, res) => {
         const tour = await TravelDestination.findById(tourId);
         // Draft and hidden tours cannot be booked
         if (!tour || tour.status !== 'active') return ResponseHandler.fail(res, 404, 'Tour not found');
+        // The limits the tour's listing promises
+        if (tour.maxGroupSize && Number(numberOfTravelers) > tour.maxGroupSize) {
+            return ResponseHandler.fail(res, 400, `This tour takes at most ${tour.maxGroupSize} travellers per booking.`);
+        }
+        if (tour.validity && date > tour.validity) {
+            return ResponseHandler.fail(res, 400, `This tour runs until ${tour.validity.toISOString().slice(0, 10)}. Please pick an earlier date.`);
+        }
 
         // Prices, add-ons and coupons are all worked out here, never trusted from the client.
         const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode });
@@ -136,7 +147,7 @@ exports.getBookingById = async (req, res) => {
 
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
 
-        if (booking.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        if (booking.user._id.toString() !== req.user._id.toString() && !handlesBookings(req.user)) {
             return ResponseHandler.fail(res, 403, 'Access denied');
         }
 
@@ -153,11 +164,11 @@ exports.cancelBooking = async (req, res) => {
         const booking = await Booking.findById(req.params.id);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
 
-        if (booking.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        if (booking.user.toString() !== req.user._id.toString() && !handlesBookings(req.user)) {
             return ResponseHandler.fail(res, 403, 'Access denied');
         }
 
-        await cancelBookingWithRefund(booking, { byAdmin: req.user.role === 'admin' });
+        await cancelBookingWithRefund(booking, { byAdmin: handlesBookings(req.user) });
         const message = booking.refundedAmount
             ? `Booking cancelled. $${booking.refundedAmount} will be refunded to your card.`
             : 'Booking cancelled successfully';
@@ -172,9 +183,18 @@ exports.cancelBooking = async (req, res) => {
 // GET /admin/bookings
 exports.getAllBookings = async (req, res) => {
     try {
-        const { page = 1, limit = config.pagination.adminDefaultLimit, status } = req.query;
+        const { page = 1, limit = config.pagination.adminDefaultLimit, status, search } = req.query;
         const query = {};
-        if (status) query.status = status;
+        if (status && status !== 'all') query.status = status;
+        // Traveller name, email or the booking reference (the last characters of its id)
+        if (search && String(search).trim()) {
+            const q = String(search).trim();
+            const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            const or = [{ 'contactInfo.email': re }, { 'contactInfo.firstName': re }, { 'contactInfo.lastName': re }];
+            if (/^[a-f0-9]{24}$/i.test(q)) or.push({ _id: new mongoose.Types.ObjectId(q) });
+            else if (/^[a-f0-9]{4,23}$/i.test(q)) or.push({ $expr: { $regexMatch: { input: { $toString: '$_id' }, regex: `${q}$`, options: 'i' } } });
+            query.$or = or;
+        }
         await completePastBookings();
 
         const bookings = await Booking.find(query)
@@ -185,15 +205,28 @@ exports.getAllBookings = async (req, res) => {
             .limit(Number(limit));
 
         const total = await Booking.countDocuments(query);
+        // Counts for the status tabs, with the same search applied
+        const { status: ignored, ...rest } = query;
+        const counts = await Booking.aggregate([{ $match: rest }, { $group: { _id: '$status', count: { $sum: 1 } } }]);
 
         return ResponseHandler.success(res, {
             bookings,
+            statusCounts: Object.fromEntries(counts.map((c) => [c._id, c.count])),
+            statusChanges: STATUS_CHANGES,
             pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / Number(limit)) }
         }, 'All bookings fetched successfully');
     } catch (err) {
         logger.error('Error fetching all bookings', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to fetch bookings');
     }
+};
+
+// Which status a booking may move to from each status (the admin menu shows the same choices)
+const STATUS_CHANGES = {
+    pending: ['confirmed', 'cancelled'],
+    confirmed: ['completed', 'cancelled'],
+    completed: [],
+    cancelled: [],
 };
 
 // PATCH /admin/bookings/:id
@@ -207,6 +240,12 @@ exports.updateBookingStatus = async (req, res) => {
 
         const booking = await Booking.findById(req.params.id);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
+
+        // A cancelled (and refunded) or finished trip cannot be reopened from here
+        const allowed = STATUS_CHANGES[booking.status] || [];
+        if (!allowed.includes(status)) {
+            return ResponseHandler.fail(res, 409, `A ${booking.status} booking can't be marked ${status}.`);
+        }
 
         // Cancelling refunds and confirming sends the confirmation, same as the traveller's own flow
         if (status === 'cancelled') {

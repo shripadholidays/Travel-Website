@@ -1,6 +1,8 @@
 const express = require('express');
 const isLoggedIn = require('../middlewares/auth-guard');
-const authorize = require('../middlewares/authorize');
+const can = require('../middlewares/can');
+const activity = require('../middlewares/activity');
+const { PERMISSIONS } = require('../config/permissions');
 const {
     getCollections, getCollectionBySlug,
     createCollection, updateCollection, deleteCollection
@@ -11,8 +13,8 @@ const router = express.Router();
 router.get('/', getCollections);
 router.get('/:slug', getCollectionBySlug);
 
-router.post('/', isLoggedIn, authorize('admin'), createCollection);
-router.put('/:id', isLoggedIn, authorize('admin'), updateCollection);
-router.delete('/:id', isLoggedIn, authorize('admin'), deleteCollection);
+router.post('/', isLoggedIn, can(PERMISSIONS.CATALOG), activity('collection'), createCollection);
+router.put('/:id', isLoggedIn, can(PERMISSIONS.CATALOG), activity('collection'), updateCollection);
+router.delete('/:id', isLoggedIn, can(PERMISSIONS.CATALOG), activity('collection'), deleteCollection);
 
 module.exports = router;

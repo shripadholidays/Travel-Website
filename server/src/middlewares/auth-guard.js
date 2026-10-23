@@ -7,6 +7,7 @@ const config = require('../config');
 
 const client = new OAuth2Client(config.google.clientId);
 const JWT_SECRET = config.auth.jwtSecret;
+const SUSPENDED = 'This account has been suspended. Contact support if you think this is a mistake.';
 
 module.exports = async function isLoggedIn(req, res, next) {
     const token = req.cookies?.[config.auth.cookieName];
@@ -18,6 +19,7 @@ module.exports = async function isLoggedIn(req, res, next) {
         if (decoded?.email) {
             const user = await User.findOne({ email: decoded.email });
             if (!user) return ResponseHandler.fail(res, 401, 'Unauthorized: User not found');
+            if (user.isSuspended) return ResponseHandler.fail(res, 403, SUSPENDED);
             req.user = user;
             return next();
         }
@@ -37,6 +39,7 @@ module.exports = async function isLoggedIn(req, res, next) {
 
         const user = await User.findOne({ email });
         if (!user) return ResponseHandler.fail(res, 401, 'Unauthorized: User not found');
+        if (user.isSuspended) return ResponseHandler.fail(res, 403, SUSPENDED);
 
         req.user = user;
         return next();

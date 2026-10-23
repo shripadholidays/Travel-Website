@@ -1,9 +1,16 @@
+const mongoose = require('mongoose');
 const TravelDestination = require('../models/TravelDestination');
+const Booking = require('../models/Booking');
+const Collection = require('../models/Collection');
 const Destination = require('../models/Destination');
 const { destinationTourQuery } = require('../services/destination-match');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const config = require('../config');
+const { hasPermission, PERMISSIONS } = require('../config/permissions');
+
+// Catalog staff can list and preview tours that are not live yet
+const canSeeAll = (user) => hasPermission(user, PERMISSIONS.CATALOG);
 
 const SEARCH_FIELDS = ['title', 'location', 'categories', 'overview.about'];
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -90,9 +97,10 @@ exports.getTours = async (req, res) => {
         if (isFeatured === 'true') {
             query.isFeatured = true;
         }
-        // Travellers only ever see live tours; admins can list drafts and hidden ones too
-        if (req.user?.role === 'admin') {
-            if (status) query.status = status;
+        // Everyone sees live tours only; the admin list (?scope=admin) also shows drafts and hidden ones
+        const admin = req.query.scope === 'admin' && canSeeAll(req.user);
+        if (admin) {
+            if (status && status !== 'all') query.status = status;
         } else {
             query.status = 'active';
         }
@@ -102,6 +110,8 @@ exports.getTours = async (req, res) => {
         else if (sortParam === 'price_high') sortOptions = { price: -1 };
         else if (sortParam === 'rating') sortOptions = { 'reviews.rating': -1 };
         else if (sortParam === 'newest') sortOptions = { createdAt: -1 };
+        else if (sortParam === 'updated') sortOptions = { updatedAt: -1 };
+        else if (sortParam === 'title') sortOptions = { title: 1 };
 
         const pageNum = Number(page);
         const limitNum = Number(limit);
@@ -109,12 +119,22 @@ exports.getTours = async (req, res) => {
         const tours = await TravelDestination.find(query)
             .skip((pageNum - 1) * limitNum)
             .limit(limitNum)
-            .sort(sortOptions);
+            .sort(sortOptions)
+            .populate(admin ? { path: 'updatedBy', select: 'displayName' } : []);
 
         const total = await TravelDestination.countDocuments(query);
 
+        // Tab counts for the admin list (same filters, every status)
+        let statusCounts;
+        if (admin) {
+            const { status: ignored, ...rest } = query;
+            const rows = await TravelDestination.aggregate([{ $match: rest }, { $group: { _id: '$status', count: { $sum: 1 } } }]);
+            statusCounts = Object.fromEntries(rows.map((r) => [r._id, r.count]));
+        }
+
         return ResponseHandler.success(res, {
             tours,
+            statusCounts,
             pagination: {
                 total,
                 page: pageNum,
@@ -175,7 +195,7 @@ exports.getTourById = async (req, res) => {
     try {
         const tour = await TravelDestination.findById(req.params.id);
         // A draft or hidden tour does not exist for anyone but admins (who preview it)
-        if (!tour || (tour.status !== 'active' && req.user?.role !== 'admin')) {
+        if (!tour || (tour.status !== 'active' && !canSeeAll(req.user))) {
             return ResponseHandler.fail(res, 404, 'Tour not found');
         }
         return ResponseHandler.success(res, { tour }, 'Tour fetched successfully');
@@ -185,16 +205,79 @@ exports.getTourById = async (req, res) => {
     }
 };
 
+// Turns an editor's form (or an import row) into a clean tour document
+function normalizeTour(input = {}, { partial = false } = {}) {
+    const data = { ...input };
+    // Ratings come from real reviews and the audit fields from the session, never from the form
+    delete data.reviews;
+    delete data.createdBy;
+    delete data.updatedBy;
+    delete data._id;
+
+    if (!partial || 'currency' in data) data.currency = 'USD';
+    if (typeof data.title === 'string') data.title = data.title.trim();
+    if (typeof data.location === 'string') data.location = data.location.trim();
+    if ('price' in data) data.price = Number(data.price);
+    if (data.duration) {
+        const days = Math.max(1, Math.round(Number(data.duration.days) || 1));
+        const rawNights = data.duration.nights;
+        const nights = rawNights === undefined || rawNights === '' ? days - 1 : Math.max(0, Math.round(Number(rawNights) || 0));
+        data.duration = { days, nights };
+    }
+    if (!partial && !data.validity) data.validity = new Date(Date.now() + 365 * 864e5);
+    if (typeof data.categories === 'string') data.categories = data.categories.split(',');
+    if (Array.isArray(data.categories)) data.categories = [...new Set(data.categories.map((c) => String(c).trim()).filter(Boolean))];
+    if (Array.isArray(data.images)) data.images = data.images.map((u) => String(u || '').trim()).filter(Boolean);
+    // Half-filled rows are dropped instead of failing the whole save
+    if (Array.isArray(data.inclusions)) data.inclusions = data.inclusions.filter((x) => x && String(x.title || '').trim());
+    if (Array.isArray(data.itinerary)) {
+        const fallbackPlace = String(data.location || '').trim() || 'See itinerary';
+        data.itinerary = data.itinerary
+            .filter((d) => d && (String(d.activity || '').trim() || String(d.location || '').trim()))
+            .map((d, i) => ({
+                day: i + 1,
+                activity: String(d.activity || '').trim() || 'Free time',
+                location: String(d.location || '').trim() || fallbackPlace,
+            }));
+    }
+    if (data.overview) {
+        data.overview = {
+            ...data.overview,
+            gallery: (data.overview.gallery || []).filter((g) => g && String(g.imageURL || '').trim()),
+        };
+    }
+    if ('isFeatured' in data) data.isFeatured = data.isFeatured === true || data.isFeatured === 'true';
+    if ('maxGroupSize' in data) {
+        const max = Number(data.maxGroupSize);
+        data.maxGroupSize = data.maxGroupSize !== null && data.maxGroupSize !== '' && Number.isFinite(max) && max >= 1 ? Math.round(max) : null;
+    }
+    if (data.coordinates) {
+        const num = (v) => (v === '' || v === null || v === undefined || Number.isNaN(Number(v)) ? null : Number(v));
+        data.coordinates = { lat: num(data.coordinates.lat), lng: num(data.coordinates.lng) };
+    }
+    return data;
+}
+exports.normalizeTour = normalizeTour;
+
+const FIELD_NAMES = {
+    'duration.days': 'Days', 'duration.nights': 'Nights', price: 'Price', validity: 'Last available date',
+    maxGroupSize: 'Max group size', 'coordinates.lat': 'Latitude', 'coordinates.lng': 'Longitude',
+};
+
+function validationMessage(err) {
+    return Object.values(err.errors).map((e) => {
+        if (e.name === 'CastError') return `${FIELD_NAMES[e.path] || e.path} has an invalid value`;
+        return e.message.replace(/^Path `([^`]+)` is required\.$/, (m, path) => `${FIELD_NAMES[path] || path} is required`);
+    }).join(', ');
+}
+
 // POST /tours
 exports.createTour = async (req, res) => {
     try {
-        const tour = await TravelDestination.create(req.body);
+        const tour = await TravelDestination.create({ ...normalizeTour(req.body), createdBy: req.user._id, updatedBy: req.user._id });
         return ResponseHandler.success(res, { tour }, 'Tour created successfully');
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationMessage(err));
         logger.error('Error creating tour', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to create tour');
     }
@@ -205,42 +288,133 @@ exports.updateTour = async (req, res) => {
     try {
         const tour = await TravelDestination.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            { ...normalizeTour(req.body, { partial: true }), updatedBy: req.user._id },
             { new: true, runValidators: true }
-        );
+        ).populate('updatedBy', 'displayName');
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
         return ResponseHandler.success(res, { tour }, 'Tour updated successfully');
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationMessage(err));
+        if (err.name === 'CastError') return ResponseHandler.fail(res, 400, `${FIELD_NAMES[err.path] || err.path} has an invalid value`);
         logger.error('Error updating tour', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update tour');
     }
 };
 
+// A tour with bookings is part of someone's trip history: hide it instead of deleting it
+async function bookingCounts(ids) {
+    const rows = await Booking.aggregate([
+        { $match: { tour: { $in: ids.map((id) => new mongoose.Types.ObjectId(String(id))) } } },
+        { $group: { _id: '$tour', count: { $sum: 1 } } },
+    ]);
+    return new Map(rows.map((r) => [String(r._id), r.count]));
+}
+
+async function removeTours(ids) {
+    if (ids.length === 0) return;
+    await TravelDestination.deleteMany({ _id: { $in: ids } });
+    // Collections should not keep pointing at tours that no longer exist
+    await Collection.updateMany({ tours: { $in: ids } }, { $pull: { tours: { $in: ids } } });
+}
+
 // DELETE /tours/:id
 exports.deleteTour = async (req, res) => {
     try {
-        const tour = await TravelDestination.findByIdAndDelete(req.params.id);
+        const tour = await TravelDestination.findById(req.params.id);
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
-        return ResponseHandler.success(res, null, 'Tour deleted successfully');
+        const booked = (await bookingCounts([tour._id])).get(String(tour._id)) || 0;
+        if (booked > 0) {
+            return ResponseHandler.fail(res, 409, `"${tour.title}" has ${booked} booking${booked === 1 ? '' : 's'}, so it can't be deleted. Set its status to Hidden to take it off the site.`);
+        }
+        await removeTours([tour._id]);
+        return ResponseHandler.success(res, { tour: { _id: tour._id, title: tour.title } }, 'Tour deleted successfully');
     } catch (err) {
         logger.error('Error deleting tour', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to delete tour');
     }
 };
 
-// POST /tours/bulk
+// POST /tours/:id/duplicate — a draft copy to build a similar listing from
+exports.duplicateTour = async (req, res) => {
+    try {
+        const source = await TravelDestination.findById(req.params.id).lean();
+        if (!source) return ResponseHandler.fail(res, 404, 'Tour not found');
+        const { _id, createdAt, updatedAt, reviews, __v, ...rest } = source;
+        const strip = (list = []) => list.map(({ _id: ignored, ...item }) => item);
+        const tour = await TravelDestination.create({
+            ...rest,
+            title: `Copy of ${source.title}`,
+            status: 'draft',
+            isFeatured: false,
+            inclusions: strip(rest.inclusions),
+            itinerary: strip(rest.itinerary),
+            overview: { about: rest.overview?.about || '', gallery: strip(rest.overview?.gallery) },
+            createdBy: req.user._id,
+            updatedBy: req.user._id,
+        });
+        return ResponseHandler.success(res, { tour }, 'Draft copy created');
+    } catch (err) {
+        logger.error('Error duplicating tour', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Failed to duplicate tour');
+    }
+};
+
+const BULK_ACTIONS = {
+    active: { status: 'active' },
+    draft: { status: 'draft' },
+    inactive: { status: 'inactive' },
+    feature: { isFeatured: true },
+    unfeature: { isFeatured: false },
+};
+
+// POST /tours/bulk-action — { ids: [...], action: 'active' | 'draft' | 'inactive' | 'feature' | 'unfeature' | 'delete' }
+exports.bulkTourAction = async (req, res) => {
+    try {
+        const ids = [...new Set((req.body?.ids || []).map(String).filter((id) => /^[a-f0-9]{24}$/i.test(id)))].slice(0, 500);
+        const { action } = req.body || {};
+        if (ids.length === 0) return ResponseHandler.fail(res, 400, 'Select at least one tour.');
+
+        if (action === 'delete') {
+            const booked = await bookingCounts(ids);
+            const deletable = ids.filter((id) => !booked.get(id));
+            await removeTours(deletable);
+            const kept = ids.length - deletable.length;
+            return ResponseHandler.success(res, { affected: deletable.length, skipped: kept },
+                kept ? `Deleted ${deletable.length}. ${kept} with bookings were kept; hide them instead.` : `Deleted ${deletable.length} tour(s).`);
+        }
+        const update = BULK_ACTIONS[action];
+        if (!update) return ResponseHandler.fail(res, 400, 'Unknown action.');
+        const result = await TravelDestination.updateMany({ _id: { $in: ids } }, { ...update, updatedBy: req.user._id });
+        return ResponseHandler.success(res, { affected: result.modifiedCount, skipped: 0 }, `Updated ${result.modifiedCount} tour(s).`);
+    } catch (err) {
+        logger.error('Error in bulk tour action', { error: err.message });
+        return ResponseHandler.error(res, 500, 'Bulk action failed');
+    }
+};
+
+// POST /tours/bulk — imports rows one by one and reports which ones failed and why
 exports.bulkCreateTours = async (req, res) => {
     try {
-        const tours = req.body.tours;
-        if (!Array.isArray(tours) || tours.length === 0) {
+        const rows = req.body.tours;
+        if (!Array.isArray(rows) || rows.length === 0) {
             return ResponseHandler.fail(res, 400, 'No tours provided for bulk upload');
         }
-        const createdTours = await TravelDestination.insertMany(tours, { ordered: false });
-        return ResponseHandler.success(res, { tours: createdTours }, 'Bulk upload successful');
+        if (rows.length > 500) return ResponseHandler.fail(res, 400, 'Import at most 500 tours at a time.');
+
+        const valid = [];
+        const failed = [];
+        rows.forEach((row, index) => {
+            const doc = new TravelDestination({ ...normalizeTour(row), createdBy: req.user._id, updatedBy: req.user._id });
+            const err = doc.validateSync();
+            if (err) failed.push({ row: index + 1, title: row?.title || '(no title)', error: validationMessage(err) });
+            else valid.push(doc);
+        });
+        const created = valid.length ? await TravelDestination.insertMany(valid) : [];
+
+        return ResponseHandler.success(res, { created: created.length, failed, tours: created },
+            failed.length
+                ? `Imported ${created.length} of ${rows.length}. Fix the ${failed.length} failed row(s) and import them again.`
+                : `Imported ${created.length} tour(s).`);
     } catch (err) {
         logger.error('Error in bulk upload', { error: err.message });
         return ResponseHandler.error(res, 500, 'Bulk upload failed');

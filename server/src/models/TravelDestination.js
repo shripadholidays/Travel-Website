@@ -30,23 +30,24 @@ const itineraryDaySchema = new mongoose.Schema({
 
 // Main schema for Travel Destination
 const travelDestinationSchema = new mongoose.Schema({
-    title: { type: String, required: true, index: true }, // Indexed for text search
-    location: { type: String, required: true, index: true }, // Indexed for country filtering
-    price: { type: Number, required: true, index: true }, // Indexed for range filtering
-    currency: { type: String, required: true, default: '₹' },
+    title: { type: String, required: [true, 'Title is required'], trim: true, index: true }, // Indexed for text search
+    location: { type: String, required: [true, 'Location is required'], trim: true, index: true }, // Indexed for country filtering
+    price: { type: Number, required: [true, 'Price is required'], min: [1, 'Price must be at least $1'], index: true }, // Indexed for range filtering
+    // Prices are in US dollars: checkout charges tour.price in USD (see BookingController)
+    currency: { type: String, required: true, default: 'USD' },
     duration: {
         days: { type: Number, required: true, index: true }, // Indexed for filtering
         nights: { type: Number, required: true, index: true },
     },
-    validity: { type: Date, required: true, index: true }, // Can filter by date range
+    validity: { type: Date, required: [true, 'The last available date is required'], index: true }, // Can filter by date range
     inclusions: [inclusionSchema],
     itinerary: [itineraryDaySchema],
-    imageURL: { type: String, required: true },
+    imageURL: { type: String, required: [true, 'A cover image is required'] },
     images: [String],
     categories: { type: [String], index: true }, // Indexed for theme filtering
     emi: { type: String },   // short card highlight, e.g. "Best seller" (never a price claim)
     overview: {
-        about: { type: String, required: true },
+        about: { type: String, required: [true, 'The "About this tour" description is required'] },
         gallery: [gallerySchema],
     },
     reviews: {
@@ -54,13 +55,16 @@ const travelDestinationSchema = new mongoose.Schema({
         basedOn: { type: Number, default: 0 },
         individualReviews: [reviewSchema],
     },
-    maxGroupSize: { type: Number, default: null },
+    maxGroupSize: { type: Number, default: null, min: 1 },
     isFeatured: { type: Boolean, default: false, index: true },
     status: { type: String, enum: ['active', 'inactive', 'draft'], default: 'active', index: true },
     coordinates: {
         lat: { type: Number, default: null },
         lng: { type: Number, default: null },
     },
+    // Who created and last changed the listing (shown in the tour editor)
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
 // Create text index for full-text search on title and overview

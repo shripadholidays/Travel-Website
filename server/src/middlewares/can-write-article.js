@@ -2,6 +2,7 @@ const Review = require('../models/Review');
 const Booking = require('../models/Booking');
 const ResponseHandler = require('../utils/response-handler');
 const { completePastBookings } = require('../services/booking-service');
+const { isStaff } = require('../config/permissions');
 
 const REQUIRED_REVIEWS = 5;
 const REQUIRED_ACCOUNT_AGE_DAYS = 30;
@@ -10,8 +11,8 @@ module.exports = async function canWriteArticle(req, res, next) {
     const user = req.user;
     if (!user) return ResponseHandler.fail(res, 401, 'Unauthorized');
 
-    // Admins and moderators are always allowed
-    if (user.role === 'admin' || user.role === 'moderator') return next();
+    // Staff are always allowed
+    if (isStaff(user)) return next();
 
     const accountAgeDays = (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24);
     if (accountAgeDays < REQUIRED_ACCOUNT_AGE_DAYS) {

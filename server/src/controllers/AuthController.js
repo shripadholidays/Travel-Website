@@ -25,6 +25,8 @@ function setAuthCookie(res, user) {
     });
 }
 
+const { permissionsFor, ROLES } = require('../config/permissions');
+
 function publicUser(user) {
     return {
         _id: user._id,
@@ -32,6 +34,8 @@ function publicUser(user) {
         email: user.email,
         profilePicture: user.profilePicture,
         role: user.role,
+        roleLabel: ROLES[user.role]?.label ?? user.role,
+        permissions: permissionsFor(user.role),
         authProvider: user.authProvider,
         isEmailVerified: !!user.isEmailVerified || user.authProvider === 'google',
         createdAt: user.createdAt,
@@ -95,6 +99,9 @@ exports.login = async (req, res) => {
         const valid = await user.comparePassword(password);
         if (!valid) {
             return ResponseHandler.fail(res, 401, 'Invalid email or password.');
+        }
+        if (user.isSuspended) {
+            return ResponseHandler.fail(res, 403, 'This account has been suspended. Contact support if you think this is a mistake.');
         }
 
         setAuthCookie(res, user);

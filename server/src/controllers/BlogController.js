@@ -5,7 +5,10 @@ const logger = require('../utils/logger');
 const config = require('../config');
 const { sendAdminAlert, sendArticleReviewEmail } = require('../services/email-service');
 
-const isStaff = (user) => user?.role === 'admin' || user?.role === 'moderator';
+const { hasPermission, PERMISSIONS } = require('../config/permissions');
+
+// Article reviewers (moderators, editors, managers, admins) see every status and publish
+const isStaff = (user) => hasPermission(user, PERMISSIONS.ARTICLES);
 const isAuthor = (post, user) => !!user && String(post.author?._id ?? post.author) === String(user._id);
 const frontendOrigin = () => (process.env.NODE_ENV === 'production' ? config.cors.productionOrigin : config.cors.localOrigin);
 
@@ -165,7 +168,7 @@ exports.deletePost = async (req, res) => {
         const post = await BlogPost.findById(req.params.id);
         if (!post) return ResponseHandler.fail(res, 404, 'Article not found');
         const ownUnpublished = isAuthor(post, req.user) && post.status !== 'published';
-        if (req.user.role !== 'admin' && !ownUnpublished) {
+        if (!isStaff(req.user) && !ownUnpublished) {
             return ResponseHandler.fail(res, 403, 'Only an editor can remove a published article');
         }
         await post.deleteOne();

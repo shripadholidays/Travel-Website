@@ -4,6 +4,7 @@ const Booking = require('../models/Booking');
 const Review = require('../models/Review');
 const User = require('../models/User');
 const ResponseHandler = require('../utils/response-handler');
+const { hasPermission, PERMISSIONS } = require('../config/permissions');
 const logger = require('../utils/logger');
 const { clearTravelConfigCache } = require('../services/travel-config');
 
@@ -118,16 +119,23 @@ exports.getSettings = async (req, res) => {
 };
 
 // PUT /admin/settings  — generic partial update for all top-level fields
+const CONTENT_KEYS = ['offerBar', 'heroSlides', 'promoSlides', 'planTrip', 'testimonials', 'supportSection', 'faqs', 'aboutPage'];
+const SYSTEM_KEYS = [
+    'companyName', 'contactEmail', 'contactPhone', 'address',
+    'socialLinks', 'footer', 'footerExploreLinks', 'footerCompanyLinks',
+    'navLinks', 'features', 'travelMarkup',
+];
+const UPDATABLE = [...SYSTEM_KEYS, ...CONTENT_KEYS];
+
 exports.updateSettings = async (req, res) => {
     try {
+        // Content editors change page content; company details, menus and services stay with administrators
+        const keys = Object.keys(req.body || {}).filter((k) => UPDATABLE.includes(k));
+        const denied = keys.filter((k) => !hasPermission(req.user, CONTENT_KEYS.includes(k) ? PERMISSIONS.CONTENT : PERMISSIONS.SETTINGS));
+        if (denied.length) {
+            return ResponseHandler.fail(res, 403, `Your role can't change: ${denied.join(', ')}. Ask an administrator.`);
+        }
         const settings = await getSettings();
-        const UPDATABLE = [
-            'companyName', 'contactEmail', 'contactPhone', 'address',
-            'socialLinks', 'footer', 'footerExploreLinks', 'footerCompanyLinks',
-            'navLinks', 'offerBar', 'heroSlides', 'promoSlides', 'planTrip',
-            'testimonials', 'supportSection', 'faqs', 'aboutPage',
-            'features', 'travelMarkup',
-        ];
         for (const key of UPDATABLE) {
             if (req.body[key] !== undefined) {
                 // For nested objects (not arrays), merge instead of replace
@@ -147,6 +155,9 @@ exports.updateSettings = async (req, res) => {
         clearTravelConfigCache();
         return ResponseHandler.success(res, { settings }, 'Settings updated');
     } catch (err) {
+        if (err.name === 'ValidationError') {
+            return ResponseHandler.fail(res, 400, Object.values(err.errors).map((e) => e.message.replace('Path ', '').replace(/`/g, '')).join(', '));
+        }
         logger.error('Failed to update settings', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update settings');
     }

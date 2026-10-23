@@ -1,6 +1,5 @@
 const express = require('express');
 const isLoggedIn = require('../middlewares/auth-guard');
-const authorize = require('../middlewares/authorize');
 const { requireFeature, requireAnyFeature } = require('../middlewares/require-feature');
 const {
     createOrder, confirmOrder, getMyOrders, cancelOrder,
@@ -8,7 +7,7 @@ const {
 
 const router = express.Router();
 
-router.use(isLoggedIn, authorize('user', 'moderator', 'admin'));
+router.use(isLoggedIn);
 
 router.post('/', requireFeature((req) => req.body?.kind), createOrder);
 router.get('/', requireAnyFeature(), getMyOrders);

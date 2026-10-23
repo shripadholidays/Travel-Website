@@ -2,6 +2,15 @@ const Collection = require('../models/Collection');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 
+function saveError(res, err, action) {
+    if (err.name === 'ValidationError') {
+        return ResponseHandler.fail(res, 400, Object.values(err.errors).map((e) => e.message.replace('Path ', '').replace(/`/g, '')).join(', '));
+    }
+    if (err.code === 11000) return ResponseHandler.fail(res, 409, 'Another collection already uses this name or web address. Pick a different name.');
+    logger.error(`Error ${action} collection`, { error: err.message });
+    return ResponseHandler.error(res, 500, `Failed to ${action} collection`);
+}
+
 // GET /collections (public — active only)
 exports.getCollections = async (req, res) => {
     try {
@@ -19,7 +28,7 @@ exports.getCollections = async (req, res) => {
 exports.getAllCollections = async (req, res) => {
     try {
         const collections = await Collection.find()
-            .populate('tours', 'title imageURL location price')
+            .populate('tours', 'title imageURL location price status')
             .sort({ displayOrder: 1 });
         return ResponseHandler.success(res, { collections }, 'Collections fetched successfully');
     } catch (err) {
@@ -48,9 +57,7 @@ exports.createCollection = async (req, res) => {
         const collection = await Collection.create(req.body);
         return ResponseHandler.success(res, { collection }, 'Collection created successfully');
     } catch (err) {
-        if (err.code === 11000) return ResponseHandler.fail(res, 400, 'Collection with this slug already exists');
-        logger.error('Error creating collection', { error: err.message });
-        return ResponseHandler.error(res, 500, 'Failed to create collection');
+        return saveError(res, err, 'create');
     }
 };
 
@@ -63,8 +70,7 @@ exports.updateCollection = async (req, res) => {
         if (!collection) return ResponseHandler.fail(res, 404, 'Collection not found');
         return ResponseHandler.success(res, { collection }, 'Collection updated successfully');
     } catch (err) {
-        logger.error('Error updating collection', { error: err.message });
-        return ResponseHandler.error(res, 500, 'Failed to update collection');
+        return saveError(res, err, 'update');
     }
 };
 
@@ -73,7 +79,7 @@ exports.deleteCollection = async (req, res) => {
     try {
         const collection = await Collection.findByIdAndDelete(req.params.id);
         if (!collection) return ResponseHandler.fail(res, 404, 'Collection not found');
-        return ResponseHandler.success(res, null, 'Collection deleted successfully');
+        return ResponseHandler.success(res, { collection: { _id: collection._id, name: collection.name } }, 'Collection deleted successfully');
     } catch (err) {
         logger.error('Error deleting collection', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to delete collection');

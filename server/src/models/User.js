@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { ROLE_NAMES } = require('../config/permissions');
 
 // User schema — supports both Google OAuth and manual email/password accounts.
 const userSchema = new mongoose.Schema({
@@ -29,7 +30,9 @@ const userSchema = new mongoose.Schema({
         default: 'google',
     },
     profilePicture: String,
-    role: { type: String, enum: ['user', 'moderator', 'admin'], default: 'user' },
+    role: { type: String, enum: ROLE_NAMES, default: 'user' },
+    // A suspended account cannot sign in or use the API (bookings and history are kept)
+    isSuspended: { type: Boolean, default: false },
 
     // Email verification
     isEmailVerified: { type: Boolean, default: false },

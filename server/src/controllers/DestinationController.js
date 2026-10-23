@@ -3,6 +3,39 @@ const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const TravelDestination = require('../models/TravelDestination');
 const { destinationPatterns, tourMatchesDestination } = require('../services/destination-match');
+const { hasPermission, PERMISSIONS } = require('../config/permissions');
+
+// The admin list (?scope=admin) shows hidden destinations too; everyone else only sees live ones
+const adminScope = (req) => req.query.scope === 'admin' && hasPermission(req.user, PERMISSIONS.CATALOG);
+const COORD = (v) => (v === '' || v === null || v === undefined || Number.isNaN(Number(v)) ? undefined : Number(v));
+
+// Validation and duplicate-slug errors in words an editor can act on
+function saveError(res, err, action) {
+    if (err.name === 'ValidationError') {
+        return ResponseHandler.fail(res, 400, Object.values(err.errors).map((e) => e.message.replace('Path ', '').replace(/`/g, '')).join(', '));
+    }
+    if (err.code === 11000) return ResponseHandler.fail(res, 409, 'Another destination already uses this name or web address. Pick a different name.');
+    logger.error(`Error ${action} destination`, { error: err.message });
+    return ResponseHandler.error(res, 500, `Failed to ${action} destination`);
+}
+
+function cleanBody(body = {}) {
+    const data = { ...body };
+    delete data.tourCount;
+    delete data.rating;
+    if (data.coordinates) {
+        const lat = COORD(data.coordinates.lat);
+        const lng = COORD(data.coordinates.lng);
+        if (lat === undefined || lng === undefined) {
+            // Blank coordinates mean "no map pin", not a pin at 0,0 in the ocean
+            delete data.coordinates;
+            data.$unset = { coordinates: 1 };
+        } else {
+            data.coordinates = { lat, lng };
+        }
+    }
+    return data;
+}
 
 // Tour counts and ratings are worked out from the tours we actually sell
 // (matched on location/title), never from hand-entered numbers.
@@ -21,15 +54,17 @@ async function withLiveStats(destinations) {
 // GET /destinations
 exports.getDestinations = async (req, res) => {
     try {
-        const { page = 1, limit = 20, continent, search, active } = req.query;
+        const admin = adminScope(req);
+        const { page = 1, limit = admin ? 500 : 20, continent, search, active } = req.query;
         const query = {};
 
         if (continent) query.continent = continent;
-        if (active !== undefined) query.isActive = active === 'true';
+        if (!admin) query.isActive = true;
+        else if (active !== undefined) query.isActive = active === 'true';
         if (search) query.$text = { $search: search };
 
         const destinations = await Destination.find(query)
-            .sort({ tourCount: -1 })
+            .sort(admin ? { name: 1 } : { tourCount: -1, name: 1 })
             .skip((Number(page) - 1) * Number(limit))
             .limit(Number(limit));
 
@@ -49,6 +84,10 @@ exports.getDestinations = async (req, res) => {
 exports.getDestinationBySlug = async (req, res) => {
     try {
         const destination = await Destination.findOne({ slug: req.params.slug });
+        // A hidden destination only exists for catalog staff (who preview it)
+        if (destination && !destination.isActive && !hasPermission(req.user, PERMISSIONS.CATALOG)) {
+            return ResponseHandler.fail(res, 404, 'Destination not found');
+        }
         if (!destination) return ResponseHandler.fail(res, 404, 'Destination not found');
         const [withStats] = await withLiveStats([destination]);
         return ResponseHandler.success(res, { destination: withStats }, 'Destination fetched successfully');
@@ -61,16 +100,12 @@ exports.getDestinationBySlug = async (req, res) => {
 // POST /destinations (admin)
 exports.createDestination = async (req, res) => {
     try {
-        const destination = await Destination.create(req.body);
+        const data = cleanBody(req.body);
+        delete data.$unset;
+        const destination = await Destination.create(data);
         return ResponseHandler.success(res, { destination }, 'Destination created successfully');
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
-        if (err.code === 11000) return ResponseHandler.fail(res, 400, 'Destination with this slug already exists');
-        logger.error('Error creating destination', { error: err.message });
-        return ResponseHandler.error(res, 500, 'Failed to create destination');
+        return saveError(res, err, 'create');
     }
 };
 
@@ -78,13 +113,12 @@ exports.createDestination = async (req, res) => {
 exports.updateDestination = async (req, res) => {
     try {
         const destination = await Destination.findByIdAndUpdate(
-            req.params.id, req.body, { new: true, runValidators: true }
+            req.params.id, cleanBody(req.body), { new: true, runValidators: true }
         );
         if (!destination) return ResponseHandler.fail(res, 404, 'Destination not found');
         return ResponseHandler.success(res, { destination }, 'Destination updated successfully');
     } catch (err) {
-        logger.error('Error updating destination', { error: err.message });
-        return ResponseHandler.error(res, 500, 'Failed to update destination');
+        return saveError(res, err, 'update');
     }
 };
 
@@ -93,7 +127,7 @@ exports.deleteDestination = async (req, res) => {
     try {
         const destination = await Destination.findByIdAndDelete(req.params.id);
         if (!destination) return ResponseHandler.fail(res, 404, 'Destination not found');
-        return ResponseHandler.success(res, null, 'Destination deleted successfully');
+        return ResponseHandler.success(res, { destination: { _id: destination._id, name: destination.name } }, 'Destination deleted successfully');
     } catch (err) {
         logger.error('Error deleting destination', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to delete destination');

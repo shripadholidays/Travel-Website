@@ -4,6 +4,7 @@ const Booking = require('../models/Booking');
 const ResponseHandler = require('../utils/response-handler');
 const { completePastBookings } = require('../services/booking-service');
 const logger = require('../utils/logger');
+const { permissionsFor, ROLES, isStaff } = require('../config/permissions');
 
 const REQUIRED_REVIEWS = 5;
 const REQUIRED_ACCOUNT_AGE_DAYS = 30;
@@ -13,6 +14,9 @@ exports.getProfile = (req, res) => {
     const user = req.user.toObject ? req.user.toObject() : { ...req.user };
     // Google has already verified these addresses (older accounts were saved without the flag)
     if (user.authProvider === 'google') user.isEmailVerified = true;
+    // What this person may open in the admin area (the client builds its menus from it)
+    user.roleLabel = ROLES[user.role]?.label ?? user.role;
+    user.permissions = permissionsFor(user.role);
     ResponseHandler.success(res, { user }, 'Profile data retrieved successfully.');
 };
 
@@ -21,7 +25,7 @@ exports.getWriteEligibility = async (req, res) => {
     try {
         const user = req.user;
         const accountAgeDays = Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24));
-        const isPrivileged = user.role === 'admin' || user.role === 'moderator';
+        const isPrivileged = isStaff(user);
 
         if (isPrivileged) {
             return ResponseHandler.success(res, {

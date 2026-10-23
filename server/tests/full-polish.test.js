@@ -58,9 +58,13 @@ describe('tours that are not live', () => {
         expect(booking.status).toBe(404);
     });
 
-    it('are still visible to admins', async () => {
-        const list = await request(app).get('/api/v1/tours').set('Cookie', cookieFor(admin));
+    it('are listed for staff in the admin list only', async () => {
+        const list = await request(app).get('/api/v1/tours?scope=admin').set('Cookie', cookieFor(admin));
         expect(list.body.data.tours).toHaveLength(2);
+        expect(list.body.data.statusCounts).toEqual({ active: 1, draft: 1 });
+        // Browsing the public site as an admin shows what travellers see
+        const site = await request(app).get('/api/v1/tours').set('Cookie', cookieFor(admin));
+        expect(site.body.data.tours).toHaveLength(1);
         expect((await request(app).get(`/api/v1/tours/${draft._id}`).set('Cookie', cookieFor(admin))).status).toBe(200);
         expect((await request(app).get(`/api/v1/tours/${live._id}`)).status).toBe(200);
     });
