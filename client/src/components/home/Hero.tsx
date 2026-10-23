@@ -120,12 +120,12 @@ export const Hero = () => {
                                                 Immerse yourself in the world's most breathtaking landscapes. Your journey begins here.
                                             </p>
 
-                                            <Link to={slide.ctaLink || "/destinations"}>
-                                                <Button className="bg-white text-black hover:bg-brand-orange hover:text-white rounded-full px-8 py-6 text-lg font-bold group transition-all duration-300">
+                                            <Button asChild className="bg-white text-black hover:bg-brand-orange hover:text-white rounded-full px-8 py-6 text-lg font-bold group transition-all duration-300">
+                                                <Link to={slide.ctaLink || "/destinations"}>
                                                     {slide.ctaLabel || `Explore ${slide.subtitle}`}
                                                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                                </Button>
-                                            </Link>
+                                                </Link>
+                                            </Button>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -141,6 +141,8 @@ export const Hero = () => {
                     <button
                         key={idx}
                         onClick={() => setActiveIdx(idx)}
+                        aria-label={`Show slide ${idx + 1}`}
+                        aria-current={idx === activeIdx}
                         className={cn("w-2 h-2 rounded-full transition-colors", idx === activeIdx ? "bg-white" : "bg-white/30")}
                     />
                 ))}

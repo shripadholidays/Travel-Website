@@ -23,19 +23,19 @@ const FALLBACK: PromoSlide[] = [
         partner: "Singapore Tourism", title: "The Garden City Awaits",
         subtitle: "Experience the magic of Sentosa and the Gardens by the Bay.",
         image: "https://images.unsplash.com/photo-1565967511849-76a60a516170?q=80&w=1600",
-        accentColor: "text-emerald-400", searchQuery: "Singapore", discount: "Save 25%", fromPrice: 1200,
+        accentColor: "text-emerald-400", searchQuery: "Singapore", discount: "", fromPrice: 1200,
     },
     {
         partner: "Visit Dubai", title: "Golden Sands & Skyscrapers",
         subtitle: "Discover the future of luxury in the heart of the desert.",
         image: "https://images.unsplash.com/photo-1603521097795-3b798129197f?q=80&w=1600",
-        accentColor: "text-amber-400", searchQuery: "Dubai", discount: "Save 30%", fromPrice: 1500,
+        accentColor: "text-amber-400", searchQuery: "Dubai", discount: "", fromPrice: 1500,
     },
     {
         partner: "Switzerland Tourism", title: "Alpine Peaks & Valleys",
         subtitle: "Breathe in the freshest air atop the world's most famous mountains.",
         image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1600",
-        accentColor: "text-blue-200", searchQuery: "Switzerland", discount: "Save 20%", fromPrice: 1800,
+        accentColor: "text-blue-200", searchQuery: "Switzerland", discount: "", fromPrice: 1800,
     },
 ];
 
@@ -96,10 +96,12 @@ export const PromotionalCarousel = () => {
                                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 md:group-hover:scale-105"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-brand-dark/20 md:to-brand-dark" />
-                                        <div className="absolute top-5 left-5 flex items-center gap-1.5 bg-brand-orange text-white text-sm font-bold px-3.5 py-1.5 rounded-full shadow-lg">
-                                            <Sparkles className="w-4 h-4" />
-                                            {slide.discount}
-                                        </div>
+                                        {slide.discount?.trim() && (
+                                            <div className="absolute top-5 left-5 flex items-center gap-1.5 bg-brand-orange text-white text-sm font-bold px-3.5 py-1.5 rounded-full shadow-lg">
+                                                <Sparkles className="w-4 h-4" />
+                                                {slide.discount}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Content */}

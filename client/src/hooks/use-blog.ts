@@ -2,10 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import type { BlogPost } from '@/types';
 
-export function useBlogPosts() {
+export function useBlogPosts(options: { limit?: number } = {}) {
+    const qs = options.limit ? `?limit=${options.limit}` : '';
     return useQuery({
-        queryKey: ['blog'],
-        queryFn: () => api.get<{ posts: BlogPost[] }>('/blog'),
+        queryKey: ['blog', 'list', options],
+        queryFn: () => api.get<{ posts: BlogPost[] }>(`/blog${qs}`),
+    });
+}
+
+/** The signed-in writer's own articles, every status. */
+export function useMyBlogPosts(enabled = true) {
+    return useQuery({
+        queryKey: ['blog', 'mine'],
+        queryFn: () => api.get<{ posts: BlogPost[] }>('/blog/mine'),
+        enabled,
     });
 }
 

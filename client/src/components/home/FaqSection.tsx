@@ -34,7 +34,7 @@ export const FaqSection = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3">
                             <Button variant="brand" asChild>
-                                <Link to="/contact" className="flex items-center gap-2">
+                                <Link to="/contact?topic=question" className="flex items-center gap-2">
                                     <MessageCircle className="w-4 h-4" /> Contact Us
                                 </Link>
                             </Button>

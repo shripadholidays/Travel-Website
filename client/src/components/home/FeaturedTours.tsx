@@ -39,10 +39,10 @@ export const FeaturedTours = () => {
                             View all <ArrowUpRight className="w-5 h-5" />
                         </Link>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="icon" className="rounded-full w-12 h-12 border-slate-200" ref={prevRef}>
+                            <Button variant="outline" size="icon" className="rounded-full w-12 h-12 border-slate-200" ref={prevRef} aria-label="Previous tours">
                                 <ArrowLeft className="w-5 h-5" />
                             </Button>
-                            <Button variant="outline" size="icon" className="rounded-full w-12 h-12 border-slate-200 bg-white" ref={nextRef}>
+                            <Button variant="outline" size="icon" className="rounded-full w-12 h-12 border-slate-200 bg-white" ref={nextRef} aria-label="Next tours">
                                 <ArrowRight className="w-5 h-5" />
                             </Button>
                         </div>

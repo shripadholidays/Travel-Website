@@ -1,3 +1,4 @@
+import { NoResults } from '@/components/NoResults';
 import { lazy, Suspense, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BedDouble, RotateCcw } from 'lucide-react';
@@ -143,10 +144,10 @@ export const HotelsPage = () => {
                         </div>
 
                         {visible.length === 0 ? (
-                            <div className="rounded-[2rem] bg-slate-50 p-10 text-center">
-                                <h3 className="text-2xl font-display font-bold text-brand-blue">No stays match</h3>
-                                <p className="mt-2 text-muted-foreground">Try another city, different dates or fewer filters.</p>
-                            </div>
+                            <NoResults
+                                title="No stays match"
+                                message="Try another city, different dates or fewer filters, or ask our team to find a stay for you."
+                            />
                         ) : view === 'map' ? (
                             <Suspense fallback={<Spinner center />}>
                                 <HotelMap offers={visible} linkFor={(o) => hotelLink(o, linkedBooking)} />

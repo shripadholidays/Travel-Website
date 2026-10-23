@@ -12,11 +12,11 @@ export const MainLayout = () => {
             >
                 Skip to content
             </a>
-            <Navbar />
+            <div className="print:hidden"><Navbar /></div>
             <main id="main-content" className="flex-grow w-full">
                 <Outlet />
             </main>
-            <Footer />
+            <div className="print:hidden"><Footer /></div>
             <TourQuickView />
             <ScrollRestoration />
         </div>

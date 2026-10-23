@@ -22,7 +22,7 @@ export const FAQS = [
     },
     {
         q: "How can I contact support?",
-        a: "Our team is available around the clock. Reach out through our Contact page or email, and we'll get back to you within 24 hours.",
+        a: "Send us a message from the Contact page or the message box on the homepage, or email us. We reply within 24 hours.",
     },
     {
         q: "Can you create a custom itinerary?",

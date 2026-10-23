@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 import { useTourActions, useTourBooking } from "@/hooks/use-tour-actions";
 import { SectionHeading, TourInclusions, TourItinerary, TourOverview, TourQuickFacts } from "@/components/tour/TourSections";
+import { TourGallery } from "@/components/tour/TourGallery";
 import { TourBookingPanel } from "@/components/tour/TourBookingPanel";
 
 import { Container } from "@/components/ui/container";
@@ -133,6 +134,7 @@ export const TourDetails = () => {
                 <div className="lg:col-span-2 space-y-12">
                     <TourQuickFacts tour={tour} className="-mt-2" />
                     <TourOverview tour={tour} />
+                    <TourGallery tour={tour} />
                     <TourInclusions tour={tour} />
                     <TourItinerary tour={tour} />
 

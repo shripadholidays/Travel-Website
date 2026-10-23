@@ -11,6 +11,8 @@ interface AuthContextType {
     loginWithEmail: (email: string, password: string) => Promise<void>;
     registerWithEmail: (displayName: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    /** Re-reads the profile (e.g. after the email is verified) */
+    refreshUser: () => Promise<void>;
     isAuthenticated: boolean;
     isAdmin: boolean;
 }
@@ -90,6 +92,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         navigate('/');
     }, [navigate]);
 
+    const refreshUser = useCallback(async () => {
+        try {
+            const data = await api.get<{ user: User }>('/users/profile');
+            setUser(data.user);
+        } catch {
+            // Signed out or offline: keep what we have
+        }
+    }, []);
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -99,6 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             loginWithEmail,
             registerWithEmail,
             logout,
+            refreshUser,
             isAuthenticated: !!user,
             isAdmin: user?.role === 'admin',
         }}>

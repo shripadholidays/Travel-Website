@@ -23,18 +23,18 @@ export const NotFound = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <Link to="/">
-                        <Button className="bg-brand-orange hover:bg-brand-orange/90 gap-2">
+                    <Button className="bg-brand-orange hover:bg-brand-orange/90 gap-2" asChild>
+                        <Link to="/">
                             <Home className="w-4 h-4" />
                             Back to Home
-                        </Button>
-                    </Link>
-                    <Link to="/tours">
-                        <Button variant="outline" className="gap-2">
+                        </Link>
+                    </Button>
+                    <Button variant="outline" className="gap-2" asChild>
+                        <Link to="/tours">
                             <Search className="w-4 h-4" />
                             Browse Tours
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                 </div>
             </div>
         </div>

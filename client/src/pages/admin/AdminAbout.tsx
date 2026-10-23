@@ -138,7 +138,7 @@ export const AdminAbout = () => {
             <Card>
                 <CardHeader>
                     <CardTitle>Stats / Numbers</CardTitle>
-                    <CardDescription>The large numbered facts shown across the About page (e.g., "120k+ Happy travelers").</CardDescription>
+                    <CardDescription>Leave empty to show live numbers worked out from your real tours, bookings and reviews.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ListEditor
@@ -151,7 +151,7 @@ export const AdminAbout = () => {
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
                                     <Label className="text-xs">Value</Label>
-                                    <Input value={stat.value} onChange={e => onChange({ ...stat, value: e.target.value })} placeholder="120k+" />
+                                    <Input value={stat.value} onChange={e => onChange({ ...stat, value: e.target.value })} placeholder="e.g. 25" />
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs">Label</Label>

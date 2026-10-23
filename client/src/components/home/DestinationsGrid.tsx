@@ -27,8 +27,11 @@ export const DestinationsGrid = () => {
                             Top Destinations
                         </motion.h2>
                         <p className="text-muted-foreground text-lg max-w-xl">
-                            Explore our most popular destinations voted by travelers like you.
+                            Explore the places our tours take you.
                         </p>
+                        <Link to="/destinations" className="md:hidden inline-flex items-center gap-2 text-brand-orange font-medium mt-4">
+                            View all destinations <ArrowUpRight className="w-4 h-4" />
+                        </Link>
                     </div>
                     <Link to="/destinations" className="hidden md:flex items-center gap-2 text-brand-orange font-medium hover:gap-4 transition-all">
                         View all destinations <ArrowUpRight className="w-5 h-5" />

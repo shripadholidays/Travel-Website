@@ -4,43 +4,38 @@ import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/PageTitle";
-import { usePublicSettings, type AboutStat, type AboutValue } from "@/hooks/use-settings";
+import { usePublicSettings, useHighlights, liveStats, type AboutValue } from "@/hooks/use-settings";
 
 function resolveIcon(name: string): LucideIcon {
     return (LucideIcons as unknown as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
 }
 
-const FALLBACK_STATS: AboutStat[] = [
-    { value: "120k+", label: "Happy travelers" },
-    { value: "500+", label: "Curated tours" },
-    { value: "50+", label: "Destinations" },
-    { value: "4.9/5", label: "Average rating" },
-];
-
 const FALLBACK_VALUES: AboutValue[] = [
-    { icon: "Globe2", title: "Global Reach", description: "Hand-picked experiences across 50+ countries and counting." },
-    { icon: "ShieldCheck", title: "Travel With Confidence", description: "Secure payments, verified partners, and free cancellation on most tours." },
+    { icon: "Globe2", title: "Global Reach", description: "Hand-picked experiences in destinations around the world." },
+    { icon: "ShieldCheck", title: "Travel With Confidence", description: "Secure payments, trusted local partners and clear cancellation terms." },
     { icon: "Heart", title: "Crafted With Care", description: "Every itinerary is curated by travel specialists, not algorithms." },
-    { icon: "Users", title: "Real Support", description: "A dedicated team available around the clock, wherever you roam." },
+    { icon: "Users", title: "Real Support", description: "A real team that answers every message within 24 hours." },
 ];
 
 export const AboutPage = () => {
     const { data } = usePublicSettings();
     const about = data?.settings?.aboutPage;
+    const { data: highlights } = useHighlights();
 
     const heroImage = about?.heroImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80";
     const heroHeadline = about?.heroHeadline || "We turn wanderlust into unforgettable journeys";
     const heroSubtext = about?.heroSubtext || "Wandeazy was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.";
     const storyParagraph1 = about?.storyParagraph1 || "What started as a small group of travel obsessives sketching itineraries on napkins has grown into a platform trusted by travelers worldwide. We've walked the trails, tasted the food, and slept under the stars — so we know exactly what makes a trip worth taking.";
     const storyParagraph2 = about?.storyParagraph2 || "Today, we partner with the best local operators on the planet to bring you experiences that are authentic, responsible, and unforgettable.";
-    const stats = (about?.stats?.length ?? 0) > 0 ? about!.stats : FALLBACK_STATS;
+    // Admin-written stats win; otherwise real numbers, never made-up ones
+    const stats = (about?.stats?.length ?? 0) > 0 ? about!.stats : liveStats(highlights?.stats);
     const values = (about?.values?.length ?? 0) > 0 ? about!.values : FALLBACK_VALUES;
     const ctaHeading = about?.ctaHeading || "Ready to start your journey?";
     const ctaSubtext = about?.ctaSubtext || "Browse our curated tours or tell us about your dream trip — we'll handle the rest.";
     const ctaBtn1Label = about?.ctaBtn1Label || "Explore Tours";
     const ctaBtn1Link = about?.ctaBtn1Link || "/tours";
     const ctaBtn2Label = about?.ctaBtn2Label || "Plan My Trip";
-    const ctaBtn2Link = about?.ctaBtn2Link || "/contact";
+    const ctaBtn2Link = about?.ctaBtn2Link || "/contact?topic=trip";
 
     return (
         <div className="bg-background min-h-screen">
@@ -70,14 +65,16 @@ export const AboutPage = () => {
                 </section>
 
                 {/* Stats */}
-                <section className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                    {stats.map((s) => (
-                        <div key={s.label}>
-                            <div className="text-4xl md:text-5xl font-display font-bold text-brand-orange">{s.value}</div>
-                            <div className="text-sm text-muted-foreground mt-2">{s.label}</div>
-                        </div>
-                    ))}
-                </section>
+                {stats.length > 0 && (
+                    <section className="flex flex-wrap justify-center gap-x-16 gap-y-8 text-center">
+                        {stats.map((s) => (
+                            <div key={s.label} className="min-w-[8rem]">
+                                <div className="text-4xl md:text-5xl font-display font-bold text-brand-orange tabular-nums">{s.value}</div>
+                                <div className="text-sm text-muted-foreground mt-2">{s.label}</div>
+                            </div>
+                        ))}
+                    </section>
+                )}
 
                 {/* Values */}
                 <section>

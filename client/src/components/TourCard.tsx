@@ -31,30 +31,8 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
     const tags = tour.categories ?? [];
     const image = tour.imageURL || tour.images?.[0] || '';
 
-    // EMI/offer discount logic
-    let finalPrice = tour.price;
-    let isSale = false;
-    let saleLabel = "";
-
-    if (tour.emi) {
-        const percentMatch = tour.emi.match(/(\d+)%\s+OFF/i);
-        const flatMatch = tour.emi.match(/\$(\d+)\s+OFF/i);
-        const saleMatch = tour.emi.match(/(sale|deal|offer|special)/i);
-
-        if (percentMatch) {
-            finalPrice = tour.price * (1 - parseInt(percentMatch[1]) / 100);
-        } else if (flatMatch) {
-            finalPrice = tour.price - parseInt(flatMatch[1]);
-        }
-
-        if (saleMatch) {
-            isSale = true;
-            saleLabel = tour.emi.replace(/\s*(\d+%|\$\d+)\s+OFF.*/i, "").trim();
-            if (!saleLabel) saleLabel = "Special Offer";
-        }
-    }
-
-    const hasDiscount = finalPrice < tour.price;
+    // The card always shows the price the traveller will pay; the admin's highlight is just a label
+    const highlight = tour.emi?.trim();
 
     return (
         <Link to={`/tour/${tour._id}`} onClick={handleOpen} className={cn("group block h-full", className)}>
@@ -139,22 +117,17 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
 
                     <div className="mt-auto flex items-end justify-between pt-5 border-t border-slate-100">
                         <div className="flex flex-col">
-                            {isSale ? (
-                                <span className="text-[10px] font-bold uppercase text-red-500 tracking-wider mb-0.5">
-                                    {saleLabel}
+                            {highlight ? (
+                                <span className="text-[10px] font-bold uppercase text-brand-orange tracking-wider mb-0.5">
+                                    {highlight}
                                 </span>
                             ) : (
                                 <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">Starting from</span>
                             )}
 
                             <div className="flex items-baseline gap-1.5">
-                                {hasDiscount && (
-                                    <span className="text-sm font-bold text-muted-foreground/60 line-through decoration-red-500/50">
-                                        {formatPrice(tour.price)}
-                                    </span>
-                                )}
-                                <span className={cn("text-[26px] leading-none font-bold font-display", isSale ? "text-red-600" : "text-brand-blue")}>
-                                    {formatPrice(hasDiscount ? finalPrice : tour.price)}
+                                <span className="text-[26px] leading-none font-bold font-display text-brand-blue">
+                                    {formatPrice(tour.price)}
                                 </span>
                                 <span className="text-xs text-muted-foreground font-medium">/ person</span>
                             </div>

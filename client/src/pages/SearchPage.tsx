@@ -6,14 +6,15 @@ import { Spinner } from '@/components/ui/spinner';
 import { Pagination } from '@/components/ui/pagination';
 import { SortSelect } from '@/components/SortSelect';
 import { PageTitle } from '@/components/PageTitle';
+import { NoResults } from '@/components/NoResults';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-import { useTours } from '@/hooks/use-tours';
-import { Search, SlidersHorizontal, X, Star, Check } from 'lucide-react';
+import { useTours, useTourFacets } from '@/hooks/use-tours';
+import { Search, SlidersHorizontal, X, Star, Check, MapPin } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -32,51 +33,70 @@ const DURATION_BUCKETS: Record<string, { min?: number; max?: number }> = {
 
 const RATING_OPTIONS = [4, 3, 2];
 
+// URL params that are filters (as opposed to the search term, sort, page or an open tour)
+const FILTER_PARAMS = ['max', 'days', 'rating', 'category', 'place'] as const;
+
 export const SearchPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const urlQuery = searchParams.get('q') || '';
 
-    // `inputQuery` is the live text box; `query` is what we actually search on.
-    const [inputQuery, setInputQuery] = useState(urlQuery);
-    const [query, setQuery] = useState(urlQuery);
-    const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
-    const [durations, setDurations] = useState<string[]>([]);
-    const [minRating, setMinRating] = useState<number | null>(null);
-    const [sort, setSort] = useState('recommended');
-    const [page, setPage] = useState(1);
+    // Every filter lives in the URL, so Back/Forward, refresh and shared links keep them.
+    const query = searchParams.get('q') || '';
+    const maxPrice = Math.min(MAX_PRICE, Number(searchParams.get('max')) || MAX_PRICE);
+    const durations = (searchParams.get('days') || '').split(',').filter((d) => d in DURATION_BUCKETS);
+    const ratingParam = Number(searchParams.get('rating'));
+    const minRating = RATING_OPTIONS.includes(ratingParam) ? ratingParam : null;
+    const categories = (searchParams.get('category') || '').split(',').filter(Boolean);
+    const place = searchParams.get('place') || '';
+    const sort = searchParams.get('sort') || 'recommended';
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
+
+    // `inputQuery` is the live text box; the URL's ?q= is what we search on.
+    const [inputQuery, setInputQuery] = useState(query);
     const [showFilters, setShowFilters] = useState(false);
+    const { data: facets } = useTourFacets();
 
-    // The URL is the source of truth for the search term: the navbar search,
-    // Back/Forward and shared links all land here.
+    // The navbar search and Back/Forward change ?q= from outside the box
     useEffect(() => {
-        setInputQuery(urlQuery);
-        setQuery(urlQuery);
-        setPage(1);
-    }, [urlQuery]);
+        setInputQuery(query);
+    }, [query]);
 
-    // Keep ?q= in step with the box, leaving other params (e.g. the tour modal) alone.
-    const syncUrl = (value: string) => {
+    /** Change some params in place, leaving the rest (e.g. an open tour) alone; filter changes go back to page 1. */
+    const setParams = (changes: Record<string, string | null>, keepPage = false) => {
         setSearchParams((prev) => {
             const next = new URLSearchParams(prev);
-            if (value) next.set('q', value); else next.delete('q');
+            for (const [key, value] of Object.entries(changes)) {
+                if (value) next.set(key, value); else next.delete(key);
+            }
+            if (!keepPage) next.delete('page');
             return next;
         }, { replace: true, preventScrollReset: true });
+    };
+
+    const syncUrl = (value: string) => setParams({ q: value.trim() || null });
+    const setMaxPrice = (value: number) => setParams({ max: value < MAX_PRICE ? String(value) : null });
+    const setMinRating = (value: number | null) => setParams({ rating: value ? String(value) : null });
+    const setSort = (value: string) => setParams({ sort: value === 'recommended' ? null : value });
+    const setPlace = (value: string) => setParams({ place: value || null });
+    const setPage = (value: number) => {
+        setParams({ page: value > 1 ? String(value) : null }, true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const toggleCategory = (value: string) => {
+        const next = categories.includes(value) ? categories.filter((c) => c !== value) : [...categories, value];
+        setParams({ category: next.join(',') || null });
+    };
+    const toggleDuration = (value: string) => {
+        const next = durations.includes(value) ? durations.filter((d) => d !== value) : [...durations, value];
+        setParams({ days: next.join(',') || null });
     };
 
     // Debounce the text box so typing doesn't fire a request per keystroke.
     useEffect(() => {
         const id = setTimeout(() => {
-            setQuery(inputQuery);
-            setPage(1);
-            if (inputQuery !== urlQuery) syncUrl(inputQuery);
+            if (inputQuery.trim() !== query) syncUrl(inputQuery);
         }, 400);
         return () => clearTimeout(id);
     }, [inputQuery]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Reset to page 1 whenever a filter changes.
-    useEffect(() => {
-        setPage(1);
-    }, [maxPrice, durations, minRating, sort]);
 
     // Translate selected duration buckets into a single min/max range.
     const dayRange = useMemo(() => {
@@ -86,10 +106,12 @@ export const SearchPage = () => {
         const hasOpenEnded = buckets.some((b) => b.max === undefined);
         const max = hasOpenEnded ? undefined : Math.max(...buckets.map((b) => b.max ?? 0));
         return { minDays: min, maxDays: max };
-    }, [durations]);
+    }, [durations.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const { data, isLoading, isError, refetch } = useTours({
         search: query,
+        category: categories.join(',') || undefined,
+        place: place || undefined,
         sort: sort === 'recommended' ? '' : sort,
         maxPrice: maxPrice < MAX_PRICE ? maxPrice : undefined,
         minRating: minRating ?? undefined,
@@ -103,29 +125,18 @@ export const SearchPage = () => {
     const totalCount = pagination?.total ?? tours.length;
     const totalPages = pagination?.pages ?? 1;
 
-    const toggleDuration = (value: string) =>
-        setDurations((prev) =>
-            prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]
-        );
-
     const activeFilterCount =
-        (maxPrice < MAX_PRICE ? 1 : 0) + durations.length + (minRating ? 1 : 0);
+        (maxPrice < MAX_PRICE ? 1 : 0) + durations.length + (minRating ? 1 : 0) + categories.length + (place ? 1 : 0);
 
-    const resetFilters = () => {
+    // Clears the filters but keeps the search term
+    const resetFilters = () => setParams(Object.fromEntries(FILTER_PARAMS.map((p) => [p, null])));
+
+    const clearEverything = () => {
         setInputQuery('');
-        setQuery('');
-        setMaxPrice(MAX_PRICE);
-        setDurations([]);
-        setMinRating(null);
-        setSort('recommended');
-        setPage(1);
+        setParams({ q: null, sort: null, ...Object.fromEntries(FILTER_PARAMS.map((p) => [p, null])) });
     };
 
-    const submitSearch = () => {
-        setQuery(inputQuery);
-        setPage(1);
-        syncUrl(inputQuery);
-    };
+    const submitSearch = () => syncUrl(inputQuery);
 
     const filtersPanel = (
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
@@ -134,7 +145,7 @@ export const SearchPage = () => {
                     <div className="w-9 h-9 rounded-full bg-brand-orange/10 flex items-center justify-center">
                         <SlidersHorizontal className="w-4 h-4 text-brand-orange" />
                     </div>
-                    <h3 className="text-lg font-display font-bold text-brand-blue">Filters</h3>
+                    <h2 className="text-lg font-display font-bold text-brand-blue">Filters</h2>
                     {activeFilterCount > 0 && (
                         <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-bold rounded-full bg-brand-orange text-white">
                             {activeFilterCount}
@@ -151,7 +162,57 @@ export const SearchPage = () => {
                 )}
             </div>
 
-            <Accordion type="multiple" defaultValue={['price', 'duration', 'rating']} className="w-full">
+            <Accordion type="multiple" defaultValue={['place', 'category', 'price', 'duration', 'rating']} className="w-full">
+                {(facets?.places.length ?? 0) > 0 && (
+                    <AccordionItem value="place" className="border-slate-100">
+                        <AccordionTrigger className="hover:no-underline text-xs font-bold uppercase tracking-wider text-slate-400">Destination</AccordionTrigger>
+                        <AccordionContent>
+                            <div className="relative pt-1 pb-2">
+                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-orange pointer-events-none" />
+                                <select
+                                    value={place}
+                                    onChange={(e) => setPlace(e.target.value)}
+                                    aria-label="Destination"
+                                    className="w-full h-11 pl-9 pr-3 rounded-2xl bg-slate-50 text-sm text-slate-700 border-0 focus:outline-none focus:ring-2 focus:ring-brand-orange/40 cursor-pointer"
+                                >
+                                    <option value="">Anywhere</option>
+                                    {facets!.places.map((p) => (
+                                        <option key={p.name} value={p.name}>{p.name} ({p.count})</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+
+                {(facets?.categories.length ?? 0) > 0 && (
+                    <AccordionItem value="category" className="border-slate-100">
+                        <AccordionTrigger className="hover:no-underline text-xs font-bold uppercase tracking-wider text-slate-400">Trip Style</AccordionTrigger>
+                        <AccordionContent>
+                            <div className="flex flex-wrap gap-2 pt-1 pb-2">
+                                {facets!.categories.map((c) => {
+                                    const active = categories.includes(c.name);
+                                    return (
+                                        <button
+                                            key={c.name}
+                                            type="button"
+                                            onClick={() => toggleCategory(c.name)}
+                                            aria-pressed={active}
+                                            className={cn(
+                                                "inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+                                                active ? "bg-brand-orange text-white" : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                                            )}
+                                        >
+                                            {active && <Check className="w-3.5 h-3.5" />}
+                                            {c.name}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+
                 <AccordionItem value="price" className="border-slate-100">
                     <AccordionTrigger className="hover:no-underline text-xs font-bold uppercase tracking-wider text-slate-400">Price Range</AccordionTrigger>
                     <AccordionContent>
@@ -162,16 +223,7 @@ export const SearchPage = () => {
                                     {maxPrice >= MAX_PRICE ? 'Any price' : `$${maxPrice.toLocaleString()}`}
                                 </span>
                             </div>
-                            <input
-                                type="range"
-                                min="0"
-                                max={MAX_PRICE}
-                                step="100"
-                                value={maxPrice}
-                                onChange={(e) => setMaxPrice(parseInt(e.target.value))}
-                                className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-secondary accent-brand-orange"
-                                aria-label="Maximum price"
-                            />
+                            <PriceSlider value={maxPrice} onCommit={setMaxPrice} />
                             <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                                 <span>$0</span>
                                 <span>${MAX_PRICE.toLocaleString()}+</span>
@@ -220,6 +272,7 @@ export const SearchPage = () => {
                                         type="button"
                                         onClick={() => setMinRating(active ? null : r)}
                                         aria-pressed={active}
+                                        aria-label={`${r} stars and up`}
                                         className={cn(
                                             "w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300",
                                             active
@@ -227,7 +280,7 @@ export const SearchPage = () => {
                                                 : "bg-slate-50 hover:bg-slate-100"
                                         )}
                                     >
-                                        <span className="flex items-center gap-0.5">
+                                        <span className="flex items-center gap-0.5" aria-hidden>
                                             {[1, 2, 3, 4, 5].map((s) => (
                                                 <Star
                                                     key={s}
@@ -253,31 +306,34 @@ export const SearchPage = () => {
 
     return (
         <div className="pt-24 pb-12 bg-background min-h-screen">
-            <PageTitle title="Search Tours" description="Find and book your next adventure from our curated tours." />
+            <PageTitle
+                title={query ? `Tours matching “${query}”` : 'All Tours'}
+                description="Find and book your next adventure from our curated tours."
+            />
             <Container>
                 {/* Search Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-display font-bold mb-6">Find your next adventure</h1>
-                    <div className="flex gap-3 max-w-2xl">
+                    <form
+                        className="flex gap-3 max-w-2xl"
+                        role="search"
+                        onSubmit={(e) => { e.preventDefault(); submitSearch(); }}
+                    >
                         <div className="relative flex-grow">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                             <Input
+                                type="search"
                                 placeholder="Search destinations, tours..."
                                 className="pl-11 h-14 rounded-2xl border-slate-200 shadow-sm text-base"
                                 value={inputQuery}
                                 onChange={(e) => setInputQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
                                 aria-label="Search tours"
                             />
                         </div>
-                        <Button
-                            className="h-14 px-8 rounded-2xl"
-                            variant="brand"
-                            onClick={submitSearch}
-                        >
+                        <Button type="submit" className="h-14 px-5 sm:px-8 rounded-2xl" variant="brand">
                             Search
                         </Button>
-                    </div>
+                    </form>
                 </div>
 
                 {/* Mobile filter toggle */}
@@ -286,6 +342,7 @@ export const SearchPage = () => {
                         variant="outline"
                         className="w-full h-11 rounded-xl"
                         onClick={() => setShowFilters((s) => !s)}
+                        aria-expanded={showFilters}
                     >
                         {showFilters ? <X className="w-4 h-4 mr-2" /> : <SlidersHorizontal className="w-4 h-4 mr-2" />}
                         {showFilters ? 'Hide Filters' : 'Filters'}
@@ -299,19 +356,20 @@ export const SearchPage = () => {
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Filters Sidebar */}
-                    <div
+                    <aside
+                        aria-label="Filters"
                         className={`w-full lg:w-64 flex-shrink-0 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}
                     >
                         {filtersPanel}
-                    </div>
+                    </aside>
 
                     {/* Results Grid */}
-                    <div className="flex-1">
-                        <div className="flex justify-between items-center mb-6">
-                            <span className="text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center gap-3 mb-6">
+                            <span className="text-muted-foreground" aria-live="polite">
                                 {isLoading ? 'Searching…' : <>Showing <strong>{totalCount}</strong> {totalCount === 1 ? 'result' : 'results'}</>}
                             </span>
-                            <SortSelect onSortChange={setSort} />
+                            <SortSelect value={sort} onSortChange={setSort} />
                         </div>
 
                         {isLoading ? (
@@ -339,19 +397,42 @@ export const SearchPage = () => {
                                 />
                             </>
                         ) : (
-                            <div className="text-center py-20 text-muted-foreground">
-                                <h3 className="text-xl font-bold mb-2">No tours found</h3>
-                                <p className="mb-4">Try adjusting your filters or search query.</p>
-                                {activeFilterCount > 0 && (
-                                    <Button variant="outline" onClick={resetFilters}>
-                                        Clear all filters
-                                    </Button>
-                                )}
-                            </div>
+                            <NoResults
+                                title={query ? `No tours for “${query}” yet` : 'No tours match these filters'}
+                                message={activeFilterCount > 0
+                                    ? 'Try removing a filter, or tell us what you have in mind and we will plan it for you.'
+                                    : "We don't run a tour there yet, but our travel team can put one together for you."}
+                                query={query || place}
+                                onClear={activeFilterCount > 0 ? resetFilters : query ? clearEverything : undefined}
+                                clearLabel={activeFilterCount > 0 ? 'Clear filters' : 'Show all tours'}
+                                suggestTours
+                            />
                         )}
                     </div>
                 </div>
             </Container>
         </div>
+    );
+};
+
+/** Moves freely while dragging and only updates the URL (and the search) on release. */
+const PriceSlider = ({ value, onCommit }: { value: number; onCommit: (v: number) => void }) => {
+    const [draft, setDraft] = useState(value);
+    useEffect(() => setDraft(value), [value]);
+    return (
+        <input
+            type="range"
+            min="0"
+            max={MAX_PRICE}
+            step="100"
+            value={draft}
+            onChange={(e) => setDraft(parseInt(e.target.value))}
+            onPointerUp={() => onCommit(draft)}
+            onKeyUp={() => onCommit(draft)}
+            onBlur={() => draft !== value && onCommit(draft)}
+            className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-secondary accent-brand-orange"
+            aria-label="Maximum price"
+            aria-valuetext={draft >= MAX_PRICE ? 'Any price' : `Up to $${draft}`}
+        />
     );
 };

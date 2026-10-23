@@ -128,3 +128,27 @@ h1, h2, h3, h4, h5, h6 {
 .leaflet-control-attribution a {
   color: #64748b !important;
 }
+
+/* Article body (blog posts) — readable long-form type without the typography plugin */
+@layer components {
+  .article-body {
+    @apply text-lg leading-[1.8] text-slate-700;
+  }
+  .article-body > * + * { @apply mt-6; }
+  .article-body h2 { @apply mt-12 mb-4 text-3xl font-display font-bold text-brand-blue leading-tight; }
+  .article-body h3 { @apply mt-10 mb-3 text-2xl font-display font-bold text-brand-blue leading-snug; }
+  .article-body h4 { @apply mt-8 mb-2 text-xl font-bold text-brand-blue; }
+  .article-body h2 + *, .article-body h3 + *, .article-body h4 + * { @apply mt-0; }
+  .article-body a { @apply text-brand-orange font-medium underline decoration-brand-orange/30 underline-offset-4 hover:decoration-brand-orange; }
+  .article-body strong, .article-body b { @apply font-semibold text-slate-900; }
+  .article-body ul { @apply list-disc pl-6 space-y-2 marker:text-brand-orange; }
+  .article-body ol { @apply list-decimal pl-6 space-y-2 marker:text-brand-orange marker:font-semibold; }
+  .article-body li { @apply pl-1; }
+  .article-body blockquote { @apply border-l-4 border-brand-orange pl-6 py-1 italic text-slate-600 text-xl; }
+  .article-body img { @apply rounded-2xl w-full h-auto my-8; }
+  .article-body figcaption { @apply text-sm text-center text-muted-foreground -mt-4; }
+  .article-body hr { @apply my-12 border-slate-200; }
+  .article-body code { @apply rounded bg-slate-100 px-1.5 py-0.5 text-[0.9em] font-mono text-slate-800; }
+  .article-body pre { @apply rounded-2xl bg-slate-900 text-slate-100 p-5 overflow-x-auto text-sm; }
+  .article-body pre code { @apply bg-transparent p-0 text-inherit; }
+}

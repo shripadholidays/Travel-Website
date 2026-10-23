@@ -1,3 +1,4 @@
+import { NoResults } from '@/components/NoResults';
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, PlaneTakeoff, RotateCcw } from 'lucide-react';
@@ -197,11 +198,12 @@ export const FlightsPage = () => {
                             </div>
 
                             {visible.length === 0 ? (
-                                <div className="rounded-[2rem] bg-slate-50 p-10 text-center">
-                                    <h3 className="text-2xl font-display font-bold text-brand-blue">No flights match</h3>
-                                    <p className="mt-2 text-muted-foreground">Try clearing a filter or searching nearby dates.</p>
-                                    <button type="button" onClick={() => setFilters(EMPTY_FLIGHT_FILTERS)} className="mt-5 font-bold text-brand-orange hover:underline">Clear filters</button>
-                                </div>
+                                <NoResults
+                                    title="No flights match"
+                                    message="Try clearing a filter or searching nearby dates, or ask our team to find a route for you."
+                                    onClear={() => setFilters(EMPTY_FLIGHT_FILTERS)}
+                                />
+
                             ) : (
                                 visible.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={setSelected} />)
                             )}

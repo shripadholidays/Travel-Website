@@ -7,6 +7,11 @@ interface TourFilters {
     limit?: number;
     search?: string;
     category?: string;
+    place?: string;
+    /** Destination slug: its tours, by the same rule as its tour count */
+    destination?: string;
+    /** Comma-separated tour ids */
+    ids?: string;
     minPrice?: number;
     maxPrice?: number;
     minDays?: number;
@@ -26,6 +31,17 @@ export function useTours(filters: TourFilters = {}, options: { enabled?: boolean
         queryKey: ['tours', filters],
         queryFn: () => api.get<PaginatedData<Tour>>(`/tours${query ? `?${query}` : ''}`),
         enabled: options.enabled ?? true,
+    });
+}
+
+export interface TourFacet { name: string; count: number }
+
+/** Categories and places that live tours cover, for the search filters. */
+export function useTourFacets() {
+    return useQuery({
+        queryKey: ['tours', 'facets'],
+        queryFn: () => api.get<{ categories: TourFacet[]; places: TourFacet[] }>('/tours/facets'),
+        staleTime: 5 * 60 * 1000,
     });
 }
 

@@ -56,7 +56,7 @@ export const FAQPage = () => {
                     <h2 className="text-xl font-bold mb-2">Still have questions?</h2>
                     <p className="text-muted-foreground mb-5">Our team is here to help you plan the perfect trip.</p>
                     <Button variant="brand" asChild>
-                        <Link to="/contact">Get in Touch</Link>
+                        <Link to="/contact?topic=question">Get in Touch</Link>
                     </Button>
                 </div>
             </Container>

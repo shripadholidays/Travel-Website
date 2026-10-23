@@ -5,6 +5,10 @@ interface CurrencyContextType {
     currency: Currency;
     setCurrency: (c: Currency) => void;
     formatPrice: (price: number) => string;
+    /** The exact amount in US dollars — what cards are actually charged */
+    formatUSD: (price: number) => string;
+    /** True when prices on screen are converted estimates rather than the charged currency */
+    isConverted: boolean;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
@@ -22,8 +26,11 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
         }).format(converted);
     };
 
+    const formatUSD = (priceInUSD: number) =>
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(priceInUSD);
+
     return (
-        <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+        <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, formatUSD, isConverted: currency !== 'USD' }}>
             {children}
         </CurrencyContext.Provider>
     );

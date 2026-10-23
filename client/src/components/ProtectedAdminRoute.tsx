@@ -2,9 +2,10 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { rememberReturnTo } from '@/lib/return-to';
 import { useAuth } from '@/context/AuthContext';
 import { Spinner } from '@/components/ui/spinner';
+import { adminHome, canOpenAdminPath } from '@/lib/admin-access';
 
 export const ProtectedAdminRoute = () => {
-    const { isAuthenticated, isAdmin, isLoading } = useAuth();
+    const { isAuthenticated, isLoading, user } = useAuth();
     const location = useLocation();
 
     if (isLoading) {
@@ -20,8 +21,13 @@ export const ProtectedAdminRoute = () => {
         return <Navigate to="/login" replace />;
     }
 
-    if (!isAdmin) {
+    if (user?.role !== 'admin' && user?.role !== 'moderator') {
         return <Navigate to="/dashboard" replace />;
+    }
+
+    // Moderators only see the article tools
+    if (!canOpenAdminPath(user, location.pathname)) {
+        return <Navigate to={adminHome(user)} replace />;
     }
 
     return <Outlet />;

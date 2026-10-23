@@ -8,28 +8,47 @@ import { Button } from "@/components/ui/button";
 import {
     ArrowLeft, MapPin, Star, Compass, Globe2, CalendarRange,
     Camera, Utensils, Mountain, Building2, Sparkles, Flag, MessageCircle,
+    Waves, Heart, Gem, Sun, Landmark, type LucideIcon,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
+import type { Destination, Tour } from "@/types";
 
 import { Container } from "@/components/ui/container";
 
-// Curated "things to know" — shown so the page feels complete even without tours.
-const HIGHLIGHTS = [
-    { icon: Camera, title: "Iconic Sights", text: "Discover landmarks that define the destination." },
-    { icon: Utensils, title: "Local Cuisine", text: "Taste authentic flavours loved by locals." },
-    { icon: Mountain, title: "Nature & Adventure", text: "From scenic trails to breathtaking views." },
-    { icon: Building2, title: "Culture & History", text: "Walk through centuries of living heritage." },
-];
+// Icons for trip styles, used when a destination's "why visit" cards come from its tours
+const STYLE_ICONS: Record<string, LucideIcon> = {
+    beach: Waves, relaxation: Sun, adventure: Mountain, trekking: Mountain, nature: Mountain,
+    culture: Landmark, history: Landmark, city: Building2, food: Utensils, culinary: Utensils,
+    luxury: Gem, romance: Heart, honeymoon: Heart, photography: Camera,
+};
+const HIGHLIGHT_ICONS = [Camera, Utensils, Mountain, Building2];
+
+type Highlight = { icon: LucideIcon; title: string; text: string };
+
+/** Written highlights first; otherwise the trip styles real tours here cover; otherwise none. */
+function buildHighlights(destination: Destination, tours: Tour[], shortName: string): Highlight[] {
+    if (destination.highlights?.length) {
+        return destination.highlights.map((h, i) => ({ icon: HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length], title: h.title, text: h.text }));
+    }
+    const counts = new Map<string, number>();
+    tours.forEach((t) => t.categories?.forEach((c) => counts.set(c, (counts.get(c) || 0) + 1)));
+    return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([style, n]) => ({
+        icon: STYLE_ICONS[style.toLowerCase()] ?? Sparkles,
+        title: style,
+        text: `${n} of our ${shortName} ${n === 1 ? "tour focuses" : "tours focus"} on ${style.toLowerCase()}.`,
+    }));
+}
 
 export const DestinationDetails = () => {
     const { slug } = useParams();
     const { data: destData, isLoading } = useDestination(slug!);
     const destination = destData?.destination;
 
-    const { data: toursData } = useTours({ search: destination?.name?.split(',')[0] });
-    const destinationTours = (toursData?.tours ?? []) as import("@/types").Tour[];
+    // Same matching rule as the tour count on destination cards
+    const { data: toursData } = useTours({ destination: slug, limit: 12 }, { enabled: !!slug });
+    const destinationTours = toursData?.tours ?? [];
 
     if (isLoading) {
         return (
@@ -52,6 +71,9 @@ export const DestinationDetails = () => {
 
     const shortName = destination.name.split(',')[0];
     const galleryImages = (destination.images?.length ? destination.images : [destination.coverImage]).slice(0, 4);
+    const highlights = buildHighlights(destination, destinationTours, shortName);
+    const askLink = `/contact?topic=trip&about=${encodeURIComponent(shortName)}&source=destination`;
+    const toursLink = `/tours?place=${encodeURIComponent(destination.country || shortName)}`;
 
     return (
         <div className="bg-background min-h-screen pb-24">
@@ -138,10 +160,11 @@ export const DestinationDetails = () => {
                     </section>
 
                     {/* Why visit / highlights */}
+                    {highlights.length > 0 && (
                     <section>
                         <SectionHeading>Why Visit {shortName}</SectionHeading>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {HIGHLIGHTS.map((h) => {
+                            {highlights.map((h) => {
                                 const Icon = h.icon;
                                 return (
                                     <div key={h.title} className="flex gap-4 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-lg transition-shadow">
@@ -150,13 +173,14 @@ export const DestinationDetails = () => {
                                         </div>
                                         <div>
                                             <h3 className="font-bold mb-1">{h.title}</h3>
-                                            <p className="text-sm text-muted-foreground leading-relaxed">{h.text}</p>
+                                            {h.text && <p className="text-sm text-muted-foreground leading-relaxed">{h.text}</p>}
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
                     </section>
+                    )}
 
                     {/* Gallery */}
                     {galleryImages.length > 1 && (
@@ -207,7 +231,7 @@ export const DestinationDetails = () => {
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                     <Button variant="brand" asChild><Link to="/tours">Browse All Tours</Link></Button>
-                                    <Button variant="outline" asChild><Link to="/contact">Plan a Custom Trip</Link></Button>
+                                    <Button variant="outline" asChild><Link to={askLink}>Plan a Custom Trip</Link></Button>
                                 </div>
                             </div>
                         )}
@@ -238,25 +262,28 @@ export const DestinationDetails = () => {
                                 {destination.rating > 0 && (
                                     <InfoRow icon={Star} label="Average rating" value={`${destination.rating.toFixed(1)} / 5`} starred />
                                 )}
+                                {destination.bestTimeToVisit && (
+                                    <InfoRow icon={CalendarRange} label="Best time to visit" value={destination.bestTimeToVisit} />
+                                )}
                                 <InfoRow icon={Globe2} label="Region" value={destination.continent} />
                                 <InfoRow icon={Flag} label="Country" value={destination.country} />
                             </div>
 
                             {/* CTA */}
                             <Button asChild className="w-full h-14 text-base font-bold bg-brand-orange hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20 rounded-2xl">
-                                <Link to={destinationTours.length > 0 ? "/tours" : "/contact"}>
+                                <Link to={destinationTours.length > 0 ? toursLink : askLink}>
                                     {destinationTours.length > 0 ? "View All Tours" : "Plan Your Trip"}
                                 </Link>
                             </Button>
 
                             <Button asChild variant="outline" className="w-full h-12 rounded-2xl">
-                                <Link to="/contact" className="flex items-center justify-center gap-2">
+                                <Link to={askLink} className="flex items-center justify-center gap-2">
                                     <MessageCircle className="w-4 h-4" /> Ask a Specialist
                                 </Link>
                             </Button>
 
                             <p className="text-center text-xs text-muted-foreground">
-                                Free cancellation · 24/7 support
+                                Secure checkout · Replies within 24 hours
                             </p>
                         </div>
                     </div>
@@ -276,7 +303,7 @@ export const DestinationDetails = () => {
                             Tell us your dates and interests — our travel specialists will craft the perfect itinerary just for you.
                         </p>
                         <Button variant="brand" size="lg" asChild>
-                            <Link to="/contact">Start Planning</Link>
+                            <Link to={askLink}>Start Planning</Link>
                         </Button>
                     </div>
                 </section>

@@ -49,7 +49,7 @@ interface ContactInfo {
 export const BookingPage = () => {
     const location = useLocation();
     const { user } = useAuth();
-    const { formatPrice } = useCurrency();
+    const { formatPrice, formatUSD, isConverted } = useCurrency();
     const createBooking = useCreateBooking();
 
     const { tourId, date, guests } = (location.state as { tourId?: string; date?: string; guests?: number }) || {};
@@ -463,7 +463,7 @@ export const BookingPage = () => {
                                 <p className="text-muted-foreground mb-2 text-lg">Your Wandeazy journey begins now.</p>
                                 <p className="text-muted-foreground mb-8">
                                     We'll email your confirmation to {contactInfo.email}.
-                                    {confirmed && <> Total charged: <span className="font-semibold text-brand-blue">{formatPrice(confirmed.totalAmount)}</span>.</>}
+                                    {confirmed && <> Total charged: <span className="font-semibold text-brand-blue">{formatUSD(confirmed.totalAmount)}</span>.</>}
                                 </p>
 
                                 {bookingId && (
@@ -480,12 +480,12 @@ export const BookingPage = () => {
                                     linkedBooking={bookingId}
                                 />
 
-                                <div className="flex justify-center gap-4 mt-8">
-                                    <Button variant="outline" asChild>
-                                        <Link to="/dashboard">Go to Dashboard</Link>
+                                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8">
+                                    <Button variant="brand" asChild>
+                                        <Link to={confirmed ? `/bookings/${confirmed._id}` : "/dashboard"}>View your booking</Link>
                                     </Button>
-                                    <Button className="bg-brand-blue" asChild>
-                                        <Link to="/">Back to Home</Link>
+                                    <Button variant="outline" asChild>
+                                        <Link to="/tours">Keep exploring</Link>
                                     </Button>
                                 </div>
                             </motion.div>
@@ -615,10 +615,15 @@ export const BookingPage = () => {
                                     <span className="font-bold text-brand-blue">Total</span>
                                     <span className="text-2xl font-bold font-display text-brand-orange">{formatPrice(totalAmount)}</span>
                                 </div>
+                                {isConverted && (
+                                    <p className="text-xs text-muted-foreground -mt-2 text-right">
+                                        Shown as an estimate. Your card is charged <span className="font-semibold text-slate-700">{formatUSD(totalAmount)}</span> (USD).
+                                    </p>
+                                )}
 
                                 <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground bg-slate-50 rounded-xl py-2.5">
                                     <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                                    Secure checkout · Free cancellation
+                                    Secure checkout · Free cancellation up to 24h before
                                 </div>
                             </div>
                         </div>

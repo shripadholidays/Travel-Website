@@ -48,12 +48,12 @@ export const CollectionDetails = () => {
 
                 <div className="absolute top-0 left-0 w-full pt-28 z-20">
                     <Container>
-                        <Link to="/collections" className="inline-block">
-                            <Button variant="ghost" className="group bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-full pl-5 pr-7 py-6 transition-all">
+                        <Button asChild variant="ghost" className="group bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-full pl-5 pr-7 py-6 transition-all">
+                            <Link to="/collections">
                                 <ArrowLeft className="w-5 h-5 mr-3 group-hover:-translate-x-1 transition-transform" />
                                 <span className="font-bold tracking-wide">All Collections</span>
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
                     </Container>
                 </div>
 

@@ -179,7 +179,7 @@ export const AdminHomepage = () => {
                             </div>
                             <div className="space-y-1.5">
                                 <Label>Offer Text</Label>
-                                <Input value={offerBar.text} onChange={e => setOfferBar(p => ({ ...p, text: e.target.value }))} placeholder="Winter Sale! Save Up to 40% on Your Next Trip" />
+                                <Input value={offerBar.text} onChange={e => setOfferBar(p => ({ ...p, text: e.target.value }))} placeholder="e.g. 15% off all Bali tours with code BALI15" />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
@@ -315,7 +315,7 @@ export const AdminHomepage = () => {
                                 items={promoSlides}
                                 onChange={setPromoSlides}
                                 addLabel="Add promo slide"
-                                createEmpty={() => ({ partner: '', title: '', subtitle: '', image: '', accentColor: 'text-emerald-400', discount: 'Save 20%', fromPrice: 999, searchQuery: '' })}
+                                createEmpty={() => ({ partner: '', title: '', subtitle: '', image: '', accentColor: 'text-emerald-400', discount: '', fromPrice: 999, searchQuery: '' })}
                                 renderItem={(slide, _i, onChange) => (
                                     <div className="space-y-3">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -325,7 +325,7 @@ export const AdminHomepage = () => {
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Discount Badge</Label>
-                                                <Input value={slide.discount} onChange={e => onChange({ ...slide, discount: e.target.value })} placeholder="Save 25%" />
+                                                <Input value={slide.discount} onChange={e => onChange({ ...slide, discount: e.target.value })} placeholder="Leave empty unless there is a real discount" />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Title</Label>
@@ -373,7 +373,7 @@ export const AdminHomepage = () => {
                                 title: String(r.title ?? ''),
                                 subtitle: String(r.subtitle ?? ''),
                                 image: String(r.image ?? ''),
-                                discount: String(r.discount ?? 'Save 20%'),
+                                discount: String(r.discount ?? ''),
                                 fromPrice: Number(r.fromPrice ?? 999),
                                 searchQuery: String(r.searchQuery ?? ''),
                                 accentColor: String(r.accentColor ?? 'text-emerald-400'),
@@ -409,9 +409,9 @@ export const AdminHomepage = () => {
                                     onChange={(steps) => setPlanTrip(p => ({ ...p, steps }))}
                                     addLabel="Add step"
                                     maxItems={6}
-                                    createEmpty={() => ({ icon: 'Map', title: '', description: '' })}
+                                    createEmpty={() => ({ icon: 'Map', title: '', description: '', link: '' })}
                                     renderItem={(step, _i, onChange) => (
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Icon</Label>
                                                 <Select value={step.icon} onValueChange={v => onChange({ ...step, icon: v })}>
@@ -425,7 +425,11 @@ export const AdminHomepage = () => {
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Description</Label>
-                                                <Input value={step.description} onChange={e => onChange({ ...step, description: e.target.value })} placeholder="Choose from 100+ locations" />
+                                                <Input value={step.description} onChange={e => onChange({ ...step, description: e.target.value })} placeholder="Browse tours and destinations" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">Link (optional)</Label>
+                                                <Input value={step.link ?? ''} onChange={e => onChange({ ...step, link: e.target.value })} placeholder="/destinations" />
                                             </div>
                                         </div>
                                     )}
@@ -573,24 +577,18 @@ export const AdminHomepage = () => {
                             </div>
 
                             <div>
-                                <Label className="mb-3 block font-semibold">Chat Preview Messages</Label>
+                                <Label className="mb-1 block font-semibold">Greeting Messages</Label>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    Shown above the homepage message box. Messages visitors send there arrive in Inquiries.
+                                </p>
                                 <ListEditor
-                                    items={support.chatMessages}
+                                    items={support.chatMessages.filter(m => m.sender === 'assistant')}
                                     onChange={(chatMessages) => setSupport(p => ({ ...p, chatMessages }))}
-                                    addLabel="Add message"
-                                    maxItems={8}
+                                    addLabel="Add greeting"
+                                    maxItems={3}
                                     createEmpty={() => ({ sender: 'assistant' as const, text: '' })}
                                     renderItem={(msg, _i, onChange) => (
-                                        <div className="flex gap-3 items-center">
-                                            <Select value={msg.sender} onValueChange={v => onChange({ ...msg, sender: v as 'user' | 'assistant' })}>
-                                                <SelectTrigger className="w-32 shrink-0"><SelectValue /></SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="assistant">Assistant</SelectItem>
-                                                    <SelectItem value="user">User</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <Input value={msg.text} onChange={e => onChange({ ...msg, text: e.target.value })} placeholder="Message text…" />
-                                        </div>
+                                        <Input value={msg.text} onChange={e => onChange({ ...msg, text: e.target.value })} placeholder="Hi! Tell us where you would like to go…" />
                                     )}
                                 />
                             </div>

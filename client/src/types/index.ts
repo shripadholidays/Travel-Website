@@ -8,6 +8,7 @@ export interface User {
     profilePicture?: string;
     role: 'user' | 'moderator' | 'admin';
     isEmailVerified?: boolean;
+    authProvider?: 'local' | 'google';
     createdAt: string;
     updatedAt: string;
 }
@@ -65,11 +66,16 @@ export interface Booking {
         phone: string;
     };
     addons: { name: string; price: number }[];
+    /** Before any coupon; totalAmount is what was charged */
+    subtotalAmount?: number;
+    coupon?: { code: string; discount: number };
     totalAmount: number;
     currency: string;
     status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-    paymentId?: string;
+    paymentId?: string | { _id: string; status: string; amount: number };
     specialRequests?: string;
+    cancelledAt?: string;
+    refundedAmount?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -94,6 +100,8 @@ export interface Destination {
     description: string;
     coverImage: string;
     images: string[];
+    highlights?: { title: string; text: string }[];
+    bestTimeToVisit?: string;
     coordinates: { lat: number; lng: number };
     tourCount: number;
     rating: number;
@@ -121,8 +129,11 @@ export interface BlogPost {
     author: Pick<User, '_id' | 'displayName' | 'profilePicture'>;
     coverImage: string;
     tags: string[];
-    status: 'draft' | 'published';
+    status: 'draft' | 'pending' | 'published' | 'rejected';
+    /** The editor's note when an article is sent back for changes */
+    reviewNote?: string;
     publishedAt?: string;
+    updatedAt?: string;
     createdAt: string;
 }
 
@@ -163,6 +174,7 @@ export interface DashboardStats {
     totalTours: number;
     totalReviews: number;
     totalRevenue: number;
+    attention?: { pendingArticles: number; newInquiries: number; pendingBookings: number; draftTours: number };
     recentBookings: Booking[];
     bookingsByStatus: { _id: string; count: number }[];
 }

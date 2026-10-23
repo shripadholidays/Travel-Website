@@ -20,6 +20,9 @@ export const Collections = () => {
                         <p className="text-muted-foreground text-lg max-w-xl">
                             Hand-picked experiences grouped by the way you love to travel.
                         </p>
+                        <Link to="/collections" className="md:hidden inline-flex items-center gap-2 text-brand-orange font-medium mt-4">
+                            View all collections <ArrowUpRight className="w-4 h-4" />
+                        </Link>
                     </div>
                     <Link to="/collections" className="hidden md:flex items-center gap-2 text-brand-orange font-medium hover:gap-4 transition-all whitespace-nowrap">
                         View all <ArrowUpRight className="w-5 h-5" />

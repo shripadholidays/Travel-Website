@@ -22,6 +22,9 @@ interface Inquiry {
     preferredTravelDate?: string;
     numberOfTravelers?: number;
     message?: string;
+    topic?: 'trip' | 'booking' | 'question' | 'other';
+    context?: string;
+    source?: 'contact' | 'chat' | 'no-results' | 'tour' | 'destination';
     status: 'new' | 'read' | 'replied';
     createdAt: string;
 }
@@ -32,11 +35,28 @@ const STATUS_COLORS: Record<string, string> = {
     replied: 'bg-emerald-50 text-emerald-700 border-emerald-200',
 };
 
+const TOPIC_LABELS: Record<string, string> = {
+    trip: 'Trip request',
+    booking: 'Booking question',
+    question: 'General question',
+    other: 'Other',
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+    contact: 'Contact page',
+    chat: 'Homepage message box',
+    'no-results': 'Empty search',
+    tour: 'Tour page',
+    destination: 'Destination page',
+};
+
 function tripSummary(i: Inquiry) {
+    if (i.topic && i.topic !== 'trip') return TOPIC_LABELS[i.topic];
     const parts = [
         i.preferredTravelDate ? format(new Date(i.preferredTravelDate), 'MMM d, yyyy') : null,
         i.numberOfTravelers ? `${i.numberOfTravelers} traveller${i.numberOfTravelers === 1 ? '' : 's'}` : null,
     ].filter(Boolean);
+    if (i.context) parts.unshift(i.context);
     return parts.length ? parts.join(' · ') : 'Dates flexible';
 }
 
@@ -65,7 +85,7 @@ export const AdminInquiries = () => {
 
     const inquiries = (data?.inquiries ?? []).filter(i => {
         const q = search.toLowerCase();
-        const matchSearch = !q || [i.fullName, i.email, i.message].some(v => (v || '').toLowerCase().includes(q));
+        const matchSearch = !q || [i.fullName, i.email, i.message, i.context].some(v => (v || '').toLowerCase().includes(q));
         const matchFilter = filter === 'all' || i.status === filter;
         return matchSearch && matchFilter;
     });
@@ -84,7 +104,7 @@ export const AdminInquiries = () => {
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl font-display font-bold tracking-tight text-brand-blue">Inquiries</h2>
-                <p className="text-muted-foreground">Contact form submissions from potential customers.</p>
+                <p className="text-muted-foreground">Messages from the Contact page, the homepage message box, and tour and destination pages.</p>
             </div>
 
             <Card>
@@ -144,7 +164,7 @@ export const AdminInquiries = () => {
                                         <TableCell className="text-right" onClick={e => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Actions for ${inquiry.fullName}`}>
                                                         <MoreHorizontal className="w-4 h-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -190,17 +210,29 @@ export const AdminInquiries = () => {
                                     </a>
                                 )}
                             </div>
-                            <div>
-                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Trip</p>
-                                <p className="font-semibold">{tripSummary(selected)}</p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{selected.topic && selected.topic !== 'trip' ? 'Topic' : 'Trip'}</p>
+                                    <p className="font-semibold">{tripSummary(selected)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Sent from</p>
+                                    <p className="font-semibold">{SOURCE_LABELS[selected.source ?? 'contact']}</p>
+                                </div>
                             </div>
+                            {selected.context && (
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">About</p>
+                                    <p className="text-sm">{selected.context}</p>
+                                </div>
+                            )}
                             <div>
                                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Message</p>
                                 <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-slate-50 rounded-xl p-4">{selected.message || 'No message'}</p>
                             </div>
                             <div className="flex gap-2 pt-2">
                                 <Button size="sm" variant="outline" asChild>
-                                    <a href={`mailto:${selected.email}?subject=${encodeURIComponent('Re: Your Wandeazy inquiry')}`}>
+                                    <a href={`mailto:${selected.email}?subject=${encodeURIComponent(`Re: ${selected.context || 'Your Wandeazy inquiry'}`)}`}>
                                         <Mail className="w-3.5 h-3.5 mr-1.5" /> Reply via Email
                                     </a>
                                 </Button>

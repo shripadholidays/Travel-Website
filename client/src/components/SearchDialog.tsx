@@ -59,7 +59,7 @@ export const SearchDialog = () => {
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setOpen(false);
-        navigate(`/tours?q=${query}`);
+        navigate(`/tours?q=${encodeURIComponent(query.trim())}`);
     }
 
     return (

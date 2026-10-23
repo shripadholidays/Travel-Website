@@ -1,11 +1,16 @@
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
+import { useTours } from "@/hooks/use-tours";
 import { TourCard } from "@/components/TourCard";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 export const RecentlyViewedTours = () => {
-    const { tours, clearAll } = useRecentlyViewed();
+    const { ids, clearAll } = useRecentlyViewed();
+    const { data } = useTours({ ids: ids.join(","), limit: ids.length || 1 }, { enabled: ids.length > 0 });
+    // Keep the order they were viewed in; tours that are no longer live simply drop out
+    const byId = new Map((data?.tours ?? []).map((t) => [t._id, t]));
+    const tours = ids.map((id) => byId.get(id)).filter((t): t is NonNullable<typeof t> => !!t);
 
     if (tours.length === 0) return null;
 

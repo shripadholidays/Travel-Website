@@ -115,7 +115,7 @@ export const LoginPage = () => {
                             Your next journey <br /> begins here.
                         </h1>
                         <p className="text-lg text-white/80 max-w-md">
-                            Join thousands of travelers exploring the world's most breathtaking destinations with Wandeazy.
+                            Sign in to see your bookings, saved tours and travel plans in one place.
                         </p>
                     </motion.div>
                 </div>

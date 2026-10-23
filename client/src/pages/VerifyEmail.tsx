@@ -5,22 +5,24 @@ import { motion } from "framer-motion";
 import { api } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/PageTitle";
+import { useAuth } from "@/context/AuthContext";
 
 export const VerifyEmailPage = () => {
     const { token } = useParams<{ token: string }>();
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
     const [message, setMessage] = useState("");
+    const { user, refreshUser } = useAuth();
 
     useEffect(() => {
         if (!token) { setStatus("error"); setMessage("Invalid verification link."); return; }
         api.get(`/auth/verify-email/${token}`)
-            .then(() => { setStatus("success"); setMessage("Your email has been verified. You're all set!"); })
+            .then(() => { setStatus("success"); setMessage("Your email has been verified. You're all set!"); refreshUser(); })
             .catch((err) => { setStatus("error"); setMessage((err as Error).message || "Verification link is invalid or has expired."); });
-    }, [token]);
+    }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-            <PageTitle title="Verify Email" />
+            <PageTitle title="Verify Email" noIndex />
             <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -37,9 +39,9 @@ export const VerifyEmailPage = () => {
                         <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto" />
                         <h1 className="text-2xl font-display font-bold">Email verified!</h1>
                         <p className="text-muted-foreground">{message}</p>
-                        <Link to="/dashboard">
-                            <Button variant="brand" className="rounded-xl">Go to dashboard</Button>
-                        </Link>
+                        <Button variant="brand" className="rounded-xl" asChild>
+                            <Link to={user ? "/dashboard" : "/login"}>{user ? "Go to dashboard" : "Sign in"}</Link>
+                        </Button>
                     </>
                 )}
                 {status === "error" && (
@@ -47,9 +49,9 @@ export const VerifyEmailPage = () => {
                         <XCircle className="w-16 h-16 text-red-500 mx-auto" />
                         <h1 className="text-2xl font-display font-bold">Verification failed</h1>
                         <p className="text-muted-foreground">{message}</p>
-                        <Link to="/login">
-                            <Button variant="outline" className="rounded-xl">Back to sign in</Button>
-                        </Link>
+                        <Button variant="outline" className="rounded-xl" asChild>
+                            <Link to={user ? "/dashboard" : "/login"}>{user ? "Send a new link from your dashboard" : "Back to sign in"}</Link>
+                        </Button>
                     </>
                 )}
             </motion.div>

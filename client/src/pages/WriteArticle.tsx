@@ -50,10 +50,18 @@ export const WriteArticle = () => {
     const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
     const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-    const handlePublish = async (e: React.FormEvent) => {
-        e.preventDefault();
+    // Editors publish straight away; everyone else's articles go to an editor first
+    const isEditor = user?.role === "admin" || user?.role === "moderator";
+    const post = existing?.post;
+    const editingOthers = isEdit && !!post && post.author?._id !== user?._id && !isEditor;
+
+    const save = async (status: "draft" | "pending" | "published") => {
         if (!title.trim() || !content.trim() || !coverImage.trim()) {
             toast.error("Please fill in the title, cover image, and content.");
+            return;
+        }
+        if (excerpt.trim().length < 20) {
+            toast.error("Please write a short summary (at least 20 characters).");
             return;
         }
 
@@ -63,22 +71,31 @@ export const WriteArticle = () => {
             content: content.trim(),
             coverImage: coverImage.trim(),
             tags: tagList,
-            status: "published" as const,
+            status,
         };
 
         try {
-            if (isEdit && existing?.post) {
-                const res = await updatePost.mutateAsync({ id: existing.post._id, data: payload });
-                toast.success("Article updated successfully!");
+            const res = isEdit && post
+                ? await updatePost.mutateAsync({ id: post._id, data: payload })
+                : await createPost.mutateAsync(payload);
+            if (status === "published") {
+                toast.success(isEdit ? "Article updated." : "Article published.");
                 navigate(`/blog/${res.post.slug}`);
+            } else if (status === "pending") {
+                toast.success("Submitted for review. We'll email you as soon as it's published.");
+                navigate("/dashboard?tab=articles");
             } else {
-                const res = await createPost.mutateAsync(payload);
-                toast.success("Article published successfully!");
-                navigate(`/blog/${res.post.slug}`);
+                toast.success("Draft saved. You can finish it from your dashboard.");
+                navigate("/dashboard?tab=articles");
             }
         } catch (err) {
             toast.error((err as Error).message || "Failed to save article.");
         }
+    };
+
+    const handlePublish = (e: React.FormEvent) => {
+        e.preventDefault();
+        save(isEditor ? "published" : "pending");
     };
 
     if (eligibilityLoading) {
@@ -182,12 +199,12 @@ export const WriteArticle = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                            <Link to="/tours">
-                                <Button variant="brand" className="rounded-xl px-8">Browse Tours</Button>
-                            </Link>
-                            <Link to="/dashboard">
-                                <Button variant="outline" className="rounded-xl px-8">Go to Dashboard</Button>
-                            </Link>
+                            <Button variant="brand" className="rounded-xl px-8" asChild>
+                                <Link to="/tours">Browse Tours</Link>
+                            </Button>
+                            <Button variant="outline" className="rounded-xl px-8" asChild>
+                                <Link to="/dashboard">Go to Dashboard</Link>
+                            </Button>
                         </div>
                     </div>
                 </Container>
@@ -217,11 +234,31 @@ export const WriteArticle = () => {
                             {isEdit ? "Edit Article" : "Write New Article"}
                         </h1>
                         <p className="text-muted-foreground mt-1">
-                            {isEdit ? "Update your article and republish." : "Share your travel experiences with the world."}
+                            {isEditor
+                                ? (isEdit ? "Update the article and publish your changes." : "Share your travel experiences with the world.")
+                                : "Share your travel experiences. An editor reads every article before it goes live."}
                             {user && <> Writing as <span className="font-medium text-brand-blue">{user.displayName}</span>.</>}
                         </p>
                     </div>
                 </div>
+
+                {editingOthers && (
+                    <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                        This article belongs to another writer, so you can't edit it.
+                    </div>
+                )}
+                {post?.status === "rejected" && post.reviewNote && (
+                    <div className="mb-6 rounded-2xl border border-brand-orange/30 bg-brand-orange/5 p-5">
+                        <p className="text-sm font-bold text-brand-orange mb-1">Notes from the editor</p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{post.reviewNote}</p>
+                        <p className="text-xs text-muted-foreground mt-2">Make your changes and submit again.</p>
+                    </div>
+                )}
+                {!isEditor && post?.status === "published" && (
+                    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-muted-foreground">
+                        This article is live. Your changes will be checked by an editor before they replace it.
+                    </div>
+                )}
 
                 <form onSubmit={handlePublish} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                     {/* Editor */}
@@ -297,17 +334,24 @@ export const WriteArticle = () => {
                                 onChange={(e) => setContent(e.target.value)}
                                 required
                             />
-                            <p className="text-xs text-muted-foreground">Markdown formatting is supported.</p>
+                            <p className="text-xs text-muted-foreground">Markdown works: <code>## Heading</code>, <code>**bold**</code>, <code>*italic*</code>, <code>- list item</code>, <code>[link](https://…)</code>. Leave a blank line between paragraphs.</p>
                         </div>
 
                         {/* Actions */}
                         <div className="flex justify-end gap-3">
-                            <Button type="button" variant="outline" className="rounded-full px-6" onClick={() => navigate("/blog")}>Cancel</Button>
+                            <Button type="button" variant="ghost" className="rounded-full px-6" onClick={() => navigate(-1)}>Cancel</Button>
+                            {!isEditor && post?.status !== "published" && (
+                                <Button type="button" variant="outline" className="rounded-full px-6" disabled={isSubmitting} onClick={() => save("draft")}>
+                                    Save draft
+                                </Button>
+                            )}
                             <Button type="submit" variant="brand" className="rounded-full px-8" disabled={isSubmitting}>
                                 {isSubmitting ? (
                                     <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving…</>
+                                ) : isEditor ? (
+                                    isEdit ? "Save & Publish" : "Publish Article"
                                 ) : (
-                                    isEdit ? "Update Article" : "Publish Article"
+                                    "Submit for Review"
                                 )}
                             </Button>
                         </div>

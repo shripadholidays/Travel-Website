@@ -43,6 +43,8 @@ export const AdminDestinations = () => {
     const [isActive, setIsActive] = useState(true);
     const [lat, setLat] = useState('');
     const [lng, setLng] = useState('');
+    const [highlightsText, setHighlightsText] = useState('');
+    const [galleryText, setGalleryText] = useState('');
 
     const { data, isLoading } = useDestinations();
     const createDestination = useCreateDestination();
@@ -61,6 +63,8 @@ export const AdminDestinations = () => {
         setIsActive(true);
         setLat('');
         setLng('');
+        setHighlightsText('');
+        setGalleryText('');
         setDialogOpen(true);
     };
 
@@ -71,6 +75,8 @@ export const AdminDestinations = () => {
         setIsActive(dest.isActive !== false);
         setLat(dest.coordinates?.lat != null ? String(dest.coordinates.lat) : '');
         setLng(dest.coordinates?.lng != null ? String(dest.coordinates.lng) : '');
+        setHighlightsText((dest.highlights ?? []).map((h) => (h.text ? `${h.title} — ${h.text}` : h.title)).join('\n'));
+        setGalleryText((dest.images ?? []).join('\n'));
         setDialogOpen(true);
     };
 
@@ -80,6 +86,13 @@ export const AdminDestinations = () => {
         const name = (form.get("name") as string).trim();
         const country = (form.get("country") as string).trim();
         const description = (form.get("description") as string).trim();
+        const bestTimeToVisit = ((form.get("bestTimeToVisit") as string) || '').trim();
+        // One highlight per line: "Title — what makes it special"
+        const highlights = highlightsText.split('\n').map((line) => line.trim()).filter(Boolean).map((line) => {
+            const [title, ...rest] = line.split(/\s+[—–-]\s+/);
+            return { title: title.trim(), text: rest.join(' — ').trim() };
+        });
+        const images = galleryText.split('\n').map((url) => url.trim()).filter((url) => /^https?:\/\//.test(url));
 
         const payload: Partial<Destination> = {
             name,
@@ -87,6 +100,9 @@ export const AdminDestinations = () => {
             country,
             continent: continent as Destination['continent'],
             description,
+            bestTimeToVisit,
+            highlights,
+            images,
             coverImage,
             isActive,
             coordinates: {
@@ -248,6 +264,25 @@ export const AdminDestinations = () => {
                         <div className="space-y-1.5">
                             <Label htmlFor="description">Description</Label>
                             <Textarea id="description" name="description" rows={3} defaultValue={editing?.description} required />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="highlights">Why visit (one per line)</Label>
+                            <Textarea
+                                id="highlights"
+                                rows={4}
+                                value={highlightsText}
+                                onChange={(e) => setHighlightsText(e.target.value)}
+                                placeholder={"Cherry blossom season — Parks turn pink every April\nStreet food — Ramen, sushi and izakaya nights"}
+                            />
+                            <p className="text-xs text-muted-foreground">Leave empty to show the trip styles of this destination's live tours.</p>
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="bestTimeToVisit">Best time to visit</Label>
+                            <Input id="bestTimeToVisit" name="bestTimeToVisit" defaultValue={editing?.bestTimeToVisit} placeholder="March to May, and October to November" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="gallery">Gallery image URLs (one per line)</Label>
+                            <Textarea id="gallery" rows={3} value={galleryText} onChange={(e) => setGalleryText(e.target.value)} placeholder="https://…" />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">

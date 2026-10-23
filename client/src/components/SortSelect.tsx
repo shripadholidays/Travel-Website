@@ -8,12 +8,13 @@ import {
 
 interface SortSelectProps {
     onSortChange: (value: string) => void;
+    value?: string;
 }
 
-export const SortSelect = ({ onSortChange }: SortSelectProps) => {
+export const SortSelect = ({ onSortChange, value = "recommended" }: SortSelectProps) => {
     return (
-        <Select onValueChange={onSortChange} defaultValue="recommended">
-            <SelectTrigger className="w-[180px] bg-background">
+        <Select onValueChange={onSortChange} value={value}>
+            <SelectTrigger className="w-[180px] bg-background" aria-label="Sort tours">
                 <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>

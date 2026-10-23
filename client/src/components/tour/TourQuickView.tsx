@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ReviewSection } from "@/components/ReviewSection";
 import { TourBookingPanel } from "@/components/tour/TourBookingPanel";
 import { TourInclusions, TourItinerary, TourOverview, TourQuickFacts } from "@/components/tour/TourSections";
+import { TourGallery } from "@/components/tour/TourGallery";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useTour } from "@/hooks/use-tours";
 import { useTourActions, useTourBooking } from "@/hooks/use-tour-actions";
@@ -115,6 +116,7 @@ const QuickViewBody = ({ id, preview }: { id: string; preview?: Tour }) => {
                     {full ? (
                         <>
                             <TourOverview tour={full} compact />
+                            <TourGallery tour={full} compact />
                             <TourInclusions tour={full} compact />
                             <TourItinerary tour={full} compact />
                             <ReviewSection tourId={full._id} />

@@ -31,6 +31,7 @@ const TourDetails = lazy(() => import('@/pages/TourDetails').then((m) => ({ defa
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 const BookingPage = lazy(() => import('@/pages/BookingPage').then((m) => ({ default: m.BookingPage })));
 const WriteArticle = lazy(() => import('@/pages/WriteArticle').then((m) => ({ default: m.WriteArticle })));
+const BookingReceipt = lazy(() => import('@/pages/BookingReceipt').then((m) => ({ default: m.BookingReceipt })));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPassword').then((m) => ({ default: m.ForgotPasswordPage })));
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPassword').then((m) => ({ default: m.ResetPasswordPage })));
 const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmail').then((m) => ({ default: m.VerifyEmailPage })));
@@ -118,6 +119,7 @@ const router = createBrowserRouter([
                         children: [
                             { path: "dashboard", element: <Dashboard /> },
                             { path: "book", element: <BookingPage /> },
+                            { path: "bookings/:id", element: <BookingReceipt /> },
                             { path: "write-article", element: <WriteArticle /> },
                             { path: "checkout/travel/:kind/:offerId", element: <TravelCheckoutRoute /> },
                         ]

@@ -48,6 +48,7 @@ export interface PlanTripStep {
     icon: string;
     title: string;
     description: string;
+    link?: string;
 }
 
 export interface SupportFeature {
@@ -190,4 +191,41 @@ export function useToggleSection() {
             api.patch<{ settings: SiteSettings }>(`/admin/settings/sections/${sectionId}`, { isVisible }),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] }),
     });
+}
+
+export interface Highlights {
+    stats: { tours: number; destinations: number; travellers: number; reviews: number; rating: number };
+    reviews: {
+        _id: string;
+        name: string;
+        image: string;
+        rating: number;
+        title: string;
+        quote: string;
+        tourId: string;
+        tourTitle: string;
+        location: string;
+        verified: boolean;
+    }[];
+}
+
+/** Live numbers and real traveller reviews (About page, homepage testimonials). */
+export function useHighlights() {
+    return useQuery({
+        queryKey: ['settings', 'highlights'],
+        queryFn: () => api.get<Highlights>('/settings/highlights'),
+        staleTime: config.query.staleTimeMs,
+    });
+}
+
+/** About-page stats from real data, leaving out anything still at zero. */
+export function liveStats(stats?: Highlights['stats']): AboutStat[] {
+    if (!stats) return [];
+    const plural = (n: number, word: string) => `${word}${n === 1 ? '' : 's'}`;
+    return [
+        stats.travellers > 0 && { value: stats.travellers.toLocaleString(), label: `${plural(stats.travellers, 'Traveller')} hosted` },
+        stats.tours > 0 && { value: String(stats.tours), label: plural(stats.tours, 'Curated tour') },
+        stats.destinations > 0 && { value: String(stats.destinations), label: plural(stats.destinations, 'Destination') },
+        stats.reviews > 0 && { value: `${stats.rating}/5`, label: `From ${stats.reviews} ${plural(stats.reviews, 'review')}` },
+    ].filter(Boolean) as AboutStat[];
 }

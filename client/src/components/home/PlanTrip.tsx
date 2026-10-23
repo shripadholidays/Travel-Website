@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -15,11 +18,14 @@ function resolveIcon(name: string): LucideIcon {
 }
 
 const FALLBACK_STEPS: PlanTripStep[] = [
-    { icon: "Map", title: "Pick Destination", description: "Choose from 100+ locations" },
-    { icon: "Calendar", title: "Select Dates", description: "When do you want to fly?" },
-    { icon: "Settings", title: "Custom Addons", description: "Hotels, flights, & activities" },
-    { icon: "CheckCircle2", title: "Confirm Travel", description: "Get ready to explore!" },
+    { icon: "Map", title: "Pick Destination", description: "Browse tours and destinations" },
+    { icon: "Calendar", title: "Select Dates", description: "Pick the dates that suit you" },
+    { icon: "Settings", title: "Custom Addons", description: "Add extras that suit your trip" },
+    { icon: "CheckCircle2", title: "Confirm Travel", description: "Book securely and get ready to explore" },
 ];
+
+// Where each step leads when the admin has not set a link
+const DEFAULT_LINKS = ["/destinations", "/tours", "/tours", "/tours"];
 
 export const PlanTrip = () => {
     const [activeStep, setActiveStep] = useState(0);
@@ -61,10 +67,12 @@ export const PlanTrip = () => {
                             const isCurrent = index === activeStep;
 
                             return (
-                                <div
+                                <Link
                                     key={index}
-                                    className="relative z-10 flex flex-col items-center text-center cursor-pointer group flex-1"
+                                    to={step.link?.trim() || DEFAULT_LINKS[index] || "/tours"}
+                                    className="relative z-10 flex flex-col items-center text-center group flex-1 mb-10 md:mb-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
                                     onMouseEnter={() => setActiveStep(index)}
+                                    onFocus={() => setActiveStep(index)}
                                 >
                                     <motion.div
                                         animate={{
@@ -90,9 +98,18 @@ export const PlanTrip = () => {
                                             {step.description}
                                         </p>
                                     </motion.div>
-                                </div>
+                                </Link>
                             );
                         })}
+                    </div>
+
+                    <div className="mt-14 flex flex-col sm:flex-row gap-3 justify-center">
+                        <Button variant="brand" size="lg" asChild>
+                            <Link to="/tours">Start planning <ArrowRight className="w-4 h-4 ml-2" /></Link>
+                        </Button>
+                        <Button variant="glass" size="lg" asChild>
+                            <Link to="/contact?topic=trip"><MessageCircle className="w-4 h-4 mr-2" /> Plan a custom trip with us</Link>
+                        </Button>
                     </div>
                 </div>
             </Container>

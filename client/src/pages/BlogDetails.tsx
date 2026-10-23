@@ -1,3 +1,4 @@
+import { renderArticle } from "@/lib/article-html";
 import { useParams, Link } from "react-router-dom";
 import { useBlogPost, useBlogPosts } from "@/hooks/use-blog";
 import { Image } from "@/components/ui/image";
@@ -57,8 +58,8 @@ export const BlogDetails = () => {
 
     const related = (allPosts?.posts ?? []).filter((p) => p.slug !== blog.slug).slice(0, 3);
 
-    // Render content as HTML when it contains tags, otherwise preserve paragraph breaks for plain/markdown text.
-    const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(blog.content || "");
+    // HTML or Markdown, reduced to safe formatting tags
+    const bodyHtml = renderArticle(blog.content || "");
 
     return (
         <div className="bg-background min-h-screen pb-24">
@@ -148,15 +149,8 @@ export const BlogDetails = () => {
                             {blog.excerpt}
                         </p>
 
-                        <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-brand-blue prose-a:text-brand-orange prose-img:rounded-2xl">
-                            {looksLikeHtml ? (
-                                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-                            ) : (
-                                blog.content.split(/\n\s*\n/).map((para, i) => (
-                                    <p key={i} className="whitespace-pre-line">{para}</p>
-                                ))
-                            )}
-                        </div>
+                        {/* Written by travellers: always sanitised before it is rendered */}
+                        <div className="article-body" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
 
                         {/* Tags */}
                         {blog.tags && blog.tags.length > 0 && (

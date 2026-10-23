@@ -57,9 +57,9 @@ export const ForgotPasswordPage = () => {
                         <p className="text-muted-foreground text-sm max-w-xs">
                             If an account with <strong>{email}</strong> exists, we've sent a password reset link. Check your inbox (and spam folder).
                         </p>
-                        <Link to="/login">
-                            <Button variant="outline" className="mt-2 rounded-xl">Back to sign in</Button>
-                        </Link>
+                        <Button variant="outline" className="mt-2 rounded-xl" asChild>
+                            <Link to="/login">Back to sign in</Link>
+                        </Button>
                     </div>
                 ) : (
                     <>

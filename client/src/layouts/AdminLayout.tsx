@@ -7,6 +7,8 @@ import {
     CreditCard, HelpCircle, Info, Tag, Plane } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { PageTitle } from '@/components/PageTitle';
+import { canOpenAdminPath } from '@/lib/admin-access';
 import { Logo } from '@/components/ui/Logo';
 
 type NavItem = {
@@ -72,8 +74,12 @@ const NAV: NavGroup[] = [
 
 export const AdminLayout = () => {
     const location = useLocation();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const [mobileOpen, setMobileOpen] = useState(false);
+    // Moderators only get the article tools
+    const nav = NAV
+        .map((g) => ({ ...g, items: g.items.filter((item) => canOpenAdminPath(user, item.path)) }))
+        .filter((g) => g.items.length > 0);
 
     const sidebarContent = (
         <div className="flex h-full flex-col">
@@ -95,7 +101,7 @@ export const AdminLayout = () => {
 
             <div className="flex flex-1 flex-col justify-between py-4 px-3 overflow-y-auto">
                 <nav className="space-y-5">
-                    {NAV.map(({ group, items }) => (
+                    {nav.map(({ group, items }) => (
                         <div key={group}>
                             <p className="mb-1 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
                                 {group}
@@ -147,8 +153,13 @@ export const AdminLayout = () => {
         </div>
     );
 
+    // Tab title from the section being worked on ("Bookings · Admin | Wandeazy")
+    const section = NAV.flatMap((g) => g.items).find((item) => location.pathname.startsWith(item.path))?.label
+        ?? (location.pathname.includes('write-article') ? 'Write Article' : location.pathname.includes('tours/') ? 'Tour Editor' : 'Admin');
+
     return (
         <div className="min-h-screen bg-slate-50">
+            <PageTitle title={section === 'Admin' ? 'Admin' : `${section} · Admin`} noIndex />
             {/* Desktop sidebar */}
             <aside className="hidden lg:block fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 bg-white">
                 {sidebarContent}

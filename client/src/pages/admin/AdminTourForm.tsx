@@ -229,8 +229,9 @@ export const AdminTourForm = () => {
                                     <Input type="date" value={validity} onChange={e => setValidity(e.target.value)} />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label>EMI Option (optional)</Label>
-                                    <Input value={emi} onChange={e => setEmi(e.target.value)} placeholder="Starting ₹2,500/month" />
+                                    <Label>Card highlight (optional)</Label>
+                                    <Input value={emi} onChange={e => setEmi(e.target.value)} placeholder="Best seller" maxLength={30} />
+                                    <p className="text-xs text-muted-foreground">A short label on the tour card. Prices and discounts always come from the price above and coupons.</p>
                                 </div>
                             </div>
 

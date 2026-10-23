@@ -22,7 +22,7 @@ export const AdminBookings = () => {
     const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
     const { data, isLoading } = useAdminBookings();
     const updateStatus = useUpdateBookingStatus();
-    const { formatPrice } = useCurrency();
+    const { formatUSD } = useCurrency();
 
     const bookings = data?.bookings ?? [];
 
@@ -31,8 +31,8 @@ export const AdminBookings = () => {
         try {
             await updateStatus.mutateAsync({ id, status: newStatus });
             toast.success(`Booking status updated to ${newStatus}`, { id: toastId });
-        } catch {
-            toast.error("Failed to update status", { id: toastId });
+        } catch (err) {
+            toast.error((err as Error).message || "Failed to update status", { id: toastId });
         }
     };
 
@@ -139,7 +139,7 @@ export const AdminBookings = () => {
                                             </TableCell>
                                             <TableCell>{tourName}</TableCell>
                                             <TableCell>{new Date(booking.travelDate).toLocaleDateString()}</TableCell>
-                                            <TableCell>{formatPrice(booking.totalAmount)}</TableCell>
+                                            <TableCell className="tabular-nums">{formatUSD(booking.totalAmount)}</TableCell>
                                             <TableCell>
                                                 <Badge variant={
                                                     booking.status === "confirmed" ? "success" :
@@ -175,7 +175,7 @@ export const AdminBookings = () => {
                 open={!!cancelTarget}
                 onOpenChange={(o) => !o && setCancelTarget(null)}
                 title="Cancel this booking?"
-                description={`Booking ${cancelTarget?._id.slice(-8).toUpperCase()} will be marked as cancelled.`}
+                description={`Booking ${cancelTarget?._id.slice(-8).toUpperCase()} will be cancelled and any card payment refunded to the traveller.`}
                 confirmLabel="Cancel Booking"
                 cancelLabel="Keep It"
                 destructive

@@ -58,16 +58,17 @@ export const OfferBar = ({ onClose }: OfferBarProps) => {
             style={bg}
         >
             <div className="text-white relative z-[60]">
-                <Container className="py-2.5 md:py-3">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 text-sm font-medium">
+                <Container className="py-2 md:py-3">
+                    {/* One row on phones too: text wraps to two lines at most, the close button stays put */}
+                    <div className="flex items-center justify-between gap-3 md:gap-4 text-xs sm:text-sm font-medium">
 
-                        <div className="flex items-center gap-2 text-center md:text-left">
+                        <div className="flex items-center gap-2 min-w-0">
                             {offerBar?.badgeLabel && (
-                                <span className="bg-white/20 p-1 px-2 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
+                                <span className="shrink-0 bg-white/20 p-1 px-2 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
                                     {offerBar.badgeLabel}
                                 </span>
                             )}
-                            <span>{offerBar?.text || 'Special offer — limited time only!'}</span>
+                            <span className="line-clamp-2">{offerBar?.text}</span>
                             {offerBar?.ctaLabel && offerBar?.ctaLink && (
                                 <Link to={offerBar.ctaLink} className="underline font-bold ml-1">
                                     {offerBar.ctaLabel}
@@ -75,9 +76,9 @@ export const OfferBar = ({ onClose }: OfferBarProps) => {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-4 md:gap-6">
+                        <div className="flex items-center gap-4 md:gap-6 shrink-0">
                             {showCountdown && (
-                                <div className="flex items-center gap-3 bg-black/10 px-3 py-1 rounded-full backdrop-blur-sm">
+                                <div className="hidden sm:flex items-center gap-3 bg-black/10 px-3 py-1 rounded-full backdrop-blur-sm">
                                     <Clock className="w-3.5 h-3.5 opacity-80" />
                                     <div className="flex gap-2 text-xs font-mono font-bold tracking-wide">
                                         <span>{timeLeft.days}d</span>
