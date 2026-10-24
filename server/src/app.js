@@ -39,6 +39,8 @@ const cors = require('cors');
 
 const app = express();
 const { nodeEnv } = config.app;
+// Hosts like Render sit behind one proxy: trust it so req.ip (rate limits) and req.protocol (https upload URLs) are real
+if (nodeEnv === 'production') app.set('trust proxy', 1);
 if (!config.auth.sessionSecret && nodeEnv === 'production') {
     throw new Error('SESSION_SECRET is required in production');
 }
