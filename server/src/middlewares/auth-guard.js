@@ -17,7 +17,7 @@ module.exports = async function isLoggedIn(req, res, next) {
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         if (decoded?.email) {
-            const user = await User.findOne({ email: decoded.email });
+            const user = await User.findByEmail(decoded.email);
             if (!user) return ResponseHandler.fail(res, 401, 'Unauthorized: User not found');
             if (user.isSuspended) return ResponseHandler.fail(res, 403, SUSPENDED);
             req.user = user;
@@ -37,7 +37,7 @@ module.exports = async function isLoggedIn(req, res, next) {
         const email = payload?.email;
         if (!email) return ResponseHandler.fail(res, 401, 'Unauthorized: Token missing email');
 
-        const user = await User.findOne({ email });
+        const user = await User.findByEmail(email);
         if (!user) return ResponseHandler.fail(res, 401, 'Unauthorized: User not found');
         if (user.isSuspended) return ResponseHandler.fail(res, 403, SUSPENDED);
 

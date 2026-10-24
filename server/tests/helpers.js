@@ -1,28 +1,33 @@
-const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const config = require('../src/config');
+const db = require('../src/db');
+const { migrate } = require('../src/db/migrate');
 const User = require('../src/models/User');
 const SiteSettings = require('../src/models/SiteSettings');
 const { clearTravelConfigCache } = require('../src/services/travel-config');
+const { clearCurrencyCache } = require('../src/services/currency');
 
+// Every test file gets its own in-memory database (see setup-env.js), migrated like production
 async function connect() {
-    if (mongoose.connection.readyState !== 1) await mongoose.connect(process.env.DB_URI);
+    db.connect();
+    await migrate();
 }
 
 async function disconnect() {
-    await mongoose.connection.close();
+    await db.close();
 }
 
 async function reset() {
-    const collections = await mongoose.connection.db.collections();
-    await Promise.all(collections.map((c) => c.deleteMany({})));
+    const tables = await db.all("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT IN ('schema_migrations') AND name NOT LIKE 'sqlite_%'");
+    await db.batch(tables.map((t) => `DELETE FROM ${t.name}`));
     clearTravelConfigCache();
+    clearCurrencyCache();
 }
 
 let counter = 0;
 async function createUser(role = 'user') {
     counter += 1;
-    return User.create({
+    return User.insert({
         displayName: `Test ${role} ${counter}`,
         email: `test-${role}-${counter}-${Date.now()}@example.com`,
         authProvider: 'local',
@@ -38,7 +43,7 @@ function cookieFor(user) {
 async function setFeatures(features, travelMarkup) {
     const update = { features: { flights: false, hotels: false, ...features } };
     if (travelMarkup) update.travelMarkup = travelMarkup;
-    await SiteSettings.findOneAndUpdate({}, update, { upsert: true, setDefaultsOnInsert: true });
+    await SiteSettings.update(update);
     clearTravelConfigCache();
 }
 

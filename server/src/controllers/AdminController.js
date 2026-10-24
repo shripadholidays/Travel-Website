@@ -1,3 +1,6 @@
+const { all } = require('../db');
+const { isId } = require('../db/ids');
+const { Where, containsAny, populate, paging: pageFrom } = require('../db/sql');
 const User = require('../models/User');
 const Booking = require('../models/Booking');
 const TravelDestination = require('../models/TravelDestination');
@@ -15,20 +18,10 @@ const config = require('../config');
 const { getCurrencyConfig, convert, round2 } = require('../services/currency');
 const { ROLES, ROLE_NAMES, STAFF_ROLES, PERMISSIONS: P, hasPermission, permissionsFor } = require('../config/permissions');
 
-const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const searchRegex = (q) => (q && String(q).trim() ? new RegExp(escapeRegex(String(q).trim()), 'i') : null);
-
-function paging(req, fallback = config.pagination.adminDefaultLimit) {
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.min(200, Math.max(1, Number(req.query.limit) || fallback));
-    return { page, limit, skip: (page - 1) * limit };
-}
+const paging = (req, fallback = config.pagination.adminDefaultLimit) => pageFrom(req.query, fallback);
 const pageInfo = (total, { page, limit }) => ({ total, page, limit, pages: Math.max(1, Math.ceil(total / limit)) });
-
-async function countBy(Model, field, match = {}) {
-    const rows = await Model.aggregate([{ $match: match }, { $group: { _id: `$${field}`, count: { $sum: 1 } } }]);
-    return Object.fromEntries(rows.map((r) => [r._id, r.count]));
-}
+const searchText = (q) => (q && String(q).trim() ? String(q).trim() : null);
+const marks = (list) => list.map(() => '?').join(',');
 
 // GET /admin/stats — every staff member sees the parts their role works on
 exports.getDashboardStats = async (req, res) => {
@@ -37,14 +30,14 @@ exports.getDashboardStats = async (req, res) => {
         const data = { attention: {} };
 
         const counts = await Promise.all([
-            TravelDestination.countDocuments({ status: 'active' }),
-            TravelDestination.countDocuments({ status: { $ne: 'active' } }),
-            can(P.BOOKINGS) ? Booking.countDocuments() : null,
-            can(P.BOOKINGS) ? Booking.countDocuments({ status: 'pending' }) : null,
-            can(P.ARTICLES) ? BlogPost.countDocuments({ status: 'pending' }) : null,
-            can(P.COMMUNITY) ? UserInquiry.countDocuments({ status: 'new' }) : null,
-            can(P.COMMUNITY) ? Review.countDocuments() : null,
-            can(P.USERS) || can(P.FINANCE) ? User.countDocuments() : null,
+            TravelDestination.count("status = 'active'"),
+            TravelDestination.count("status <> 'active'"),
+            can(P.BOOKINGS) ? Booking.count() : null,
+            can(P.BOOKINGS) ? Booking.count("status = 'pending'") : null,
+            can(P.ARTICLES) ? BlogPost.count("status = 'pending'") : null,
+            can(P.COMMUNITY) ? UserInquiry.count("status = 'new'") : null,
+            can(P.COMMUNITY) ? Review.count() : null,
+            can(P.USERS) || can(P.FINANCE) ? User.count() : null,
         ]);
         const [liveTours, draftTours, totalBookings, pendingBookings, pendingArticles, newInquiries, totalReviews, totalUsers] = counts;
 
@@ -53,12 +46,10 @@ exports.getDashboardStats = async (req, res) => {
         if (totalBookings !== null) {
             data.totalBookings = totalBookings;
             data.attention.pendingBookings = pendingBookings;
-            data.bookingsByStatus = await Booking.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]);
-            data.recentBookings = await Booking.find()
-                .populate('user', 'displayName email')
-                .populate('tour', 'title')
-                .sort({ createdAt: -1 })
-                .limit(config.pagination.dashboardRecentLimit);
+            data.bookingsByStatus = Object.entries(await Booking.countBy('status')).map(([_id, count]) => ({ _id, count }));
+            data.recentBookings = await Booking.find({ order: 'created_at DESC', limit: config.pagination.dashboardRecentLimit });
+            await populate(data.recentBookings, 'user', User, 'displayName email');
+            await populate(data.recentBookings, 'tour', TravelDestination, 'title');
         }
         if (pendingArticles !== null) data.attention.pendingArticles = pendingArticles;
         if (newInquiries !== null) data.attention.newInquiries = newInquiries;
@@ -68,21 +59,20 @@ exports.getDashboardStats = async (req, res) => {
             // Bookings are charged in many currencies: add them up in the base currency.
             // Each booking keeps its base amount from the day it was made; older ones are converted now.
             const { base, rates } = await getCurrencyConfig();
-            const rows = await Booking.aggregate([
-                { $match: { status: { $in: ['confirmed', 'completed'] } } },
-                { $group: { _id: { currency: '$currency', baseCurrency: '$baseCurrency' }, total: { $sum: '$totalAmount' }, baseTotal: { $sum: '$baseAmount' } } },
-            ]);
-            data.totalRevenue = round2(rows.reduce((sum, r) => sum + (r._id.baseCurrency === base && r.baseTotal
-                ? r.baseTotal
-                : convert(r.total, r._id.currency || 'USD', base, rates)), 0));
+            const rows = await all(`SELECT currency, base_currency, SUM(total_amount) AS total, SUM(base_amount) AS base_total
+                                    FROM bookings WHERE status IN ('confirmed', 'completed') GROUP BY currency, base_currency`);
+            data.totalRevenue = round2(rows.reduce((sum, r) => sum + (r.base_currency === base && r.base_total
+                ? r.base_total
+                : convert(r.total, r.currency || 'USD', base, rates)), 0));
             data.revenueCurrency = base;
         }
         if (can(P.CATALOG)) {
             // Live tours missing what travellers look for first
+            const emptyList = (c) => `coalesce(json_array_length(${c}), 0) = 0`;
             const [noGallery, noItinerary, expiringSoon] = await Promise.all([
-                TravelDestination.countDocuments({ status: 'active', $and: [{ $or: [{ images: { $size: 0 } }, { images: { $exists: false } }] }, { $or: [{ 'overview.gallery': { $size: 0 } }, { 'overview.gallery': { $exists: false } }] }] }),
-                TravelDestination.countDocuments({ status: 'active', $or: [{ itinerary: { $size: 0 } }, { itinerary: { $exists: false } }] }),
-                TravelDestination.countDocuments({ status: 'active', validity: { $lte: new Date(Date.now() + 30 * 864e5) } }),
+                TravelDestination.count(`status = 'active' AND ${emptyList('images')} AND ${emptyList('overview_gallery')}`),
+                TravelDestination.count(`status = 'active' AND ${emptyList('itinerary')}`),
+                TravelDestination.count("status = 'active' AND validity <= ?", [new Date(Date.now() + 30 * 864e5).toISOString()]),
             ]);
             data.catalogHealth = { noGallery, noItinerary, expiringSoon };
         }
@@ -103,26 +93,26 @@ exports.getRoles = (req, res) => ResponseHandler.success(res, {
 exports.getUsers = async (req, res) => {
     try {
         const pg = paging(req);
-        const query = {};
+        const where = new Where();
         const { role, search, suspended } = req.query;
-        if (role === 'staff') query.role = { $in: STAFF_ROLES };
-        else if (role && ROLE_NAMES.includes(role)) query.role = role;
-        if (suspended === 'true') query.isSuspended = true;
-        const re = searchRegex(search);
-        if (re) query.$or = [{ displayName: re }, { email: re }];
+        if (role === 'staff') where.in('role', STAFF_ROLES);
+        else if (role && ROLE_NAMES.includes(role)) where.add('role = ?', role);
+        if (suspended === 'true') where.add('is_suspended = 1');
+        const q = searchText(search);
+        if (q) { const m = containsAny(['display_name', 'email'], q); where.add(m.sql, ...m.args); }
 
         const [users, total, roleCounts] = await Promise.all([
-            User.find(query).sort({ createdAt: -1 }).skip(pg.skip).limit(pg.limit).lean(),
-            User.countDocuments(query),
-            countBy(User, 'role'),
+            User.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: pg.limit, offset: pg.offset }),
+            User.count(where.sql, where.args),
+            User.countBy('role'),
         ]);
         // How much each person has booked, so nobody deletes a customer by mistake
         const ids = users.map((u) => u._id);
-        const booked = await Booking.aggregate([{ $match: { user: { $in: ids } } }, { $group: { _id: '$user', count: { $sum: 1 } } }]);
-        const bookedBy = new Map(booked.map((b) => [String(b._id), b.count]));
+        const booked = ids.length ? await all(`SELECT user_id, COUNT(*) AS n FROM bookings WHERE user_id IN (${marks(ids)}) GROUP BY user_id`, ids) : [];
+        const bookedBy = new Map(booked.map((b) => [b.user_id, Number(b.n)]));
 
         return ResponseHandler.success(res, {
-            users: users.map((u) => ({ ...u, roleLabel: ROLES[u.role]?.label ?? u.role, bookingCount: bookedBy.get(String(u._id)) || 0 })),
+            users: users.map((u) => ({ ...u, roleLabel: ROLES[u.role]?.label ?? u.role, bookingCount: bookedBy.get(u._id) || 0 })),
             roleCounts,
             pagination: pageInfo(total, pg),
         }, 'Users fetched successfully');
@@ -134,7 +124,7 @@ exports.getUsers = async (req, res) => {
 
 async function isLastAdmin(user) {
     if (user.role !== 'admin' || user.isSuspended) return false;
-    return (await User.countDocuments({ role: 'admin', isSuspended: { $ne: true } })) <= 1;
+    return (await User.count("role = 'admin' AND coalesce(is_suspended, 0) = 0")) <= 1;
 }
 
 // PATCH /admin/users/:id — { role?, isSuspended? }
@@ -154,10 +144,9 @@ exports.updateUser = async (req, res) => {
 
         if (role !== undefined) user.role = role;
         if (isSuspended !== undefined) user.isSuspended = !!isSuspended;
-        await user.save();
+        await User.save(user);
 
-        const out = user.toObject();
-        return ResponseHandler.success(res, { user: { ...out, roleLabel: ROLES[out.role]?.label } }, 'User updated successfully');
+        return ResponseHandler.success(res, { user: { ...user, roleLabel: ROLES[user.role]?.label } }, 'User updated successfully');
     } catch (err) {
         logger.error('Error updating user', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update user');
@@ -173,13 +162,13 @@ exports.deleteUser = async (req, res) => {
         if (await isLastAdmin(user)) return ResponseHandler.fail(res, 409, 'This is the only active administrator and cannot be deleted.');
 
         const [bookings, orders] = await Promise.all([
-            Booking.countDocuments({ user: user._id }),
-            TravelOrder.countDocuments({ user: user._id }),
+            Booking.count('user_id = ?', [user._id]),
+            TravelOrder.count('user_id = ?', [user._id]),
         ]);
         if (bookings + orders > 0) {
             return ResponseHandler.fail(res, 409, `${user.displayName} has ${bookings + orders} booking(s) on record, so the account can't be deleted. Suspend it instead.`);
         }
-        await user.deleteOne();
+        await User.remove(user._id);
         return ResponseHandler.success(res, { user: { _id: user._id, email: user.email } }, 'User deleted successfully');
     } catch (err) {
         logger.error('Error deleting user', { error: err.message });
@@ -191,14 +180,14 @@ exports.deleteUser = async (req, res) => {
 exports.getInquiries = async (req, res) => {
     try {
         const pg = paging(req);
-        const query = {};
-        const re = searchRegex(req.query.search);
-        if (re) query.$or = [{ fullName: re }, { email: re }, { message: re }, { context: re }];
-        const counts = await countBy(UserInquiry, 'status', query);
-        if (req.query.status && req.query.status !== 'all') query.status = req.query.status;
+        const where = new Where();
+        const q = searchText(req.query.search);
+        if (q) { const m = containsAny(['full_name', 'email', 'message', 'context'], q); where.add(m.sql, ...m.args); }
+        const counts = await UserInquiry.countBy('status', where.sql, where.args);
+        if (req.query.status && req.query.status !== 'all') where.add('status = ?', req.query.status);
         const [inquiries, total] = await Promise.all([
-            UserInquiry.find(query).sort({ createdAt: -1 }).skip(pg.skip).limit(pg.limit),
-            UserInquiry.countDocuments(query),
+            UserInquiry.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: pg.limit, offset: pg.offset }),
+            UserInquiry.count(where.sql, where.args),
         ]);
         return ResponseHandler.success(res, { inquiries, statusCounts: counts, pagination: pageInfo(total, pg) });
     } catch (err) {
@@ -212,7 +201,7 @@ exports.updateInquiryStatus = async (req, res) => {
     try {
         const { status } = req.body;
         if (!['new', 'read', 'replied'].includes(status)) return ResponseHandler.fail(res, 400, 'Invalid status');
-        const inquiry = await UserInquiry.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        const inquiry = await UserInquiry.update(req.params.id, { status });
         if (!inquiry) return ResponseHandler.fail(res, 404, 'Inquiry not found');
         return ResponseHandler.success(res, { inquiry: { _id: inquiry._id, name: inquiry.fullName, status: inquiry.status } }, 'Inquiry updated');
     } catch (err) {
@@ -225,14 +214,13 @@ exports.updateInquiryStatus = async (req, res) => {
 exports.getSubscribers = async (req, res) => {
     try {
         const pg = paging(req, config.pagination.subscribersLimit);
-        const query = {};
-        const re = searchRegex(req.query.search);
-        if (re) query.email = re;
+        const where = new Where();
+        const q = searchText(req.query.search);
+        if (q) { const m = containsAny(['email'], q); where.add(m.sql, ...m.args); }
         const all = req.query.all === 'true';
         const [subscribers, total] = await Promise.all([
-            all ? NewsletterSubscriber.find(query).sort({ createdAt: -1 })
-                : NewsletterSubscriber.find(query).sort({ createdAt: -1 }).skip(pg.skip).limit(pg.limit),
-            NewsletterSubscriber.countDocuments(query),
+            NewsletterSubscriber.find({ where: where.sql, args: where.args, order: 'created_at DESC', ...(all ? {} : { limit: pg.limit, offset: pg.offset }) }),
+            NewsletterSubscriber.count(where.sql, where.args),
         ]);
         return ResponseHandler.success(res, { subscribers, pagination: pageInfo(total, pg) });
     } catch (err) {
@@ -244,7 +232,7 @@ exports.getSubscribers = async (req, res) => {
 // DELETE /admin/subscribers/:id
 exports.deleteSubscriber = async (req, res) => {
     try {
-        const sub = await NewsletterSubscriber.findByIdAndDelete(req.params.id);
+        const sub = await NewsletterSubscriber.remove(req.params.id);
         if (!sub) return ResponseHandler.fail(res, 404, 'Subscriber not found');
         return ResponseHandler.success(res, { subscriber: { _id: sub._id, email: sub.email } }, 'Subscriber removed');
     } catch (err) {
@@ -253,30 +241,33 @@ exports.deleteSubscriber = async (req, res) => {
     }
 };
 
+// Ids of users whose name or email contains the text
+async function usersMatching(q) {
+    const m = containsAny(['display_name', 'email'], q);
+    return (await all(`SELECT id FROM users WHERE ${m.sql}`, m.args)).map((r) => r.id);
+}
+
 // GET /admin/reviews?search=&rating=&page=
 exports.getAllReviews = async (req, res) => {
     try {
         const pg = paging(req);
-        const query = {};
-        const re = searchRegex(req.query.search);
-        if (re) {
-            const [users, tours] = await Promise.all([
-                User.find({ $or: [{ displayName: re }, { email: re }] }, '_id').lean(),
-                TravelDestination.find({ title: re }, '_id').lean(),
-            ]);
-            query.$or = [{ content: re }, { title: re }, { user: { $in: users.map((u) => u._id) } }, { tour: { $in: tours.map((t) => t._id) } }];
+        const where = new Where();
+        const q = searchText(req.query.search);
+        if (q) {
+            const text = containsAny(['content', 'title'], q);
+            const users = containsAny(['u.display_name', 'u.email'], q);
+            const tours = containsAny(['t.title'], q);
+            where.add(`${text.sql} OR user_id IN (SELECT u.id FROM users u WHERE ${users.sql}) OR tour_id IN (SELECT t.id FROM tours t WHERE ${tours.sql})`,
+                ...text.args, ...users.args, ...tours.args);
         }
         const rating = Number(req.query.rating);
-        if (rating >= 1 && rating <= 5) query.rating = rating;
+        if (rating >= 1 && rating <= 5) where.add('rating = ?', rating);
         const [reviews, total] = await Promise.all([
-            Review.find(query)
-                .populate('user', 'displayName email profilePicture')
-                .populate('tour', 'title')
-                .sort({ createdAt: -1 })
-                .skip(pg.skip)
-                .limit(pg.limit),
-            Review.countDocuments(query),
+            Review.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: pg.limit, offset: pg.offset }),
+            Review.count(where.sql, where.args),
         ]);
+        await populate(reviews, 'user', User, 'displayName email profilePicture');
+        await populate(reviews, 'tour', TravelDestination, 'title');
         return ResponseHandler.success(res, { reviews, pagination: pageInfo(total, pg) });
     } catch (err) {
         logger.error('Error fetching reviews', { error: err.message });
@@ -287,7 +278,7 @@ exports.getAllReviews = async (req, res) => {
 // DELETE /admin/reviews/:id
 exports.deleteReview = async (req, res) => {
     try {
-        const review = await Review.findByIdAndDelete(req.params.id);
+        const review = await Review.remove(req.params.id);
         if (!review) return ResponseHandler.fail(res, 404, 'Review not found');
         await recomputeTourRating(review.tour);
         return ResponseHandler.success(res, { review: { _id: review._id, title: review.title || `${review.rating}-star review` } }, 'Review deleted');
@@ -301,31 +292,32 @@ exports.deleteReview = async (req, res) => {
 exports.getPayments = async (req, res) => {
     try {
         const pg = paging(req);
-        const query = {};
-        if (req.query.status && req.query.status !== 'all') query.status = req.query.status;
-        const re = searchRegex(req.query.search);
-        if (re) {
-            const users = await User.find({ $or: [{ displayName: re }, { email: re }] }, '_id').lean();
-            query.$or = [{ stripePaymentIntentId: re }, { user: { $in: users.map((u) => u._id) } }];
+        const where = new Where();
+        if (req.query.status && req.query.status !== 'all') where.add('status = ?', req.query.status);
+        const q = searchText(req.query.search);
+        if (q) {
+            const intent = containsAny(['stripe_payment_intent_id'], q);
+            const ids = await usersMatching(q);
+            where.add(ids.length ? `${intent.sql} OR user_id IN (${marks(ids)})` : intent.sql, ...intent.args, ...ids);
         }
         const [payments, total, totals] = await Promise.all([
-            Payment.find(query)
-                .populate('user', 'displayName email')
-                .populate({ path: 'booking', select: 'tour status', populate: { path: 'tour', select: 'title' } })
-                .populate('order', 'kind status providerRef')
-                .sort({ createdAt: -1 })
-                .skip(pg.skip)
-                .limit(pg.limit),
-            Payment.countDocuments(query),
-            Payment.aggregate([{ $group: { _id: { status: '$status', currency: '$currency' }, count: { $sum: 1 }, amount: { $sum: '$amount' } } }]),
+            Payment.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: pg.limit, offset: pg.offset }),
+            Payment.count(where.sql, where.args),
+            all('SELECT status, currency, COUNT(*) AS n, SUM(amount) AS amount FROM payments GROUP BY status, currency'),
         ]);
+        await populate(payments, 'user', User, 'displayName email');
+        await populate(payments, 'booking', Booking, 'tour status');
+        await populate(payments.map((p) => p.booking).filter(Boolean), 'tour', TravelDestination, 'title');
+        await populate(payments, 'order', TravelOrder, 'kind status providerRef');
+        for (const p of payments) delete p.gatewayResponse;
+
         // Totals per status in the base currency (payments are taken in several currencies)
         const { base, rates } = await getCurrencyConfig();
         const summary = {};
         for (const t of totals) {
-            const row = summary[t._id.status] || (summary[t._id.status] = { count: 0, amount: 0 });
-            row.count += t.count;
-            row.amount = round2(row.amount + convert(t.amount, (t._id.currency || 'USD').toUpperCase(), base, rates));
+            const row = summary[t.status] || (summary[t.status] = { count: 0, amount: 0 });
+            row.count += Number(t.n);
+            row.amount = round2(row.amount + convert(t.amount || 0, (t.currency || 'USD').toUpperCase(), base, rates));
         }
         return ResponseHandler.success(res, { payments, summary, summaryCurrency: base, pagination: pageInfo(total, pg) });
     } catch (err) {
@@ -338,17 +330,18 @@ exports.getPayments = async (req, res) => {
 exports.getActivity = async (req, res) => {
     try {
         const pg = paging(req, 30);
-        const query = {};
-        if (req.query.resource && req.query.resource !== 'all') query.resource = req.query.resource;
-        if (req.query.actor) query.actor = req.query.actor;
+        const where = new Where();
+        if (req.query.resource && req.query.resource !== 'all') where.add('resource = ?', req.query.resource);
+        if (req.query.actor && isId(String(req.query.actor))) where.add('actor_id = ?', String(req.query.actor));
         const [entries, total, resources] = await Promise.all([
-            ActivityLog.find(query).sort({ createdAt: -1 }).skip(pg.skip).limit(pg.limit).lean(),
-            ActivityLog.countDocuments(query),
-            ActivityLog.distinct('resource'),
+            ActivityLog.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: pg.limit, offset: pg.offset }),
+            ActivityLog.count(where.sql, where.args),
+            all('SELECT DISTINCT resource FROM activity_log ORDER BY resource'),
         ]);
-        return ResponseHandler.success(res, { entries, resources: resources.sort(), pagination: pageInfo(total, pg) });
+        return ResponseHandler.success(res, { entries, resources: resources.map((r) => r.resource), pagination: pageInfo(total, pg) });
     } catch (err) {
         logger.error('Error fetching activity', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to fetch activity');
     }
 };
+

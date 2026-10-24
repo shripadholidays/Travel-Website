@@ -3,14 +3,16 @@
  * Run: npm run ratings:recompute
  */
 require('dotenv').config({ quiet: true });
-const mongoose = require('mongoose');
+const db = require('../src/db');
+const { migrate } = require('../src/db/migrate');
 const { recomputeAllTourRatings } = require('../src/services/rating-service');
 
 (async () => {
-    await mongoose.connect(process.env.DB_URI || 'mongodb://127.0.0.1:27017/wandeazy');
+    db.connect();
+    await migrate();
     const count = await recomputeAllTourRatings();
     console.log(`Recomputed ratings for ${count} tour(s).`);
-    await mongoose.disconnect();
+    await db.close();
 })().catch((err) => {
     console.error(err);
     process.exit(1);

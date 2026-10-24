@@ -37,3 +37,7 @@ server/create-admin.js
 
 # Local test staff accounts (generated passwords, never committed)
 *.local.json
+
+# Local SQLite / libSQL database files (production uses Turso)
+server/data/*.db
+server/data/*.db-*

@@ -1,53 +1,24 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const paymentSchema = new mongoose.Schema({
-    // Exactly one of booking (tour) or order (flight/hotel) is set.
-    booking: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Booking'
+const Payment = defineTable({
+    table: 'payments',
+    fields: {
+        // Exactly one of booking (tour) or order (flight/hotel) is set.
+        booking: { type: 'ref', col: 'booking_id' },
+        order: { type: 'ref', col: 'order_id' },
+        user: { type: 'ref', required: true, col: 'user_id' },
+        amount: { type: 'number', required: true },
+        currency: { type: 'text', default: 'USD' },
+        method: { type: 'text', enum: ['stripe', 'razorpay'], default: 'stripe' },
+        stripePaymentIntentId: 'text',
+        status: { type: 'text', enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
+        gatewayResponse: 'json',
     },
-    order: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TravelOrder'
+    validate(doc) {
+        return Boolean(doc.booking) === Boolean(doc.order)
+            ? { booking: 'A payment must reference exactly one of booking or order' }
+            : {};
     },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    amount: {
-        type: Number,
-        required: true
-    },
-    currency: {
-        type: String,
-        default: 'USD'
-    },
-    method: {
-        type: String,
-        enum: ['stripe', 'razorpay'],
-        default: 'stripe'
-    },
-    stripePaymentIntentId: {
-        type: String,
-        index: true
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'completed', 'failed', 'refunded'],
-        default: 'pending',
-        index: true
-    },
-    gatewayResponse: {
-        type: mongoose.Schema.Types.Mixed
-    }
-}, { timestamps: true });
-
-paymentSchema.pre('validate', function requireOneTarget(next) {
-    if (Boolean(this.booking) === Boolean(this.order)) {
-        return next(new Error('A payment must reference exactly one of booking or order'));
-    }
-    return next();
 });
 
-module.exports = mongoose.model('Payment', paymentSchema);
+module.exports = Payment;

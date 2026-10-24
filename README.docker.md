@@ -1,6 +1,6 @@
 # Wandeazy — Run with Docker
 
-This runs the **entire stack** (frontend + API + MongoDB) with one command. No need to install Node or MongoDB locally — just Docker.
+This runs the **entire stack** (frontend + API + database) with one command. No need to install Node or a database locally — just Docker.
 
 ## Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
@@ -26,17 +26,16 @@ Then open:
 | Frontend  | http://localhost:3000        |
 | API       | http://localhost:8080        |
 | API health| http://localhost:8080/health |
-| MongoDB   | mongodb://localhost:27017    |
 
 To stop: `Ctrl+C`, then `docker compose down`.
 To wipe the database too: `docker compose down -v`.
 
 ## What's included
-- **mongo** — MongoDB 7 with a persistent volume (`mongo-data`).
+- **database** — a SQLite file in the `db-data` volume, or your Turso database when `TURSO_DATABASE_URL` is set. Tables are created on start.
 - **server** — the Node/Express API on port `8080`.
 - **client** — the React app built by Vite and served by nginx on port `3000`.
 
-The services talk to each other over Docker's internal network; the API connects to Mongo at `mongodb://mongo:27017/wandeazy` automatically.
+The services talk to each other over Docker's internal network. Uploaded images go to the `uploads` volume, or to Cloudflare R2 when the R2 variables are set.
 
 ## Optional features (all work without them, just disabled)
 Fill these in `.env` to enable:
@@ -54,5 +53,5 @@ docker compose up -d --build     # start in background
 docker compose logs -f server    # follow API logs
 docker compose ps                # see running containers
 docker compose down              # stop and remove containers
-docker compose down -v           # also delete the Mongo volume
+docker compose down -v           # also delete the database and uploads volumes
 ```

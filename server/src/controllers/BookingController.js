@@ -1,16 +1,19 @@
-const mongoose = require('mongoose');
+const { isId } = require('../db/ids');
+const { Where, containsAny, populate, escapeLike } = require('../db/sql');
+const { validationText } = require('../db/errors');
 const Booking = require('../models/Booking');
 const Payment = require('../models/Payment');
 const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
-const { completePastBookings, BookingError, parseTravelDate, priceBooking, confirmBooking, cancelBooking: cancelBookingWithRefund } = require('../services/booking-service');
+const { completePastBookings, populateBooking, BookingError, parseTravelDate, priceBooking, confirmBooking, cancelBooking: cancelBookingWithRefund } = require('../services/booking-service');
 const { stripeClient } = require('../services/travel-order-service');
 const config = require('../config');
 const { formatMoney } = require('../services/currency');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 
 const handlesBookings = (user) => hasPermission(user, PERMISSIONS.BOOKINGS);
+const idOfUser = (b) => String(b.user?._id ?? b.user);
 
 // POST /bookings - Create booking + payment intent
 exports.createBooking = async (req, res) => {
@@ -40,15 +43,20 @@ exports.createBooking = async (req, res) => {
         const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode, currency: requestedCurrency });
         const { currency } = pricing;
 
-        const booking = await Booking.create({
+        const booking = await Booking.insert({
             user: req.user._id,
-            tour: tourId,
+            tour: tour._id,
             travelDate: date,
             numberOfTravelers,
-            contactInfo,
+            contactInfo: {
+                firstName: contactInfo?.firstName,
+                lastName: contactInfo?.lastName,
+                email: contactInfo?.email,
+                phone: contactInfo?.phone,
+            },
             addons: pricing.addons,
             subtotalAmount: pricing.subtotalAmount,
-            coupon: pricing.coupon || undefined,
+            coupon: pricing.coupon || null,
             totalAmount: pricing.totalAmount,
             currency,
             unitPrice: pricing.unitPrice,
@@ -71,12 +79,12 @@ exports.createBooking = async (req, res) => {
                     amount: Math.round(pricing.totalAmount * 100),
                     currency: currency.toLowerCase(),
                     metadata: {
-                        bookingId: booking._id.toString(),
-                        userId: req.user._id.toString()
+                        bookingId: booking._id,
+                        userId: String(req.user._id)
                     }
                 });
 
-                const payment = await Payment.create({
+                const payment = await Payment.insert({
                     booking: booking._id,
                     user: req.user._id,
                     amount: pricing.totalAmount,
@@ -87,20 +95,18 @@ exports.createBooking = async (req, res) => {
                 });
 
                 booking.paymentId = payment._id;
-                await booking.save();
+                await Booking.save(booking);
                 clientSecret = paymentIntent.client_secret;
             } catch (stripeErr) {
                 // Don't tell the traveller they're booked when payment can't even start.
                 logger.error('Stripe payment intent creation failed', { error: stripeErr.message, bookingId: booking._id });
                 booking.status = 'cancelled';
-                await booking.save();
+                await Booking.save(booking);
                 return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');
             }
         }
 
-        const populatedBooking = await Booking.findById(booking._id)
-            .populate('tour', 'title imageURL location price duration')
-            .populate('user', 'displayName email');
+        const populatedBooking = await populateBooking(await Booking.findById(booking._id));
 
         return ResponseHandler.success(res, {
             booking: populatedBooking,
@@ -108,10 +114,7 @@ exports.createBooking = async (req, res) => {
         }, 'Booking created successfully');
     } catch (err) {
         if (err instanceof BookingError) return ResponseHandler.fail(res, err.status, err.message);
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Error creating booking', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to create booking');
     }
@@ -121,17 +124,15 @@ exports.createBooking = async (req, res) => {
 exports.getUserBookings = async (req, res) => {
     try {
         const { page = 1, limit = config.pagination.defaultLimit, status } = req.query;
-        const query = { user: req.user._id };
-        if (status) query.status = status;
+        const where = new Where().add('user_id = ?', req.user._id);
+        if (status) where.add('status = ?', status);
         await completePastBookings({ user: req.user._id });
 
-        const bookings = await Booking.find(query)
-            .populate('tour', 'title imageURL location price duration')
-            .sort({ createdAt: -1 })
-            .skip((Number(page) - 1) * Number(limit))
-            .limit(Number(limit));
-
-        const total = await Booking.countDocuments(query);
+        const [bookings, total] = await Promise.all([
+            Booking.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: Number(limit), offset: (Number(page) - 1) * Number(limit) }),
+            Booking.count(where.sql, where.args),
+        ]);
+        await populate(bookings, 'tour', TravelDestination, 'title imageURL location price currency duration');
 
         return ResponseHandler.success(res, {
             bookings,
@@ -146,16 +147,15 @@ exports.getUserBookings = async (req, res) => {
 // GET /bookings/:id
 exports.getBookingById = async (req, res) => {
     try {
-        const booking = await Booking.findById(req.params.id)
-            .populate('tour', 'title imageURL location price duration itinerary inclusions')
-            .populate('user', 'displayName email')
-            .populate('paymentId');
-
+        const booking = await Booking.findById(req.params.id);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
 
-        if (booking.user._id.toString() !== req.user._id.toString() && !handlesBookings(req.user)) {
+        if (idOfUser(booking) !== String(req.user._id) && !handlesBookings(req.user)) {
             return ResponseHandler.fail(res, 403, 'Access denied');
         }
+
+        await populateBooking(booking, 'title imageURL location price currency duration itinerary inclusions');
+        await populate(booking, 'paymentId', Payment);
 
         return ResponseHandler.success(res, { booking }, 'Booking fetched successfully');
     } catch (err) {
@@ -170,7 +170,7 @@ exports.cancelBooking = async (req, res) => {
         const booking = await Booking.findById(req.params.id);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
 
-        if (booking.user.toString() !== req.user._id.toString() && !handlesBookings(req.user)) {
+        if (idOfUser(booking) !== String(req.user._id) && !handlesBookings(req.user)) {
             return ResponseHandler.fail(res, 403, 'Access denied');
         }
 
@@ -190,34 +190,32 @@ exports.cancelBooking = async (req, res) => {
 exports.getAllBookings = async (req, res) => {
     try {
         const { page = 1, limit = config.pagination.adminDefaultLimit, status, search } = req.query;
-        const query = {};
-        if (status && status !== 'all') query.status = status;
+        const where = new Where();
         // Traveller name, email or the booking reference (the last characters of its id)
         if (search && String(search).trim()) {
             const q = String(search).trim();
-            const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-            const or = [{ 'contactInfo.email': re }, { 'contactInfo.firstName': re }, { 'contactInfo.lastName': re }];
-            if (/^[a-f0-9]{24}$/i.test(q)) or.push({ _id: new mongoose.Types.ObjectId(q) });
-            else if (/^[a-f0-9]{4,23}$/i.test(q)) or.push({ $expr: { $regexMatch: { input: { $toString: '$_id' }, regex: `${q}$`, options: 'i' } } });
-            query.$or = or;
+            const match = containsAny(['contact_info_email', 'contact_info_first_name', 'contact_info_last_name'], q);
+            const parts = [match.sql];
+            const args = [...match.args];
+            if (isId(q)) { parts.push('id = ?'); args.push(q.toLowerCase()); }
+            else if (/^[a-f0-9]{4,23}$/i.test(q)) { parts.push("id LIKE ? ESCAPE '\\'"); args.push(`%${escapeLike(q.toLowerCase())}`); }
+            where.add(parts.join(' OR '), ...args);
         }
         await completePastBookings();
 
-        const bookings = await Booking.find(query)
-            .populate('tour', 'title location price')
-            .populate('user', 'displayName email')
-            .sort({ createdAt: -1 })
-            .skip((Number(page) - 1) * Number(limit))
-            .limit(Number(limit));
-
-        const total = await Booking.countDocuments(query);
         // Counts for the status tabs, with the same search applied
-        const { status: ignored, ...rest } = query;
-        const counts = await Booking.aggregate([{ $match: rest }, { $group: { _id: '$status', count: { $sum: 1 } } }]);
+        const statusCounts = await Booking.countBy('status', where.sql, where.args);
+        if (status && status !== 'all') where.add('status = ?', status);
+
+        const [bookings, total] = await Promise.all([
+            Booking.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: Number(limit), offset: (Number(page) - 1) * Number(limit) }),
+            Booking.count(where.sql, where.args),
+        ]);
+        await populateBooking(bookings, 'title location price currency');
 
         return ResponseHandler.success(res, {
             bookings,
-            statusCounts: Object.fromEntries(counts.map((c) => [c._id, c.count])),
+            statusCounts,
             statusChanges: STATUS_CHANGES,
             pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / Number(limit)) }
         }, 'All bookings fetched successfully');
@@ -260,12 +258,9 @@ exports.updateBookingStatus = async (req, res) => {
             await confirmBooking(booking);
         } else {
             booking.status = status;
-            await booking.save();
+            await Booking.save(booking);
         }
-        await booking.populate([
-            { path: 'tour', select: 'title location price' },
-            { path: 'user', select: 'displayName email' },
-        ]);
+        await populateBooking(booking, 'title location price currency');
 
         return ResponseHandler.success(res, { booking }, 'Booking status updated successfully');
     } catch (err) {

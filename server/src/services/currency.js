@@ -18,7 +18,7 @@ const round2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
 /** { base, enabled, rates, updatedAt } with every gap filled from the defaults. */
 async function getCurrencyConfig() {
     if (cached && Date.now() - cachedAt < TTL_MS) return cached;
-    const s = (await SiteSettings.findOne().lean())?.currency || {};
+    const s = (await SiteSettings.find())?.currency || {};
     const rates = { ...DEFAULT_RATES };
     for (const code of SUPPORTED) {
         const r = Number(s.rates?.[code]);

@@ -9,9 +9,10 @@
  * Run: npm run content:clean
  */
 require('dotenv').config({ quiet: true });
-const mongoose = require('mongoose');
+const db = require('../src/db');
+const { migrate } = require('../src/db/migrate');
+const { setPath } = require('../src/db/table');
 const SiteSettings = require('../src/models/SiteSettings');
-const TravelDestination = require('../src/models/TravelDestination');
 const legacy = require('./data/legacy-settings-defaults.json');
 
 const plain = (v) => JSON.parse(JSON.stringify(v ?? null, (k, x) => (k === '_id' ? undefined : x)));
@@ -32,9 +33,9 @@ function cleanList(current, oldList, newList) {
 }
 
 async function cleanPlaceholderContent() {
-    const doc = await SiteSettings.findOne();
+    const doc = await SiteSettings.find();
     if (!doc) return [];
-    const defaults = plain(new SiteSettings().toObject());
+    const defaults = plain(SiteSettings.DEFAULTS);
     const changes = [];
 
     for (const field of ['contactPhone', 'address']) {
@@ -68,14 +69,14 @@ async function cleanPlaceholderContent() {
     for (const path of lists) {
         const get = (o) => path.reduce((acc, k) => acc?.[k], o);
         const { list, changed } = cleanList(plain(get(doc)), get(legacy), get(defaults));
-        if (changed) { doc.set(path.join('.'), list); changes.push(path.join('.')); }
+        if (changed) { setPath(doc, path.join('.'), list); changes.push(path.join('.')); }
     }
 
-    if (changes.length) await doc.save();
+    if (changes.length) await SiteSettings.save(doc);
 
     // Sample tours said "EMI from $142/mo", but checkout has no instalments
-    const emi = await TravelDestination.updateMany({ emi: /^EMI from \$\d+\/mo$/ }, { $unset: { emi: '' } });
-    if (emi.modifiedCount) changes.push(`tour EMI labels (${emi.modifiedCount})`);
+    const emi = await db.run("UPDATE tours SET emi = NULL WHERE emi GLOB 'EMI from $[0-9]*/mo'");
+    if (emi.changes) changes.push(`tour EMI labels (${emi.changes})`);
 
     return changes;
 }
@@ -84,10 +85,11 @@ module.exports = { cleanPlaceholderContent };
 
 if (require.main === module) {
     (async () => {
-        await mongoose.connect(process.env.DB_URI || 'mongodb://127.0.0.1:27017/wandeazy');
+        db.connect();
+        await migrate();
         const changes = await cleanPlaceholderContent();
         console.log(changes.length ? `Replaced sample content in: ${changes.join(', ')}` : 'No sample content left to replace.');
-        await mongoose.disconnect();
+        await db.close();
     })().catch((err) => {
         console.error(err);
         process.exit(1);

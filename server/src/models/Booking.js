@@ -1,85 +1,37 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const bookingSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-        index: true
+const Booking = defineTable({
+    table: 'bookings',
+    fields: {
+        user: { type: 'ref', required: true, col: 'user_id' },
+        tour: { type: 'ref', required: true, col: 'tour_id' },
+        travelDate: { type: 'date', required: true, label: 'Travel date' },
+        numberOfTravelers: { type: 'int', required: true, min: 1, minMessage: 'At least 1 traveler is required', label: 'Number of travelers' },
+        'contactInfo.firstName': { type: 'text', required: true, label: 'First name' },
+        'contactInfo.lastName': { type: 'text', required: true, label: 'Last name' },
+        'contactInfo.email': { type: 'text', required: true, label: 'Email' },
+        'contactInfo.phone': { type: 'text', required: true, label: 'Phone' },
+        addons: { type: 'json', default: [] },                 // [{ name, price }]
+        // Before any coupon; totalAmount is what the traveller pays
+        subtotalAmount: 'number',
+        coupon: { type: 'json', default: null },               // { code, discount }
+        totalAmount: { type: 'number', required: true },
+        // What the traveller chose and was charged in; every amount on the booking is in this currency
+        currency: { type: 'text', default: 'USD' },
+        // How the price was converted: the tour's own price per person, its currency and the rate used
+        unitPrice: 'number',
+        tourCurrency: 'text',
+        exchangeRate: 'number',
+        // The total in the site's base currency at the day's rate, for revenue reports
+        baseCurrency: 'text',
+        baseAmount: 'number',
+        status: { type: 'text', enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
+        paymentId: { type: 'ref', col: 'payment_id' },
+        specialRequests: 'text',
+        cancelledAt: 'date',
+        // What went back to the traveller's card when the booking was cancelled
+        refundedAmount: { type: 'number', default: 0 },
     },
-    tour: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Travel_Destination',
-        required: true,
-        index: true
-    },
-    travelDate: {
-        type: Date,
-        required: true
-    },
-    numberOfTravelers: {
-        type: Number,
-        required: true,
-        min: [1, 'At least 1 traveler is required']
-    },
-    contactInfo: {
-        firstName: { type: String, required: true },
-        lastName: { type: String, required: true },
-        email: { type: String, required: true },
-        phone: { type: String, required: true }
-    },
-    addons: [{
-        name: { type: String },
-        price: { type: Number }
-    }],
-    // Before any coupon; totalAmount is what the traveller pays
-    subtotalAmount: {
-        type: Number
-    },
-    coupon: {
-        code: { type: String },
-        discount: { type: Number }
-    },
-    totalAmount: {
-        type: Number,
-        required: true
-    },
-    // What the traveller chose and was charged in; every amount on the booking is in this currency
-    currency: {
-        type: String,
-        default: 'USD'
-    },
-    // How the price was converted: the tour's own price per person, its currency and the rate used
-    unitPrice: { type: Number },
-    tourCurrency: { type: String },
-    exchangeRate: { type: Number },
-    // The total in the site's base currency at the day's rate, for revenue reports
-    baseCurrency: { type: String },
-    baseAmount: { type: Number },
-    status: {
-        type: String,
-        enum: ['pending', 'confirmed', 'cancelled', 'completed'],
-        default: 'pending',
-        index: true
-    },
-    paymentId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Payment'
-    },
-    specialRequests: {
-        type: String
-    },
-    cancelledAt: {
-        type: Date
-    },
-    // What went back to the traveller's card when the booking was cancelled
-    refundedAmount: {
-        type: Number,
-        default: 0
-    }
-}, { timestamps: true });
+});
 
-bookingSchema.index({ user: 1, createdAt: -1 });
-bookingSchema.index({ status: 1, createdAt: -1 });
-
-module.exports = mongoose.model('Booking', bookingSchema);
+module.exports = Booking;

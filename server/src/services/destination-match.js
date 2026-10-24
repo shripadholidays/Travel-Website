@@ -2,24 +2,20 @@
 // on destination cards and the tour list on the destination page, so the two
 // can never disagree: the destination's name or country appears as a whole
 // word in the tour's location or title ("Japan" matches "Tokyo, Japan").
+const { wordMatch, wordMatchJs } = require('../db/sql');
 
-const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const destinationNames = (destination) => [destination.name, destination.country].map((n) => String(n || '').trim()).filter(Boolean);
 
-function destinationPatterns(destination) {
-    return [destination.name, destination.country]
-        .filter(Boolean)
-        .map((n) => new RegExp(`\\b${escapeRegex(String(n).trim())}\\b`, 'i'));
+function tourMatchesDestination(tour, names) {
+    return names.some((n) => wordMatchJs(tour.location, n) || wordMatchJs(tour.title, n));
 }
 
-function tourMatchesDestination(tour, patterns) {
-    return patterns.some((re) => re.test(tour.location || '') || re.test(tour.title || ''));
-}
-
-/** Mongo filter for the tours of a destination. */
+/** SQL condition for the tours of a destination: { sql, args }. */
 function destinationTourQuery(destination) {
-    const patterns = destinationPatterns(destination);
-    if (!patterns.length) return { _id: null };
-    return { $or: patterns.flatMap((re) => [{ location: re }, { title: re }]) };
+    const names = destinationNames(destination);
+    if (!names.length) return { sql: '0', args: [] };
+    const parts = names.flatMap((n) => [wordMatch('location', n), wordMatch('title', n)]);
+    return { sql: parts.map((p) => p.sql).join(' OR '), args: parts.flatMap((p) => p.args) };
 }
 
-module.exports = { escapeRegex, destinationPatterns, tourMatchesDestination, destinationTourQuery };
+module.exports = { destinationNames, tourMatchesDestination, destinationTourQuery };

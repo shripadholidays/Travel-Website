@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
@@ -11,6 +10,7 @@ require('dotenv').config();
 
 const config = require('./config');
 const ResponseHandler = require('./utils/response-handler');
+const { ping } = require('./db');
 const logger = require('./utils/logger');
 const { initializePassport } = require('./services/auth-service');
 const mockAuth = require('./middlewares/mock-auth');
@@ -126,7 +126,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', async (req, res) => {
-    const dbState = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    const dbState = await ping().then(() => 'connected', () => 'disconnected');
     res.status(dbState === 'connected' ? 200 : 503).json({
         status: dbState === 'connected' ? 'ok' : 'degraded',
         pid: process.pid,

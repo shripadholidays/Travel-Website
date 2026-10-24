@@ -1,36 +1,40 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
 const config = require('./src/config');
-const connectDB = require('./src/database/connect-db');
+const db = require('./src/db');
+const { migrate } = require('./src/db/migrate');
 const logger = require('./src/utils/logger');
 const app = require('./src/app');
 
 const { port: PORT } = config.app;
-const { uri: DB_URI } = config.db;
 
-// --- Start server after DB connection ---
+// --- Start server once the database is reachable and up to date ---
 let server;
 (async () => {
     try {
-        await connectDB(DB_URI);
+        db.connect();
+        await db.ping();
+        await migrate();
+        logger.info(`Database ready (${config.db.url.startsWith('file:') ? config.db.url : 'Turso'})`);
         server = app.listen(PORT, () => {
             logger.info(`Server running on http://localhost:${PORT}`);
         });
     } catch (err) {
-        logger.error('Failed to connect to DB', { error: err.message });
+        logger.error('Failed to connect to the database', { error: err.message });
         process.exit(1);
     }
 })();
 
 const gracefulShutdown = (signal) => {
     logger.info(`${signal} received. Starting graceful shutdown...`);
-    server.close(() => {
-        logger.info('HTTP server closed');
-        mongoose.connection.close(false).then(() => {
-            logger.info('MongoDB connection closed');
-            process.exit(0);
-        });
+    const finish = () => db.close().finally(() => {
+        logger.info('Database connection closed');
+        process.exit(0);
     });
+    if (server) server.close(() => {
+        logger.info('HTTP server closed');
+        finish();
+    });
+    else finish();
     setTimeout(() => {
         logger.error('Forced shutdown after timeout');
         process.exit(1);

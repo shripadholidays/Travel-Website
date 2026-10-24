@@ -1,31 +1,15 @@
 services:
-  # ---- MongoDB ----
-  mongo:
-    image: mongo:7
-    container_name: wandeazy-mongo
-    restart: unless-stopped
-    volumes:
-      - mongo-data:/data/db
-    ports:
-      - "27017:27017"
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # ---- API server ----
   server:
     build: ./server
     container_name: wandeazy-server
     restart: unless-stopped
-    depends_on:
-      mongo:
-        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 8080
-      DB_URI: mongodb://mongo:27017/wandeazy
+      # Turso when set; otherwise a SQLite file kept in the db-data volume
+      TURSO_DATABASE_URL: ${TURSO_DATABASE_URL:-file:/app/data/wandeazy.db}
+      TURSO_AUTH_TOKEN: ${TURSO_AUTH_TOKEN:-}
       # App / auth
       JWT_SECRET: ${JWT_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
@@ -46,6 +30,9 @@ services:
       MAILGUN_SECURE: ${MAILGUN_SECURE:-}
       MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
       MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+    volumes:
+      - db-data:/app/data
+      - uploads:/app/uploads
     ports:
       - "8080:8080"
 
@@ -65,4 +52,5 @@ services:
       - "3000:80"
 
 volumes:
-  mongo-data:
+  db-data:
+  uploads:

@@ -1,3 +1,4 @@
+const { isDuplicate, validationText } = require('../db/errors');
 const Coupon = require('../models/Coupon');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
@@ -26,8 +27,8 @@ function cleanCoupon(body = {}, { partial = false } = {}) {
 }
 
 function saveError(res, err, action) {
-    if (err.code === 11000) return ResponseHandler.fail(res, 409, 'A coupon with that code already exists.');
-    if (err.name === 'ValidationError' || err.name === 'CastError') return ResponseHandler.fail(res, 400, err.message);
+    if (isDuplicate(err)) return ResponseHandler.fail(res, 409, 'A coupon with that code already exists.');
+    if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
     logger.error(`${action} coupon failed`, { error: err.message });
     return ResponseHandler.error(res, 500, `Failed to ${action.toLowerCase()} coupon.`);
 }
@@ -38,7 +39,7 @@ exports.validateCoupon = async (req, res) => {
         const { code, orderAmount } = req.body || {};
         if (!code) return ResponseHandler.fail(res, 400, 'Coupon code is required.');
 
-        const coupon = await Coupon.findOne({ code: code.toUpperCase().trim() });
+        const coupon = await Coupon.findByCode(code);
         if (!coupon) return ResponseHandler.fail(res, 404, 'Coupon not found.');
 
         // The order amount is in the checkout currency; the discount comes back in it too
@@ -65,7 +66,7 @@ exports.validateCoupon = async (req, res) => {
 // GET /api/v1/admin/coupons
 exports.listCoupons = async (req, res) => {
     try {
-        const coupons = await Coupon.find().sort({ createdAt: -1 });
+        const coupons = await Coupon.find({ order: 'created_at DESC' });
         return ResponseHandler.success(res, { coupons });
     } catch (err) {
         logger.error('List coupons failed', { error: err.message });
@@ -79,7 +80,7 @@ exports.createCoupon = async (req, res) => {
         const { data, error } = cleanCoupon(req.body);
         if (error) return ResponseHandler.fail(res, 400, error);
         if (data.discountType === 'percent' && data.discountValue > 100) return ResponseHandler.fail(res, 400, 'A percentage discount can be at most 100%.');
-        const coupon = await Coupon.create({ currency: (await getCurrencyConfig()).base, ...data, isActive: data.isActive !== false });
+        const coupon = await Coupon.insert({ currency: (await getCurrencyConfig()).base, ...data, isActive: data.isActive !== false });
         return res.status(201).json({ status: 'success', message: 'Coupon created.', data: { coupon } });
     } catch (err) {
         return saveError(res, err, 'Create');
@@ -95,7 +96,7 @@ exports.updateCoupon = async (req, res) => {
         if (!coupon) return ResponseHandler.fail(res, 404, 'Coupon not found.');
         Object.assign(coupon, data);
         if (coupon.discountType === 'percent' && coupon.discountValue > 100) return ResponseHandler.fail(res, 400, 'A percentage discount can be at most 100%.');
-        await coupon.save();
+        await Coupon.save(coupon);
         return ResponseHandler.success(res, { coupon }, 'Coupon updated.');
     } catch (err) {
         return saveError(res, err, 'Update');
@@ -105,7 +106,7 @@ exports.updateCoupon = async (req, res) => {
 // DELETE /api/v1/admin/coupons/:id
 exports.deleteCoupon = async (req, res) => {
     try {
-        const coupon = await Coupon.findByIdAndDelete(req.params.id);
+        const coupon = await Coupon.remove(req.params.id);
         if (!coupon) return ResponseHandler.fail(res, 404, 'Coupon not found.');
         return ResponseHandler.success(res, { coupon: { _id: coupon._id, code: coupon.code } }, 'Coupon deleted.');
     } catch (err) {

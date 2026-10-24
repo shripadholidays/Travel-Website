@@ -13,7 +13,7 @@ const future = (days) => new Date(Date.now() + days * 864e5).toISOString().slice
 const contactInfo = { firstName: 'Asha', lastName: 'Rao', email: 'asha@example.com', phone: '+911234567890' };
 
 function tour(overrides = {}) {
-    return TravelDestination.create({
+    return TravelDestination.insert({
         title: 'Discover Tokyo',
         location: 'Tokyo, Japan',
         price: 1000,
@@ -74,7 +74,7 @@ describe('tour filters', () => {
     beforeEach(async () => {
         await tour();
         await tour({ title: 'Bali Escape', location: 'Bali, Indonesia', categories: ['Beach'] });
-        await Destination.create({
+        await Destination.insert({
             name: 'Japan', slug: 'japan', country: 'Japan', continent: 'Asia', description: 'x', coverImage: 'https://example.com/j.jpg',
         });
     });
@@ -83,7 +83,7 @@ describe('tour filters', () => {
         const titles = async (qs) => (await request(app).get(`/api/v1/tours?${qs}`)).body.data.tours.map((t) => t.title);
         expect(await titles('place=Indonesia')).toEqual(['Bali Escape']);
         expect(await titles('destination=japan')).toEqual(['Discover Tokyo']);
-        const bali = await TravelDestination.findOne({ title: 'Bali Escape' });
+        const bali = await TravelDestination.findOne('title = ?', ['Bali Escape']);
         expect(await titles(`ids=${bali._id},not-an-id`)).toEqual(['Bali Escape']);
 
         const facets = (await request(app).get('/api/v1/tours/facets')).body.data;
@@ -104,16 +104,16 @@ describe('cancelling a tour booking', () => {
         .send({ tour: t._id, travelDate, numberOfTravelers: 1, contactInfo, ...body });
 
     it('is free until 24 hours before departure and gives a used coupon back', async () => {
-        await Coupon.create({ code: 'SAVE10', discountType: 'percent', discountValue: 10, maxUses: 1, expiresAt: new Date(Date.now() + 30 * 864e5) });
+        await Coupon.insert({ code: 'SAVE10', discountType: 'percent', discountValue: 10, maxUses: 1, expiresAt: new Date(Date.now() + 30 * 864e5) });
         const booked = await book(future(10), { couponCode: 'SAVE10' });
         expect(booked.status).toBe(200);
-        expect((await Coupon.findOne({ code: 'SAVE10' })).usedCount).toBe(1);
+        expect((await Coupon.findByCode('SAVE10')).usedCount).toBe(1);
 
         const res = await request(app).patch(`/api/v1/bookings/${booked.body.data.booking._id}/cancel`).set('Cookie', cookieFor(user));
         expect(res.status).toBe(200);
         expect(res.body.data.booking.status).toBe('cancelled');
         expect(res.body.data.booking.cancelledAt).toBeTruthy();
-        expect((await Coupon.findOne({ code: 'SAVE10' })).usedCount).toBe(0);
+        expect((await Coupon.findByCode('SAVE10')).usedCount).toBe(0);
     });
 
     it('is refused for travellers inside the last 24 hours, but allowed for admins', async () => {
@@ -128,7 +128,7 @@ describe('cancelling a tour booking', () => {
     });
 
     it('marks finished trips as completed', async () => {
-        await Booking.create({
+        await Booking.insert({
             user: user._id, tour: t._id, travelDate: new Date(Date.now() - 30 * 864e5), numberOfTravelers: 1,
             contactInfo, totalAmount: 1000, status: 'confirmed',
         });
@@ -142,9 +142,9 @@ describe('articles from writers', () => {
     beforeEach(async () => {
         // Old enough account with a completed trip, so the writer may submit
         writer = await createUser();
-        await User.collection.updateOne({ _id: writer._id }, { $set: { createdAt: new Date(Date.now() - 60 * 864e5) } });
+        await require('../src/db').run('UPDATE users SET created_at = ? WHERE id = ?', [new Date(Date.now() - 60 * 864e5).toISOString(), writer._id]);
         const t = await tour();
-        await Booking.create({ user: writer._id, tour: t._id, travelDate: new Date(Date.now() - 20 * 864e5), numberOfTravelers: 1, contactInfo, totalAmount: 1, status: 'completed' });
+        await Booking.insert({ user: writer._id, tour: t._id, travelDate: new Date(Date.now() - 20 * 864e5), numberOfTravelers: 1, contactInfo, totalAmount: 1, status: 'completed' });
     });
 
     const article = { title: 'Ramen Nights in Tokyo', excerpt: 'Where to slurp the best bowls after dark.', content: '## Shinjuku\n\nGo late.', coverImage: 'https://example.com/r.jpg' };
@@ -185,7 +185,7 @@ describe('articles from writers', () => {
         const created = await request(app).post('/api/v1/blog').set('Cookie', cookieFor(writer)).send({ ...article, status: 'draft' });
         expect(created.body.data.post.status).toBe('draft');
         expect((await request(app).delete(`/api/v1/blog/${created.body.data.post._id}`).set('Cookie', cookieFor(writer))).status).toBe(200);
-        expect(await BlogPost.countDocuments()).toBe(0);
+        expect(await BlogPost.count()).toBe(0);
     });
 });
 
@@ -207,9 +207,9 @@ describe('messages to the team', () => {
 describe('highlights', () => {
     it('use real numbers and leave out reviews written by staff', async () => {
         const t = await tour();
-        await Review.create({ tour: t._id, user: admin._id, rating: 5, content: 'Staff review' });
-        await Review.create({ tour: t._id, user: user._id, rating: 4, content: 'Loved the food tour.', isVerifiedBooking: true });
-        await Booking.create({ user: user._id, tour: t._id, travelDate: new Date(), numberOfTravelers: 3, contactInfo, totalAmount: 1, status: 'confirmed' });
+        await Review.insert({ tour: t._id, user: admin._id, rating: 5, content: 'Staff review' });
+        await Review.insert({ tour: t._id, user: user._id, rating: 4, content: 'Loved the food tour.', isVerifiedBooking: true });
+        await Booking.insert({ user: user._id, tour: t._id, travelDate: new Date(), numberOfTravelers: 3, contactInfo, totalAmount: 1, status: 'confirmed' });
 
         const { stats, reviews } = (await request(app).get('/api/v1/settings/highlights')).body.data;
         expect(stats).toMatchObject({ tours: 1, destinations: 1, travellers: 3, reviews: 1, rating: 4 });

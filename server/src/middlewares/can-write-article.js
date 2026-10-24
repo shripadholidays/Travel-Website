@@ -21,8 +21,8 @@ module.exports = async function canWriteArticle(req, res, next) {
 
     await completePastBookings({ user: user._id });
     const [reviewCount, completedBookings] = await Promise.all([
-        Review.countDocuments({ user: user._id }),
-        Booking.countDocuments({ user: user._id, status: 'completed' }),
+        Review.count('user_id = ?', [user._id]),
+        Booking.count("user_id = ? AND status = 'completed'", [user._id]),
     ]);
 
     if (reviewCount >= REQUIRED_REVIEWS || completedBookings >= 1) return next();

@@ -291,7 +291,7 @@ export const AdminTourForm = () => {
         .filter((s) => !form.categories.some((c) => c.toLowerCase() === s.toLowerCase()))
         .slice(0, 16);
     const isLive = tour?.status === 'active';
-    const editorName = typeof tour?.updatedBy === 'object' ? tour.updatedBy.displayName : null;
+    const editorName = tour?.updatedBy && typeof tour.updatedBy === 'object' ? tour.updatedBy.displayName : null;
 
     if (isEdit && isLoading) {
         return (

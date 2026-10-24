@@ -242,7 +242,7 @@ export const AdminTours = () => {
                                 <TableBody>
                                     {tours.map((tour) => {
                                         const st = TOUR_STATUS[tour.status ?? "active"];
-                                        const editor = typeof tour.updatedBy === "object" ? tour.updatedBy.displayName : null;
+                                        const editor = tour.updatedBy && typeof tour.updatedBy === "object" ? tour.updatedBy.displayName : null;
                                         return (
                                             <TableRow key={tour._id} data-state={selected.includes(tour._id) ? "selected" : undefined}>
                                                 <TableCell>

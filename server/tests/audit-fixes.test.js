@@ -14,7 +14,7 @@ const future = (days) => {
 const contactInfo = { firstName: 'Asha', lastName: 'Rao', email: 'asha@example.com', phone: '+911234567890' };
 
 function tour(overrides = {}) {
-    return TravelDestination.create({
+    return TravelDestination.insert({
         title: 'Discover Tokyo',
         location: 'Tokyo, Japan',
         price: 1000,
@@ -80,11 +80,11 @@ describe('tour bookings', () => {
         expect((await book({ addons: [{ name: 'Free Upgrade', price: 0 }] })).status).toBe(400);
         expect((await book({ travelDate: '' })).status).toBe(400);
         expect((await book({ travelDate: '2020-01-01' })).status).toBe(400);
-        expect(await Booking.countDocuments()).toBe(0);
+        expect(await Booking.count()).toBe(0);
     });
 
     it('applies a coupon on the server and uses it up on confirmation', async () => {
-        await Coupon.create({ code: 'SAVE10', discountType: 'percent', discountValue: 10, maxUses: 1 });
+        await Coupon.insert({ code: 'SAVE10', discountType: 'percent', discountValue: 10, maxUses: 1 });
         const res = await book({ couponCode: 'save10' });
         expect(res.status).toBe(200);
         const b = res.body.data.booking;
@@ -93,13 +93,13 @@ describe('tour bookings', () => {
         expect(b.totalAmount).toBe(1800);
         // No payment gateway in tests, so the booking confirms and the coupon is spent
         expect(b.status).toBe('confirmed');
-        expect((await Coupon.findOne({ code: 'SAVE10' })).usedCount).toBe(1);
+        expect((await Coupon.findByCode('SAVE10')).usedCount).toBe(1);
         expect((await book({ couponCode: 'SAVE10' })).status).toBe(400);
     });
 
     it('only lets the owner confirm a booking', async () => {
         const other = await createUser();
-        const booking = await Booking.create({
+        const booking = await Booking.insert({
             user: other._id, tour: t._id, travelDate: new Date(future(20)), numberOfTravelers: 1,
             contactInfo, totalAmount: 1000, status: 'pending',
         });
@@ -116,7 +116,7 @@ describe('inquiries', () => {
             preferredTravelDate: future(30), message: 'Hi', status: 'replied',
         });
         expect(res.status).toBe(200);
-        const saved = await UserInquiry.findOne({ email: 'asha@example.com' });
+        const saved = await UserInquiry.findOne('email = ?', ['asha@example.com']);
         expect(saved.status).toBe('new');
         expect(saved.fullName).toBe('Asha Rao');
     });

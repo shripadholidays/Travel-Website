@@ -1,8 +1,6 @@
+const { all, get } = require('../db');
+const { validationText } = require('../db/errors');
 const SiteSettings = require('../models/SiteSettings');
-const TravelDestination = require('../models/TravelDestination');
-const Booking = require('../models/Booking');
-const Review = require('../models/Review');
-const User = require('../models/User');
 const ResponseHandler = require('../utils/response-handler');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 const logger = require('../utils/logger');
@@ -10,24 +8,8 @@ const { clearTravelConfigCache } = require('../services/travel-config');
 const { getCurrencyConfig, clearCurrencyCache, fetchLatestRates, SUPPORTED } = require('../services/currency');
 const { refreshTourPriceIndex } = require('../services/tour-price-index');
 
-// Helper: get or create singleton settings doc
-async function getSettings() {
-    let settings = await SiteSettings.findOne();
-    if (!settings) {
-        settings = await SiteSettings.create({
-            contentSections: [
-                { sectionId: 'hero',         name: 'Hero Banner',          description: 'Main banner section on the homepage.', isVisible: true },
-                { sectionId: 'promo',        name: 'Special Offers',       description: 'Promotional carousel with partner deals.', isVisible: true },
-                { sectionId: 'featured',     name: 'Featured Tours',       description: 'Showcase hand-picked tours on the homepage.', isVisible: true },
-                { sectionId: 'testimonials', name: 'Testimonials',         description: 'Customer reviews and testimonials section.', isVisible: true },
-                { sectionId: 'plantrip',     name: 'Plan Your Trip',       description: 'Step-by-step trip planning guide.', isVisible: true },
-                { sectionId: 'support',      name: 'Support Section',      description: '24/7 support concierge feature display.', isVisible: true },
-                { sectionId: 'faq',          name: 'FAQ Section',          description: 'Frequently asked questions preview.', isVisible: true },
-            ],
-        });
-    }
-    return settings;
-}
+// The settings record, created with the default page sections on first use
+const getSettings = () => SiteSettings.load();
 
 // Fields exposed publicly (no auth needed)
 const PUBLIC_FIELDS = [
@@ -62,21 +44,15 @@ exports.getPublicSettings = async (req, res) => {
 exports.getHighlights = async (req, res) => {
     try {
         // Reviews by our own staff are not testimonials
-        const staffIds = await User.find({ role: { $in: ['admin', 'moderator'] } }).distinct('_id');
-        const travellerReviews = { user: { $nin: staffIds } };
+        const byTravellers = "r.user_id NOT IN (SELECT id FROM users WHERE role IN ('admin', 'moderator'))";
         const [tours, bookingTotals, reviewTotals, reviews] = await Promise.all([
-            TravelDestination.find({ status: 'active' }, 'location').lean(),
-            Booking.aggregate([
-                { $match: { status: { $in: ['confirmed', 'completed'] } } },
-                { $group: { _id: null, travellers: { $sum: '$numberOfTravelers' } } },
-            ]),
-            Review.aggregate([{ $match: travellerReviews }, { $group: { _id: null, count: { $sum: 1 }, avg: { $avg: '$rating' } } }]),
-            Review.find({ ...travellerReviews, rating: { $gte: 4 }, content: { $exists: true, $ne: '' } })
-                .sort({ rating: -1, createdAt: -1 })
-                .limit(6)
-                .populate('user', 'displayName profilePicture')
-                .populate({ path: 'tour', select: 'title location status' })
-                .lean(),
+            all("SELECT location FROM tours WHERE status = 'active'"),
+            get("SELECT SUM(number_of_travelers) AS travellers FROM bookings WHERE status IN ('confirmed', 'completed')"),
+            get(`SELECT COUNT(*) AS count, AVG(rating) AS avg FROM reviews r WHERE ${byTravellers}`),
+            all(`SELECT r.id, r.rating, r.title, r.content, r.is_verified_booking, u.display_name, u.profile_picture, t.id AS tour_id, t.title AS tour_title, t.location
+                 FROM reviews r JOIN users u ON u.id = r.user_id JOIN tours t ON t.id = r.tour_id
+                 WHERE ${byTravellers} AND r.rating >= 4 AND coalesce(r.content, '') <> '' AND t.status = 'active'
+                 ORDER BY r.rating DESC, r.created_at DESC LIMIT 6`),
         ]);
 
         // One destination per country/place a live tour goes to ("Tokyo, Japan" → "Japan")
@@ -86,24 +62,22 @@ exports.getHighlights = async (req, res) => {
             stats: {
                 tours: tours.length,
                 destinations: places.size,
-                travellers: bookingTotals[0]?.travellers ?? 0,
-                reviews: reviewTotals[0]?.count ?? 0,
-                rating: reviewTotals[0]?.avg ? Math.round(reviewTotals[0].avg * 10) / 10 : 0,
+                travellers: Number(bookingTotals?.travellers || 0),
+                reviews: Number(reviewTotals?.count || 0),
+                rating: reviewTotals?.avg ? Math.round(reviewTotals.avg * 10) / 10 : 0,
             },
-            reviews: reviews
-                .filter((r) => r.user && r.tour && r.tour.status === 'active')
-                .map((r) => ({
-                    _id: r._id,
-                    name: r.user.displayName,
-                    image: r.user.profilePicture || '',
-                    rating: r.rating,
-                    title: r.title || '',
-                    quote: r.content,
-                    tourId: r.tour._id,
-                    tourTitle: r.tour.title,
-                    location: r.tour.location,
-                    verified: !!r.isVerifiedBooking,
-                })),
+            reviews: reviews.map((r) => ({
+                _id: r.id,
+                name: r.display_name,
+                image: r.profile_picture || '',
+                rating: r.rating,
+                title: r.title || '',
+                quote: r.content,
+                tourId: r.tour_id,
+                tourTitle: r.tour_title,
+                location: r.location,
+                verified: !!r.is_verified_booking,
+            })),
         });
     } catch (err) {
         logger.error('Failed to fetch highlights', { error: err.message });
@@ -156,8 +130,8 @@ exports.refreshRates = async (req, res) => {
     try {
         const rates = await fetchLatestRates();
         const settings = await getSettings();
-        settings.currency = { ...(settings.currency?.toObject?.() ?? settings.currency ?? {}), rates, ratesUpdatedAt: new Date() };
-        await settings.save();
+        settings.currency = { ...settings.currency, rates, ratesUpdatedAt: new Date() };
+        await SiteSettings.save(settings);
         await refreshTourPriceIndex();
         return ResponseHandler.success(res, { currency: await getCurrencyConfig() }, 'Exchange rates updated');
     } catch (err) {
@@ -178,32 +152,16 @@ exports.updateSettings = async (req, res) => {
             if (problem) return ResponseHandler.fail(res, 400, problem);
             if (req.body.currency.rates) req.body.currency.ratesUpdatedAt = new Date();
         }
-        const settings = await getSettings();
-        for (const key of UPDATABLE) {
-            if (req.body[key] !== undefined) {
-                // For nested objects (not arrays), merge instead of replace
-                if (
-                    !Array.isArray(req.body[key]) &&
-                    typeof req.body[key] === 'object' &&
-                    !Array.isArray(settings[key])
-                ) {
-                    const current = settings[key]?.toObject?.() ?? settings[key] ?? {};
-                    settings[key] = { ...current, ...req.body[key] };
-                } else {
-                    settings[key] = req.body[key];
-                }
-            }
-        }
-        await settings.save();
+        await getSettings();
+        // Objects merge into what is saved (so one card can change part of a section); lists replace
+        const settings = await SiteSettings.update(Object.fromEntries(keys.map((k) => [k, req.body[k]])));
         clearTravelConfigCache();
         clearCurrencyCache();
         // Price filters and sorting use each tour's USD price, which depends on the rates
         if (req.body.currency?.rates) await refreshTourPriceIndex();
         return ResponseHandler.success(res, { settings }, 'Settings updated');
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            return ResponseHandler.fail(res, 400, Object.values(err.errors).map((e) => e.message.replace('Path ', '').replace(/`/g, '')).join(', '));
-        }
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Failed to update settings', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update settings');
     }
@@ -217,9 +175,8 @@ exports.toggleSection = async (req, res) => {
         const settings = await getSettings();
         const section = settings.contentSections.find(s => s.sectionId === sectionId);
         if (!section) return ResponseHandler.fail(res, 404, 'Section not found');
-        section.isVisible = isVisible;
-        await settings.save();
-        return ResponseHandler.success(res, { settings }, 'Section updated');
+        section.isVisible = isVisible !== false && isVisible !== 'false';
+        return ResponseHandler.success(res, { settings: await SiteSettings.save(settings) }, 'Section updated');
     } catch (err) {
         logger.error('Failed to toggle section', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update section');

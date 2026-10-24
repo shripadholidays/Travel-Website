@@ -1,3 +1,4 @@
+const { validationText } = require('../db/errors');
 const UserInquiry = require('../models/UserInquiry');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
@@ -19,10 +20,7 @@ exports.createInquiry = async (req, res) => {
         if (data.topic && data.topic !== 'trip' && !String(data.message || '').trim()) {
             return ResponseHandler.fail(res, 400, 'Please tell us how we can help.');
         }
-        const newInquiry = new UserInquiry(data);
-
-        // Save the new inquiry to the database
-        const savedInquiry = await newInquiry.save();
+        const savedInquiry = await UserInquiry.insert(data);
 
         // Acknowledge the traveller and alert the team; neither may fail the request.
         Promise.allSettled([
@@ -43,10 +41,7 @@ exports.createInquiry = async (req, res) => {
         return ResponseHandler.success(res, savedInquiry, 'Inquiry submitted successfully!');
     } catch (err) {
         // Handle validation errors or database errors
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
 
         logger.error('Error during inquiry submission', { error: err.message });
         return ResponseHandler.error(res, 500, 'Internal Server Error during inquiry submission.');

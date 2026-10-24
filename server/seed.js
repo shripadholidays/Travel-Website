@@ -4,7 +4,8 @@
  * Seeds: Tours, Destinations, Collections, Blog Posts, Reviews, Site Settings
  */
 require('dotenv').config();
-const mongoose = require('mongoose');
+const db = require('./src/db');
+const { migrate } = require('./src/db/migrate');
 const { recomputeAllTourRatings } = require('./src/services/rating-service');
 const TravelDestination = require('./src/models/TravelDestination');
 const Destination = require('./src/models/Destination');
@@ -508,12 +509,13 @@ function createBlogPosts(authorId) {
 // ─── SEED FUNCTION ────────────────────────────────────
 async function seed() {
     try {
-        await mongoose.connect(process.env.DB_URI);
-        console.log('Connected to MongoDB');
+        db.connect();
+        await migrate();
+        console.log('Connected to the database');
 
         // Get the admin user (or first user) for blog author
-        let user = await User.findOne({ role: 'admin' });
-        if (!user) user = await User.findOne();
+        let user = await User.findOne("role = 'admin'");
+        if (!user) user = await User.findOne(null, [], { order: 'created_at ASC' });
         if (!user) {
             console.log('No users found. Please log in at least once first to create a user, then run the seed again.');
             process.exit(1);
@@ -523,12 +525,12 @@ async function seed() {
         // Clear existing data
         console.log('Clearing existing data...');
         await Promise.all([
-            TravelDestination.deleteMany({}),
-            Destination.deleteMany({}),
-            Collection.deleteMany({}),
-            BlogPost.deleteMany({}),
-            Review.deleteMany({}),
-            SiteSettings.deleteMany({}),
+            TravelDestination.removeWhere(),
+            Destination.removeWhere(),
+            Collection.removeWhere(),
+            BlogPost.removeWhere(),
+            Review.removeWhere(),
+            SiteSettings.remove(),
         ]);
 
         // Seed tours
@@ -617,7 +619,7 @@ async function seed() {
 
         // Seed site settings
         console.log('Seeding site settings...');
-        await SiteSettings.create({
+        await SiteSettings.save({
             companyName: 'Wandeazy Travels',
             contactEmail: 'hello@wandeazy.com',
             // Phone, address and social links stay empty until the real ones are entered in Admin → Settings
@@ -650,8 +652,8 @@ async function seed() {
     } catch (err) {
         console.error('Seed failed:', err);
     } finally {
-        await mongoose.disconnect();
-        console.log('Disconnected from MongoDB');
+        await db.close();
+        console.log('Disconnected from the database');
     }
 }
 

@@ -11,7 +11,7 @@ const contactInfo = { firstName: 'Asha', lastName: 'Rao', email: 'asha@example.c
 // Fixed rates so the arithmetic in these tests is easy to check: 1 USD = 80 INR = 0.5 GBP
 const RATES = { USD: 1, INR: 80, EUR: 0.9, GBP: 0.5, AED: 3.6 };
 
-const tour = (overrides = {}) => TravelDestination.create({
+const tour = (overrides = {}) => TravelDestination.insert({
     title: 'Kerala Backwaters', location: 'Kochi, India', price: 40000, currency: 'INR',
     duration: { days: 5, nights: 4 }, validity: new Date(Date.now() + 365 * 864e5),
     imageURL: 'https://example.com/k.jpg', overview: { about: 'Houseboats.' }, ...overrides,
@@ -23,7 +23,7 @@ beforeAll(connect);
 afterAll(disconnect);
 beforeEach(async () => {
     await reset();
-    await SiteSettings.create({ currency: { base: 'INR', enabled: ['INR', 'USD', 'GBP'], rates: RATES } });
+    await SiteSettings.update({ currency: { base: 'INR', enabled: ['INR', 'USD', 'GBP'], rates: RATES } });
     clearCurrencyCache();
     user = await createUser();
     admin = await createUser('admin');
@@ -76,7 +76,7 @@ describe('checkout in the traveller\'s currency', () => {
     });
 
     it('applies flat coupons in their own currency and checks minimum orders after converting', async () => {
-        await Coupon.create({ code: 'RUPEES500', discountType: 'flat', discountValue: 500, currency: 'INR', minOrderAmount: 50000 });
+        await Coupon.insert({ code: 'RUPEES500', discountType: 'flat', discountValue: 500, currency: 'INR', minOrderAmount: 50000 });
         const t = await tour();
         const usd = await book(t, { currency: 'USD', couponCode: 'RUPEES500' });
         // ₹500 off a $1,000 order is $6.25

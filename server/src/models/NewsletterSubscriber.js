@@ -1,13 +1,10 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const NewsletterSubscriberSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true
-    }
-}, { timestamps: true });
+const NewsletterSubscriber = defineTable({
+    table: 'newsletter_subscribers',
+    fields: {
+        email: { type: 'text', required: true, unique: true, trim: true, lowercase: true, label: 'Email' },
+    },
+});
 
-module.exports = mongoose.model('NewsletterSubscriber', NewsletterSubscriberSchema);
+module.exports = NewsletterSubscriber;

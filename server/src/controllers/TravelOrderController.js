@@ -1,5 +1,8 @@
-const mongoose = require('mongoose');
+const { isId } = require('../db/ids');
+const { Where, populate } = require('../db/sql');
 const TravelOrder = require('../models/TravelOrder');
+const User = require('../models/User');
+const TravelDestination = require('../models/TravelDestination');
 const Booking = require('../models/Booking');
 const Payment = require('../models/Payment');
 const ResponseHandler = require('../utils/response-handler');
@@ -30,16 +33,22 @@ function validateTravellers(travellers, international) {
 
 // Loads the caller's own order; 404 when missing, not theirs, or its service is switched off.
 async function loadOwnOrder(req, res) {
-    if (!mongoose.isValidObjectId(req.params.id)) {
+    if (!isId(req.params.id)) {
         notFound(res);
         return null;
     }
-    const order = await TravelOrder.findOne({ _id: req.params.id, user: req.user._id });
+    const order = await TravelOrder.findOne('id = ? AND user_id = ?', [req.params.id, req.user._id]);
     if (!order || !(await isKindEnabled(order.kind))) {
         notFound(res);
         return null;
     }
     return order;
+}
+
+// The tour booking an order belongs to (its date and tour), for "part of your trip" labels
+async function populateLinkedTrip(orders, tourFields) {
+    await populate(orders, 'linkedBooking', Booking, 'travelDate tour');
+    await populate(orders.map((o) => o.linkedBooking).filter(Boolean), 'tour', TravelDestination, tourFields);
 }
 
 // POST /travel-orders
@@ -64,8 +73,8 @@ exports.createOrder = async (req, res) => {
         }
 
         if (linkedBooking) {
-            const owned = mongoose.isValidObjectId(linkedBooking)
-                && await Booking.exists({ _id: linkedBooking, user: req.user._id });
+            const owned = isId(String(linkedBooking))
+                && await Booking.count('id = ? AND user_id = ?', [String(linkedBooking), req.user._id]) > 0;
             if (!owned) return ResponseHandler.fail(res, 400, 'The linked trip was not found.');
         }
 
@@ -74,7 +83,7 @@ exports.createOrder = async (req, res) => {
         const pay = enabled.includes(String(requestedCurrency || '').toUpperCase()) ? String(requestedCurrency).toUpperCase() : base;
         const charge = { currency: pay, total: convert(pricing.total, pricing.currency, pay, rates), rate: rateBetween(pricing.currency, pay, rates) };
 
-        const order = await TravelOrder.create({
+        const order = await TravelOrder.insert({
             user: req.user._id,
             kind,
             linkedBooking: linkedBooking || null,
@@ -91,7 +100,7 @@ exports.createOrder = async (req, res) => {
         if (!stripe) {
             // No payment gateway configured (local dev): book straight away.
             await finalizeOrder(order);
-            return ResponseHandler.success(res, { order: order.toPublic() }, 'Booking confirmed');
+            return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) }, 'Booking confirmed');
         }
 
         let paymentIntent;
@@ -105,10 +114,10 @@ exports.createOrder = async (req, res) => {
             logger.error('Stripe payment intent creation failed', { orderId: order._id, error: stripeErr.message });
             order.status = 'failed';
             order.failureReason = 'Payment could not be started';
-            await order.save();
+            await TravelOrder.save(order);
             return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');
         }
-        const payment = await Payment.create({
+        const payment = await Payment.insert({
             order: order._id,
             user: req.user._id,
             amount: charge.total,
@@ -118,9 +127,9 @@ exports.createOrder = async (req, res) => {
             status: 'pending',
         });
         order.paymentId = payment._id;
-        await order.save();
+        await TravelOrder.save(order);
 
-        return ResponseHandler.success(res, { order: order.toPublic(), clientSecret: paymentIntent.client_secret }, 'Order created');
+        return ResponseHandler.success(res, { order: TravelOrder.toPublic(order), clientSecret: paymentIntent.client_secret }, 'Order created');
     } catch (err) {
         return sendProviderError(res, err, 'Failed to create the booking');
     }
@@ -131,7 +140,7 @@ exports.confirmOrder = async (req, res) => {
     try {
         const order = await loadOwnOrder(req, res);
         if (!order) return undefined;
-        if (order.status !== 'pending') return ResponseHandler.success(res, { order: order.toPublic() });
+        if (order.status !== 'pending') return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) });
 
         const stripe = stripeClient();
         const payment = order.paymentId ? await Payment.findById(order.paymentId) : null;
@@ -140,13 +149,13 @@ exports.confirmOrder = async (req, res) => {
             if (intent.status !== 'succeeded') return ResponseHandler.fail(res, 400, 'Payment not completed');
             payment.status = 'completed';
             payment.gatewayResponse = intent;
-            await payment.save();
+            await Payment.save(payment);
         } else if (stripe) {
             return ResponseHandler.fail(res, 400, 'Payment not completed');
         }
 
         await finalizeOrder(order);
-        return ResponseHandler.success(res, { order: order.toPublic() });
+        return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) });
     } catch (err) {
         logger.error('Failed to confirm travel order', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to confirm the booking');
@@ -157,10 +166,10 @@ exports.confirmOrder = async (req, res) => {
 exports.getMyOrders = async (req, res) => {
     try {
         const kinds = await enabledKinds();
-        const orders = await TravelOrder.find({ user: req.user._id, kind: { $in: kinds } })
-            .sort({ createdAt: -1 })
-            .populate({ path: 'linkedBooking', select: 'travelDate tour', populate: { path: 'tour', select: 'title location' } });
-        return ResponseHandler.success(res, { orders: orders.map((o) => o.toPublic()) });
+        const where = new Where().add('user_id = ?', req.user._id).in('kind', kinds);
+        const orders = await TravelOrder.find({ where: where.sql, args: where.args, order: 'created_at DESC' });
+        await populateLinkedTrip(orders, 'title location');
+        return ResponseHandler.success(res, { orders: orders.map(TravelOrder.toPublic) });
     } catch (err) {
         logger.error('Failed to list travel orders', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to load your bookings');
@@ -183,8 +192,8 @@ exports.cancelOrder = async (req, res) => {
         }
         await refundPayment(order);
         order.status = 'cancelled';
-        await order.save();
-        return ResponseHandler.success(res, { order: order.toPublic() }, 'Booking cancelled');
+        await TravelOrder.save(order);
+        return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) }, 'Booking cancelled');
     } catch (err) {
         return sendProviderError(res, err, 'Failed to cancel the booking');
     }
@@ -193,14 +202,12 @@ exports.cancelOrder = async (req, res) => {
 // GET /admin/travel-orders?kind&status — admins always see every order
 exports.adminList = async (req, res) => {
     try {
-        const filter = {};
-        if (KINDS.includes(req.query.kind)) filter.kind = req.query.kind;
-        if (STATUSES.includes(req.query.status)) filter.status = req.query.status;
-        const orders = await TravelOrder.find(filter)
-            .sort({ createdAt: -1 })
-            .limit(200)
-            .populate('user', 'displayName email')
-            .populate({ path: 'linkedBooking', select: 'travelDate tour', populate: { path: 'tour', select: 'title' } });
+        const where = new Where();
+        if (KINDS.includes(req.query.kind)) where.add('kind = ?', req.query.kind);
+        if (STATUSES.includes(req.query.status)) where.add('status = ?', req.query.status);
+        const orders = await TravelOrder.find({ where: where.sql, args: where.args, order: 'created_at DESC', limit: 200 });
+        await populate(orders, 'user', User, 'displayName email');
+        await populateLinkedTrip(orders, 'title');
         return ResponseHandler.success(res, { orders });
     } catch (err) {
         logger.error('Failed to list travel orders (admin)', { error: err.message });
@@ -213,7 +220,7 @@ exports.adminUpdate = async (req, res) => {
     try {
         const { status } = req.body;
         if (!STATUSES.includes(status)) return ResponseHandler.fail(res, 400, 'Invalid status.');
-        if (!mongoose.isValidObjectId(req.params.id)) return ResponseHandler.fail(res, 404, 'Order not found');
+        if (!isId(req.params.id)) return ResponseHandler.fail(res, 404, 'Order not found');
         const order = await TravelOrder.findById(req.params.id);
         if (!order) return ResponseHandler.fail(res, 404, 'Order not found');
 
@@ -222,8 +229,8 @@ exports.adminUpdate = async (req, res) => {
             await refundPayment(order);
         }
         order.status = status;
-        await order.save();
-        await order.populate('user', 'displayName email');
+        await TravelOrder.save(order);
+        await populate(order, 'user', User, 'displayName email');
         return ResponseHandler.success(res, { order }, 'Order updated');
     } catch (err) {
         return sendProviderError(res, err, 'Failed to update the order');

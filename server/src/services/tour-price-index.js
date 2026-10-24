@@ -1,4 +1,4 @@
-const TravelDestination = require('../models/TravelDestination');
+const { run } = require('../db');
 const { getCurrencyConfig, clearCurrencyCache, SUPPORTED, normalizeCode } = require('./currency');
 
 /**
@@ -10,15 +10,10 @@ async function refreshTourPriceIndex() {
     const { rates } = await getCurrencyConfig();
     // Older tours stored a symbol ("$", "₹") instead of a code
     for (const symbol of ['$', '₹', '€', '£']) {
-        await TravelDestination.updateMany({ currency: symbol }, { $set: { currency: normalizeCode(symbol) } });
+        await run('UPDATE tours SET currency = ? WHERE currency = ?', [normalizeCode(symbol), symbol]);
     }
     for (const code of SUPPORTED) {
-        const perUSD = rates[code] || 1;
-        await TravelDestination.updateMany(
-            { currency: code },
-            [{ $set: { priceUSD: { $round: [{ $divide: ['$price', perUSD] }, 2] } } }],
-            { updatePipeline: true },
-        );
+        await run('UPDATE tours SET price_usd = round(coalesce(price, 0) / ?, 2) WHERE currency = ?', [rates[code] || 1, code]);
     }
 }
 

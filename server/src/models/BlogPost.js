@@ -1,54 +1,21 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const blogPostSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        index: true
+const BlogPost = defineTable({
+    table: 'blog_posts',
+    fields: {
+        title: { type: 'text', required: true, label: 'Title' },
+        slug: { type: 'text', required: true, unique: true },
+        content: { type: 'text', required: true, label: 'Content' },
+        excerpt: { type: 'text', required: true, maxlength: 500, label: 'Excerpt' },
+        author: { type: 'ref', required: true, col: 'author_id' },
+        coverImage: { type: 'text', required: true, label: 'Cover image' },
+        tags: { type: 'json', default: [] },
+        // draft → pending (submitted by a writer) → published, or rejected with a note
+        status: { type: 'text', enum: ['draft', 'pending', 'published', 'rejected'], default: 'draft' },
+        // The editor's note when an article is sent back for changes
+        reviewNote: { type: 'text', maxlength: 1000, default: '', label: 'Review note' },
+        publishedAt: 'date',
     },
-    slug: {
-        type: String,
-        required: true,
-        unique: true,
-        index: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-    excerpt: {
-        type: String,
-        required: true,
-        maxlength: 500
-    },
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    coverImage: {
-        type: String,
-        required: true
-    },
-    tags: [String],
-    // draft → pending (submitted by a writer) → published, or rejected with a note
-    status: {
-        type: String,
-        enum: ['draft', 'pending', 'published', 'rejected'],
-        default: 'draft',
-        index: true
-    },
-    // The editor's note when an article is sent back for changes
-    reviewNote: {
-        type: String,
-        maxlength: 1000,
-        default: ''
-    },
-    publishedAt: {
-        type: Date
-    }
-}, { timestamps: true });
+});
 
-blogPostSchema.index({ title: 'text', content: 'text', excerpt: 'text' });
-
-module.exports = mongoose.model('BlogPost', blogPostSchema);
+module.exports = BlogPost;

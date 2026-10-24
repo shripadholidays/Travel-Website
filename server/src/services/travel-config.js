@@ -15,7 +15,7 @@ function envPct(name, fallback) {
 
 async function getTravelConfig() {
     if (cached && Date.now() - cachedAt < TTL_MS) return cached;
-    const settings = await SiteSettings.findOne().lean();
+    const settings = await SiteSettings.find();
     cached = {
         features: {
             flights: settings?.features?.flights === true,

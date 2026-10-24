@@ -1,4 +1,7 @@
+const { populate } = require('../db/sql');
+const { isDuplicate, validationText } = require('../db/errors');
 const Review = require('../models/Review');
+const User = require('../models/User');
 const Booking = require('../models/Booking');
 const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
@@ -15,18 +18,14 @@ exports.createReview = async (req, res) => {
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
 
         // Check for existing review
-        const existingReview = await Review.findOne({ tour: tourId, user: req.user._id });
+        const existingReview = await Review.findOne('tour_id = ? AND user_id = ?', [tour._id, req.user._id]);
         if (existingReview) return ResponseHandler.fail(res, 400, 'You have already reviewed this tour');
 
         // Check if user has a confirmed booking
-        const hasBooking = await Booking.findOne({
-            user: req.user._id,
-            tour: tourId,
-            status: { $in: ['confirmed', 'completed'] }
-        });
+        const hasBooking = await Booking.findOne("user_id = ? AND tour_id = ? AND status IN ('confirmed', 'completed')", [req.user._id, tour._id]);
 
-        const review = await Review.create({
-            tour: tourId,
+        const review = await Review.insert({
+            tour: tour._id,
             user: req.user._id,
             rating,
             title,
@@ -34,18 +33,14 @@ exports.createReview = async (req, res) => {
             isVerifiedBooking: !!hasBooking
         });
 
-        await recomputeTourRating(tourId);
+        await recomputeTourRating(tour._id);
 
-        const populatedReview = await Review.findById(review._id)
-            .populate('user', 'displayName profilePicture');
+        const populatedReview = await populate(review, 'user', User, 'displayName profilePicture');
 
         return ResponseHandler.success(res, { review: populatedReview }, 'Review submitted successfully');
     } catch (err) {
-        if (err.code === 11000) return ResponseHandler.fail(res, 400, 'You have already reviewed this tour');
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
+        if (isDuplicate(err)) return ResponseHandler.fail(res, 400, 'You have already reviewed this tour');
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Error creating review', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to submit review');
     }
@@ -57,13 +52,11 @@ exports.getTourReviews = async (req, res) => {
         const { tourId } = req.params;
         const { page = 1, limit = 10 } = req.query;
 
-        const reviews = await Review.find({ tour: tourId })
-            .populate('user', 'displayName profilePicture')
-            .sort({ createdAt: -1 })
-            .skip((Number(page) - 1) * Number(limit))
-            .limit(Number(limit));
-
-        const total = await Review.countDocuments({ tour: tourId });
+        const [reviews, total] = await Promise.all([
+            Review.find({ where: 'tour_id = ?', args: [String(tourId)], order: 'created_at DESC', limit: Number(limit), offset: (Number(page) - 1) * Number(limit) }),
+            Review.count('tour_id = ?', [String(tourId)]),
+        ]);
+        await populate(reviews, 'user', User, 'displayName profilePicture');
 
         return ResponseHandler.success(res, {
             reviews,

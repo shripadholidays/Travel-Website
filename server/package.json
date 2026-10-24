@@ -20,10 +20,15 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "ratings:recompute": "node scripts/recompute-ratings.js",
-    "content:clean": "node scripts/clean-placeholder-content.js"
+    "content:clean": "node scripts/clean-placeholder-content.js",
+    "db:migrate": "node -e \"require('dotenv').config();const db=require('./src/db');db.connect();require('./src/db/migrate').migrate().then(a=>{console.log(a.length?'Applied: '+a.join(', '):'Database is up to date');return db.close()})\"",
+    "db:import-mongo": "node scripts/import-from-mongo.js",
+    "seed": "node seed.js",
+    "staff:test-accounts": "node scripts/create-test-staff.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1096.0",
+    "@libsql/client": "^0.18.0",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
@@ -36,8 +41,6 @@
     "google-auth-library": "^10.3.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
-    "mongoose-paginate-v2": "^1.9.1",
     "morgan": "^1.10.1",
     "multer": "^2.2.0",
     "nodemailer": "^8.0.1",

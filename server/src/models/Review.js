@@ -1,39 +1,16 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const reviewSchema = new mongoose.Schema({
-    tour: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Travel_Destination',
-        required: true,
-        index: true
+// One review per traveller per tour (unique index in the migration)
+const Review = defineTable({
+    table: 'reviews',
+    fields: {
+        tour: { type: 'ref', required: true, col: 'tour_id' },
+        user: { type: 'ref', required: true, col: 'user_id' },
+        rating: { type: 'int', required: true, min: 1, max: 5, label: 'Rating' },
+        title: { type: 'text', maxlength: 200, label: 'Title' },
+        content: { type: 'text', required: true, maxlength: 2000, label: 'Review' },
+        isVerifiedBooking: { type: 'bool', default: false },
     },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5
-    },
-    title: {
-        type: String,
-        maxlength: 200
-    },
-    content: {
-        type: String,
-        required: true,
-        maxlength: 2000
-    },
-    isVerifiedBooking: {
-        type: Boolean,
-        default: false
-    }
-}, { timestamps: true });
+});
 
-reviewSchema.index({ tour: 1, createdAt: -1 });
-reviewSchema.index({ user: 1, tour: 1 }, { unique: true });
-
-module.exports = mongoose.model('Review', reviewSchema);
+module.exports = Review;

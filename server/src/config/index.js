@@ -17,14 +17,10 @@ const config = {
         apiPrefix:          e.API_PREFIX                       || '/api/v1',
     },
 
+    // Turso (libSQL). Locally a SQLite file; in production the libsql:// URL and token from the Turso dashboard
     db: {
-        uri:             e.DB_URI                              || 'mongodb://127.0.0.1:27017/wandeazy',
-        maxRetries:      Number(e.DB_MAX_RETRIES)              || 5,
-        retryDelayMs:    Number(e.DB_RETRY_DELAY_MS)           || 5_000,
-        connectTimeoutMs:Number(e.DB_CONNECT_TIMEOUT_MS)       || 30_000,
-        socketTimeoutMs: Number(e.DB_SOCKET_TIMEOUT_MS)        || 45_000,
-        maxPoolSize:     Number(isProd ? e.DB_POOL_MAX_PROD : e.DB_POOL_MAX_DEV)  || (isProd ? 50 : 10),
-        minPoolSize:     Number(isProd ? e.DB_POOL_MIN_PROD : e.DB_POOL_MIN_DEV)  || (isProd ? 10 : 2),
+        url:       e.TURSO_DATABASE_URL || e.DATABASE_URL         || 'file:data/wandeazy.db',
+        authToken: e.TURSO_AUTH_TOKEN                             || '',
     },
 
     auth: {

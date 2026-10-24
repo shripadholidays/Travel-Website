@@ -1,37 +1,16 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const collectionSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
+const Collection = defineTable({
+    table: 'collections',
+    fields: {
+        name: { type: 'text', required: true },
+        slug: { type: 'text', required: true, unique: true },
+        description: { type: 'text', required: true },
+        coverImage: { type: 'text', required: true },
+        tours: { type: 'refs', default: [] },     // tour ids, in display order
+        isActive: { type: 'bool', default: true },
+        displayOrder: { type: 'int', default: 0 },
     },
-    slug: {
-        type: String,
-        required: true,
-        unique: true,
-        index: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    coverImage: {
-        type: String,
-        required: true
-    },
-    tours: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Travel_Destination'
-    }],
-    isActive: {
-        type: Boolean,
-        default: true,
-        index: true
-    },
-    displayOrder: {
-        type: Number,
-        default: 0
-    }
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model('Collection', collectionSchema);
+module.exports = Collection;

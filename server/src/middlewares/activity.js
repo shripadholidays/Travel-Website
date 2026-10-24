@@ -39,7 +39,7 @@ module.exports = function activity(resource, resolve) {
             if (res.statusCode >= 400 || !req.user) return;
             const extra = (resolve && resolve(req, body)) || {};
             const named = describe(body?.data, req.body);
-            ActivityLog.create({
+            ActivityLog.insert({
                 actor: req.user._id,
                 actorName: req.user.displayName,
                 actorRole: req.user.role,

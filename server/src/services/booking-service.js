@@ -1,4 +1,8 @@
+const { all } = require('../db');
+const { populate } = require('../db/sql');
 const Booking = require('../models/Booking');
+const TravelDestination = require('../models/TravelDestination');
+const User = require('../models/User');
 const Coupon = require('../models/Coupon');
 const Payment = require('../models/Payment');
 const { refundPayment } = require('./travel-order-service');
@@ -38,7 +42,7 @@ function parseTravelDate(value) {
  */
 function couponDiscount(coupon, subtotal, currency, rates) {
     const orderInCouponCurrency = convert(subtotal, currency, coupon.currency || 'USD', rates);
-    const { valid, reason } = coupon.isValid(orderInCouponCurrency, currency, rates);
+    const { valid, reason } = Coupon.isValid(coupon, orderInCouponCurrency);
     if (!valid) return { valid, reason };
     const discount = coupon.discountType === 'percent'
         ? round2(subtotal * (coupon.discountValue / 100))
@@ -70,7 +74,7 @@ async function priceBooking({ tour, numberOfTravelers, addons = [], couponCode, 
 
     let coupon = null;
     if (couponCode) {
-        const found = await Coupon.findOne({ code: String(couponCode).toUpperCase().trim() });
+        const found = await Coupon.findByCode(couponCode);
         if (!found) throw new BookingError(400, 'That coupon code was not found.');
         const result = couponDiscount(found, subtotal, pay, rates);
         if (!result.valid) throw new BookingError(400, result.reason);
@@ -97,17 +101,12 @@ async function priceBooking({ tour, numberOfTravelers, addons = [], couponCode, 
 async function confirmBooking(booking) {
     if (booking.status !== 'pending') return booking;
     booking.status = 'confirmed';
-    await booking.save();
+    await Booking.save(booking);
 
-    if (booking.coupon?.code) {
-        await Coupon.updateOne({ code: booking.coupon.code }, { $inc: { usedCount: 1 } });
-    }
+    if (booking.coupon?.code) await Coupon.changeUses(booking.coupon.code, 1);
 
     try {
-        await booking.populate([
-            { path: 'tour', select: 'title imageURL location price duration' },
-            { path: 'user', select: 'displayName email' },
-        ]);
+        await populateBooking(booking, 'title imageURL location price duration');
         const email = booking.contactInfo?.email || booking.user?.email;
         if (email) await sendBookingConfirmation(booking, email);
         await sendAdminAlert(`New booking: ${booking.tour?.title || 'tour'}`, [
@@ -141,7 +140,7 @@ async function cancelBooking(booking, { byAdmin = false } = {}) {
     }
 
     const wasConfirmed = booking.status === 'confirmed';
-    const payment = booking.paymentId ? await Payment.findById(booking.paymentId) : null;
+    const payment = booking.paymentId ? await Payment.findById(booking.paymentId?._id ?? booking.paymentId) : null;
     const paid = payment?.status === 'completed';
     // The refund goes first: a booking is only cancelled once the money is on its way back
     await refundPayment(booking);
@@ -149,14 +148,12 @@ async function cancelBooking(booking, { byAdmin = false } = {}) {
     booking.status = 'cancelled';
     booking.cancelledAt = new Date();
     booking.refundedAmount = paid ? payment.amount : 0;
-    await booking.save();
+    await Booking.save(booking);
 
-    if (wasConfirmed && booking.coupon?.code) {
-        await Coupon.updateOne({ code: booking.coupon.code, usedCount: { $gt: 0 } }, { $inc: { usedCount: -1 } });
-    }
+    if (wasConfirmed && booking.coupon?.code) await Coupon.changeUses(booking.coupon.code, -1);
 
     try {
-        await booking.populate([{ path: 'tour', select: 'title' }, { path: 'user', select: 'displayName email' }]);
+        await populateBooking(booking, 'title');
         await sendAdminAlert(`Booking cancelled: ${booking.tour?.title || 'tour'}`, [
             ['Traveller', booking.user?.displayName || booking.user?.email],
             ['Travel date', new Date(booking.travelDate).toDateString()],
@@ -173,19 +170,25 @@ async function cancelBooking(booking, { byAdmin = false } = {}) {
  * Confirmed trips whose last day has passed become "completed" (it unlocks
  * reviews-as-verified and article writing). Cheap to call before reads.
  */
-async function completePastBookings(filter = {}) {
-    const started = await Booking.find({ ...filter, status: 'confirmed', travelDate: { $lt: new Date() } })
-        .select('travelDate tour')
-        .populate('tour', 'duration')
-        .lean();
-    const finished = started.filter((b) => {
-        const days = b.tour?.duration?.days || 1;
-        return new Date(b.travelDate).getTime() + days * 864e5 < Date.now();
-    });
-    if (finished.length) {
-        await Booking.updateMany({ _id: { $in: finished.map((b) => b._id) }, status: 'confirmed' }, { status: 'completed' });
+async function completePastBookings({ user } = {}) {
+    const args = [new Date().toISOString()];
+    let sql = `SELECT b.id, b.travel_date, t.duration_days FROM bookings b LEFT JOIN tours t ON t.id = b.tour_id
+               WHERE b.status = 'confirmed' AND b.travel_date < ?`;
+    if (user) { sql += ' AND b.user_id = ?'; args.push(String(user._id ?? user)); }
+    const started = await all(sql, args);
+    const finished = started.filter((b) => new Date(b.travel_date).getTime() + (b.duration_days || 1) * 864e5 < Date.now()).map((b) => b.id);
+    for (let i = 0; i < finished.length; i += 400) {
+        const part = finished.slice(i, i + 400);
+        await Booking.setWhere({ status: 'completed' }, `status = 'confirmed' AND id IN (${part.map(() => '?').join(',')})`, part);
     }
     return finished.length;
 }
 
-module.exports = { couponDiscount, completePastBookings, ADDON_CATALOG, BookingError, FREE_CANCELLATION_HOURS, parseTravelDate, priceBooking, confirmBooking, cancelBooking };
+/** Loads a booking's tour (with the given fields) and its traveller's name and email. */
+async function populateBooking(bookings, tourFields = 'title imageURL location price duration') {
+    await populate(bookings, 'tour', TravelDestination, tourFields);
+    await populate(bookings, 'user', User, 'displayName email');
+    return bookings;
+}
+
+module.exports = { couponDiscount, completePastBookings, populateBooking, ADDON_CATALOG, BookingError, FREE_CANCELLATION_HOURS, parseTravelDate, priceBooking, confirmBooking, cancelBooking };

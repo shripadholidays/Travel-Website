@@ -1,73 +1,41 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const couponSchema = new mongoose.Schema({
-    code: {
-        type: String,
-        required: true,
-        unique: true,
-        uppercase: true,
-        trim: true,
-        index: true,
+const Coupon = defineTable({
+    table: 'coupons',
+    fields: {
+        code: { type: 'text', required: true, unique: true, uppercase: true, trim: true, label: 'Code' },
+        discountType: { type: 'text', enum: ['percent', 'flat'], required: true, label: 'Discount type' },
+        discountValue: { type: 'number', required: true, min: 0, label: 'Discount' },
+        // Flat discounts and the minimum order are in this currency (converted for other checkouts)
+        currency: { type: 'text', enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'], default: 'USD' },
+        minOrderAmount: { type: 'number', default: 0 },
+        maxUses: { type: 'int', default: null },       // null = unlimited
+        usedCount: { type: 'int', default: 0 },
+        expiresAt: { type: 'date', default: null },    // null = no expiry
+        isActive: { type: 'bool', default: true },
+        description: 'text',
     },
-    discountType: {
-        type: String,
-        enum: ['percent', 'flat'],
-        required: true,
-    },
-    discountValue: {
-        type: Number,
-        required: true,
-        min: 0,
-    },
-    // Flat discounts and the minimum order are in this currency (converted for other checkouts)
-    currency: {
-        type: String,
-        enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'],
-        default: 'USD',
-    },
-    minOrderAmount: {
-        type: Number,
-        default: 0,
-    },
-    maxUses: {
-        type: Number,
-        default: null, // null = unlimited
-    },
-    usedCount: {
-        type: Number,
-        default: 0,
-    },
-    expiresAt: {
-        type: Date,
-        default: null, // null = no expiry
-        index: true,
-    },
-    isActive: {
-        type: Boolean,
-        default: true,
-        index: true,
-    },
-    description: String,
-}, { timestamps: true });
+});
 
-// orderAmount is in the coupon's own currency
-couponSchema.methods.isValid = function (orderAmount = 0) {
-    if (!this.isActive) return { valid: false, reason: 'Coupon is inactive.' };
-    if (this.expiresAt && this.expiresAt < new Date()) return { valid: false, reason: 'Coupon has expired.' };
-    if (this.maxUses !== null && this.usedCount >= this.maxUses) return { valid: false, reason: 'Coupon usage limit reached.' };
-    if (orderAmount < this.minOrderAmount) {
+Coupon.findByCode = (code) => Coupon.findOne('code = ?', [String(code || '').toUpperCase().trim()]);
+
+/** Whether a coupon can be used on an order (orderAmount is in the coupon's own currency). */
+Coupon.isValid = (coupon, orderAmount = 0) => {
+    if (!coupon.isActive) return { valid: false, reason: 'Coupon is inactive.' };
+    if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) return { valid: false, reason: 'Coupon has expired.' };
+    if (coupon.maxUses !== null && coupon.maxUses !== undefined && coupon.usedCount >= coupon.maxUses) return { valid: false, reason: 'Coupon usage limit reached.' };
+    if (orderAmount < (coupon.minOrderAmount || 0)) {
         const { formatMoney } = require('../services/currency');
-        return { valid: false, reason: `This code needs an order of at least ${formatMoney(this.minOrderAmount, this.currency || 'USD')}.` };
+        return { valid: false, reason: `This code needs an order of at least ${formatMoney(coupon.minOrderAmount, coupon.currency || 'USD')}.` };
     }
     return { valid: true };
 };
 
-couponSchema.methods.applyDiscount = function (orderAmount) {
-    if (this.discountType === 'percent') {
-        return Math.round(orderAmount * (this.discountValue / 100) * 100) / 100;
-    }
-    return Math.min(this.discountValue, orderAmount);
+/** One more use (on confirmation), or one fewer (on cancellation, never below 0). */
+Coupon.changeUses = async (code, delta) => {
+    const { run } = require('../db');
+    const guard = delta < 0 ? ' AND used_count > 0' : '';
+    await run(`UPDATE coupons SET used_count = used_count + ?, updated_at = ? WHERE code = ?${guard}`, [delta, new Date().toISOString(), code]);
 };
 
-const Coupon = mongoose.model('Coupon', couponSchema);
 module.exports = Coupon;

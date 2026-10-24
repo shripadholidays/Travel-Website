@@ -19,7 +19,7 @@ const form = (overrides = {}) => ({
     overview: { about: 'Houseboats and spice gardens.', gallery: [] },
     ...overrides,
 });
-const tour = (overrides = {}) => TravelDestination.create({ ...form(), validity: new Date(Date.now() + 365 * 864e5), ...overrides });
+const tour = (overrides = {}) => TravelDestination.insert({ ...form(), validity: new Date(Date.now() + 365 * 864e5), ...overrides });
 
 let admin;
 let editor;
@@ -92,7 +92,7 @@ describe('staff accounts', () => {
 
     it('suspends instead of deleting people with bookings, and blocks suspended sign-ins', async () => {
         const t = await tour();
-        await Booking.create({ user: traveller._id, tour: t._id, travelDate: new Date(future(20)), numberOfTravelers: 1, contactInfo, totalAmount: 850 });
+        await Booking.insert({ user: traveller._id, tour: t._id, travelDate: new Date(future(20)), numberOfTravelers: 1, contactInfo, totalAmount: 850 });
         const del = await request(app).delete(`/api/v1/admin/users/${traveller._id}`).set(as(admin));
         expect(del.status).toBe(409);
         expect(del.body.message).toMatch(/Suspend/);
@@ -138,7 +138,7 @@ describe('listing tours', () => {
         const res = await request(app).post('/api/v1/tours').set(as(editor)).send(form({ imageURL: '', price: 0 }));
         expect(res.status).toBe(400);
         expect(res.body.message).toMatch(/cover image is required/);
-        expect(res.body.message).toMatch(/at least \$1/);
+        expect(res.body.message).toMatch(/at least 1 [A-Z]{3}/);
     });
 
     it('saves an unfinished draft, but only publishes a complete tour', async () => {
@@ -163,14 +163,14 @@ describe('listing tours', () => {
     it('will not delete a booked tour, and removes deleted tours from collections', async () => {
         const booked = await tour();
         const spare = await tour({ title: 'Spare' });
-        await Booking.create({ user: traveller._id, tour: booked._id, travelDate: new Date(future(20)), numberOfTravelers: 1, contactInfo, totalAmount: 850 });
-        await Collection.create({ name: 'Mix', slug: 'mix', description: 'd', coverImage: 'c', tours: [booked._id, spare._id] });
+        await Booking.insert({ user: traveller._id, tour: booked._id, travelDate: new Date(future(20)), numberOfTravelers: 1, contactInfo, totalAmount: 850 });
+        await Collection.insert({ name: 'Mix', slug: 'mix', description: 'd', coverImage: 'c', tours: [booked._id, spare._id] });
 
         const blocked = await request(app).delete(`/api/v1/tours/${booked._id}`).set(as(editor));
         expect(blocked.status).toBe(409);
         expect(blocked.body.message).toMatch(/Hidden/);
         expect((await request(app).delete(`/api/v1/tours/${spare._id}`).set(as(editor))).status).toBe(200);
-        expect((await Collection.findOne({ slug: 'mix' })).tours.map(String)).toEqual([String(booked._id)]);
+        expect((await Collection.findOne('slug = ?', ['mix'])).tours.map(String)).toEqual([String(booked._id)]);
     });
 
     it('duplicates a tour as a draft and runs bulk actions', async () => {
@@ -181,7 +181,7 @@ describe('listing tours', () => {
 
         const bulk = await request(app).post('/api/v1/tours/bulk-action').set(as(editor)).send({ ids: [a._id, b._id], action: 'inactive' });
         expect(bulk.body.data.affected).toBe(2);
-        expect(await TravelDestination.countDocuments({ status: 'inactive' })).toBe(2);
+        expect(await TravelDestination.count("status = 'inactive'")).toBe(2);
     });
 
     it('imports the good rows and reports the bad ones', async () => {
@@ -199,7 +199,7 @@ describe('listing tours', () => {
         // The log is written once the response has gone out
         let entries = [];
         for (let i = 0; i < 20 && entries.length === 0; i += 1) {
-            entries = await ActivityLog.find({ resource: 'tour' });
+            entries = await ActivityLog.find({ where: "resource = 'tour'" });
             if (!entries.length) await new Promise((r) => setTimeout(r, 25));
         }
         expect(entries[0]).toMatchObject({ action: 'create', label: 'Kerala Backwaters', actorName: editor.displayName });
@@ -221,7 +221,7 @@ describe('bookings and the listing limits', () => {
 
     it('does not reopen a cancelled booking', async () => {
         const t = await tour();
-        const b = await Booking.create({ user: traveller._id, tour: t._id, travelDate: new Date(future(20)), numberOfTravelers: 1, contactInfo, totalAmount: 850, status: 'cancelled' });
+        const b = await Booking.insert({ user: traveller._id, tour: t._id, travelDate: new Date(future(20)), numberOfTravelers: 1, contactInfo, totalAmount: 850, status: 'cancelled' });
         const res = await request(app).patch(`/api/v1/admin/bookings/${b._id}`).set(as(support)).send({ status: 'confirmed' });
         expect(res.status).toBe(409);
         const list = await request(app).get('/api/v1/admin/bookings?search=asha').set(as(support));
@@ -232,7 +232,7 @@ describe('bookings and the listing limits', () => {
 
 describe('destinations and coupons', () => {
     it('hides switched-off destinations from the site but not from the admin list', async () => {
-        await Destination.create({ name: 'Hidden Isle', slug: 'hidden-isle', country: 'Fiji', continent: 'Oceania', description: 'd', coverImage: 'c', isActive: false });
+        await Destination.insert({ name: 'Hidden Isle', slug: 'hidden-isle', country: 'Fiji', continent: 'Oceania', description: 'd', coverImage: 'c', isActive: false });
         expect((await request(app).get('/api/v1/destinations')).body.data.destinations).toHaveLength(0);
         expect((await request(app).get('/api/v1/destinations/hidden-isle')).status).toBe(404);
         const adminList = await request(app).get('/api/v1/destinations?scope=admin').set(as(editor));
@@ -248,5 +248,5 @@ describe('destinations and coupons', () => {
 });
 
 afterEach(async () => {
-    await User.updateMany({}, { isSuspended: false });
+    await User.setWhere({ isSuspended: false });
 });

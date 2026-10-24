@@ -1,3 +1,5 @@
+const { Where, containsAny, jsonHas, populate } = require('../db/sql');
+const { isDuplicate, validationText } = require('../db/errors');
 const BlogPost = require('../models/BlogPost');
 const User = require('../models/User');
 const ResponseHandler = require('../utils/response-handler');
@@ -22,25 +24,27 @@ const STAFF_STATUSES = ['draft', 'pending', 'published', 'rejected'];
 exports.getPosts = async (req, res) => {
     try {
         const { page = 1, limit = config.pagination.defaultLimit, tag, search, status } = req.query;
-        const query = {};
+        const where = new Where();
 
         // Travellers only ever see published articles; staff can filter by status
-        if (!isStaff(req.user)) {
-            query.status = 'published';
-        } else if (status && STAFF_STATUSES.includes(status)) {
-            query.status = status;
+        const shown = !isStaff(req.user) ? 'published' : (STAFF_STATUSES.includes(status) ? status : null);
+        if (shown) where.add('status = ?', shown);
+
+        if (tag) where.add(jsonHas('tags'), String(tag));
+        for (const word of String(search || '').trim().split(/\s+/).filter(Boolean).slice(0, 8)) {
+            const m = containsAny(['title', 'content', 'excerpt'], word);
+            where.add(m.sql, ...m.args);
         }
 
-        if (tag) query.tags = tag;
-        if (search) query.$text = { $search: search };
-
-        const posts = await BlogPost.find(query)
-            .populate('author', 'displayName profilePicture')
-            .sort(query.status === 'published' ? { publishedAt: -1, createdAt: -1 } : { createdAt: -1 })
-            .skip((Number(page) - 1) * Number(limit))
-            .limit(Number(limit));
-
-        const total = await BlogPost.countDocuments(query);
+        const [posts, total] = await Promise.all([
+            BlogPost.find({
+                where: where.sql, args: where.args,
+                order: shown === 'published' ? 'published_at DESC, created_at DESC' : 'created_at DESC',
+                limit: Number(limit), offset: (Number(page) - 1) * Number(limit),
+            }),
+            BlogPost.count(where.sql, where.args),
+        ]);
+        await populate(posts, 'author', User, 'displayName profilePicture');
 
         return ResponseHandler.success(res, {
             posts,
@@ -55,9 +59,8 @@ exports.getPosts = async (req, res) => {
 // GET /blog/mine — the signed-in writer's own articles, every status
 exports.getMyPosts = async (req, res) => {
     try {
-        const posts = await BlogPost.find({ author: req.user._id })
-            .select('title slug excerpt coverImage status reviewNote publishedAt createdAt updatedAt')
-            .sort({ updatedAt: -1 });
+        const posts = (await BlogPost.find({ where: 'author_id = ?', args: [req.user._id], order: 'updated_at DESC' }))
+            .map(({ _id, title, slug, excerpt, coverImage, status, reviewNote, publishedAt, createdAt, updatedAt }) => ({ _id, title, slug, excerpt, coverImage, status, reviewNote, publishedAt, createdAt, updatedAt }));
         return ResponseHandler.success(res, { posts }, 'Your articles fetched successfully');
     } catch (err) {
         logger.error('Error fetching own posts', { error: err.message });
@@ -68,8 +71,8 @@ exports.getMyPosts = async (req, res) => {
 // GET /blog/:slug
 exports.getPostBySlug = async (req, res) => {
     try {
-        const post = await BlogPost.findOne({ slug: req.params.slug })
-            .populate('author', 'displayName profilePicture');
+        const post = await BlogPost.findOne('slug = ?', [req.params.slug]);
+        if (post) await populate(post, 'author', User, 'displayName profilePicture');
         // Unpublished articles exist only for their writer and the editors
         if (!post || (post.status !== 'published' && !isAuthor(post, req.user) && !isStaff(req.user))) {
             return ResponseHandler.fail(res, 404, 'Article not found');
@@ -88,7 +91,7 @@ exports.createPost = async (req, res) => {
         const allowed = isStaff(req.user) ? STAFF_STATUSES : WRITER_STATUSES;
         const status = allowed.includes(req.body.status) ? req.body.status : (isStaff(req.user) ? 'draft' : 'pending');
 
-        const post = await BlogPost.create({
+        const post = await BlogPost.insert({
             title, slug: slugify(title), content, excerpt, coverImage,
             tags: tags || [],
             author: req.user._id,
@@ -98,16 +101,12 @@ exports.createPost = async (req, res) => {
 
         if (status === 'pending') notifyEditors(post, req.user);
 
-        const populatedPost = await BlogPost.findById(post._id)
-            .populate('author', 'displayName profilePicture');
+        const populatedPost = await populate(post, 'author', User, 'displayName profilePicture');
 
         return ResponseHandler.success(res, { post: populatedPost }, status === 'pending' ? 'Article submitted for review' : 'Article saved');
     } catch (err) {
-        if (err.code === 11000) return ResponseHandler.fail(res, 400, 'An article with this title already exists');
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(val => val.message);
-            return ResponseHandler.fail(res, 400, messages.join(', '));
-        }
+        if (isDuplicate(err)) return ResponseHandler.fail(res, 400, 'An article with this title already exists');
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Error creating blog post', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to create article');
     }
@@ -145,8 +144,8 @@ exports.updatePost = async (req, res) => {
         if (post.status === 'published' && previous !== 'published') post.publishedAt = new Date();
         if (post.status === 'published') post.reviewNote = '';
 
-        await post.save();
-        await post.populate('author', 'displayName profilePicture email');
+        await BlogPost.save(post);
+        await populate(post, 'author', User, 'displayName profilePicture email');
 
         if (post.status === 'pending' && previous !== 'pending') notifyEditors(post, req.user);
         // Let the writer know how the review went (not when staff edit their own articles)
@@ -156,7 +155,8 @@ exports.updatePost = async (req, res) => {
 
         return ResponseHandler.success(res, { post }, 'Article updated successfully');
     } catch (err) {
-        if (err.code === 11000) return ResponseHandler.fail(res, 400, 'An article with this title already exists');
+        if (isDuplicate(err)) return ResponseHandler.fail(res, 400, 'An article with this title already exists');
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Error updating blog post', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update article');
     }
@@ -171,7 +171,7 @@ exports.deletePost = async (req, res) => {
         if (!isStaff(req.user) && !ownUnpublished) {
             return ResponseHandler.fail(res, 403, 'Only an editor can remove a published article');
         }
-        await post.deleteOne();
+        await BlogPost.remove(post._id);
         return ResponseHandler.success(res, null, 'Article deleted successfully');
     } catch (err) {
         logger.error('Error deleting blog post', { error: err.message });
@@ -188,7 +188,7 @@ function notifyEditors(post, writer) {
 
 async function notifyWriter(post) {
     try {
-        const email = post.author?.email || (await User.findById(post.author).select('email'))?.email;
+        const email = post.author?.email || (await User.findById(post.author?._id ?? post.author))?.email;
         if (!email) return;
         const approved = post.status === 'published';
         await sendArticleReviewEmail(email, {

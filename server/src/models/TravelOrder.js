@@ -1,71 +1,67 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const travellerSchema = new mongoose.Schema({
-    title: { type: String, enum: ['Mr', 'Ms', 'Mrs', 'Mx'], default: 'Mr' },
-    firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
-    dob: String,
-    gender: { type: String, enum: ['male', 'female', 'other'] },
-    passportNumber: String,
-    passportExpiry: String,
-    nationality: String,
-}, { _id: false });
+const TITLES = ['Mr', 'Ms', 'Mrs', 'Mx'];
+const GENDERS = ['male', 'female', 'other'];
 
-const travelOrderSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    kind: { type: String, enum: ['flight', 'hotel'], required: true },
-    linkedBooking: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', default: null },
-    provider: { type: String, enum: ['mock', 'duffel', 'tripjack', 'liteapi'], required: true },
-    providerRef: String,
-    offerId: { type: String, required: true },
-    status: {
-        type: String,
-        enum: ['pending', 'confirmed', 'cancelled', 'failed'],
-        default: 'pending',
+const TravelOrder = defineTable({
+    table: 'travel_orders',
+    fields: {
+        user: { type: 'ref', required: true, col: 'user_id' },
+        kind: { type: 'text', enum: ['flight', 'hotel'], required: true },
+        linkedBooking: { type: 'ref', default: null, col: 'linked_booking_id' },
+        provider: { type: 'text', enum: ['mock', 'duffel', 'tripjack', 'liteapi'], required: true },
+        providerRef: 'text',
+        offerId: { type: 'text', required: true },
+        status: { type: 'text', enum: ['pending', 'confirmed', 'cancelled', 'failed'], default: 'pending' },
+        // Snapshot of what was booked (public shape: marked-up price, no supplier amounts)
+        offer: { type: 'json', required: true },
+        // [{ title, firstName, lastName, dob, gender, passportNumber, passportExpiry, nationality }]
+        travellers: { type: 'json', required: true },
+        'contact.email': { type: 'text', required: true, lowercase: true, trim: true, label: 'Contact email' },
+        'contact.phone': 'text',
+        // { supplierAmount, markupPct, markupAmount, total, currency }
+        pricing: { type: 'json', required: true },
+        // What the traveller was charged: the total converted into the currency they chose
+        charge: { type: 'json', default: null },          // { currency, total, rate }
+        paymentId: { type: 'ref', col: 'payment_id' },
+        failureReason: 'text',
     },
-    // Snapshot of what was booked (public shape: marked-up price, no supplier amounts)
-    offer: { type: mongoose.Schema.Types.Mixed, required: true },
-    travellers: { type: [travellerSchema], validate: (v) => Array.isArray(v) && v.length > 0 },
-    contact: {
-        email: { type: String, required: true, lowercase: true, trim: true },
-        phone: String,
+    beforeSave(doc) {
+        if (Array.isArray(doc.travellers)) {
+            doc.travellers = doc.travellers.map((t) => ({
+                ...t,
+                title: TITLES.includes(t?.title) ? t.title : 'Mr',
+                firstName: String(t?.firstName || '').trim(),
+                lastName: String(t?.lastName || '').trim(),
+                ...(t?.gender && !GENDERS.includes(t.gender) ? { gender: undefined } : {}),
+            }));
+        }
+        if (doc.pricing && doc.pricing.currency === undefined) doc.pricing.currency = 'USD';
     },
-    pricing: {
-        supplierAmount: { type: Number, required: true },
-        markupPct: { type: Number, required: true },
-        markupAmount: { type: Number, required: true },
-        total: { type: Number, required: true },
-        currency: { type: String, default: 'USD' },
+    validate(doc) {
+        const errors = {};
+        if (!Array.isArray(doc.travellers) || doc.travellers.length === 0 || doc.travellers.some((t) => !t.firstName || !t.lastName)) {
+            errors.travellers = 'Every traveller needs a first and last name';
+        }
+        const p = doc.pricing || {};
+        if (['supplierAmount', 'markupPct', 'markupAmount', 'total'].some((k) => typeof p[k] !== 'number')) errors.pricing = 'Pricing is incomplete';
+        return errors;
     },
-    // What the traveller was charged: the total converted into the currency they chose
-    charge: {
-        currency: { type: String },
-        total: { type: Number },
-        rate: { type: Number },
-    },
-    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
-    failureReason: String,
-}, { timestamps: true });
-
-travelOrderSchema.index({ user: 1, createdAt: -1 });
-travelOrderSchema.index({ kind: 1, status: 1 });
+});
 
 // Traveller-facing view: hides supplier cost, markup and internal fields.
-travelOrderSchema.methods.toPublic = function toPublic() {
-    const o = this.toObject({ virtuals: false });
-    return {
-        _id: o._id,
-        kind: o.kind,
-        status: o.status,
-        providerRef: o.providerRef,
-        offer: o.offer,
-        travellers: o.travellers,
-        contact: o.contact,
-        pricing: { total: o.charge?.total ?? o.pricing.total, currency: o.charge?.currency ?? o.pricing.currency },
-        linkedBooking: o.linkedBooking,
-        createdAt: o.createdAt,
-        updatedAt: o.updatedAt,
-    };
-};
+TravelOrder.toPublic = (o) => ({
+    _id: o._id,
+    kind: o.kind,
+    status: o.status,
+    providerRef: o.providerRef,
+    offer: o.offer,
+    travellers: o.travellers,
+    contact: o.contact,
+    pricing: { total: o.charge?.total ?? o.pricing.total, currency: o.charge?.currency ?? o.pricing.currency },
+    linkedBooking: o.linkedBooking,
+    createdAt: o.createdAt,
+    updatedAt: o.updatedAt,
+});
 
-module.exports = mongoose.model('TravelOrder', travelOrderSchema);
+module.exports = TravelOrder;

@@ -1,0 +1,406 @@
+{
+  "defaults": {
+    "socialLinks": {
+      "facebook": "",
+      "instagram": "",
+      "twitter": ""
+    },
+    "footer": {
+      "showQuickLinks": true,
+      "showNewsletter": true,
+      "copyrightText": ""
+    },
+    "offerBar": {
+      "enabled": false,
+      "badgeLabel": "",
+      "text": "",
+      "countdownEnd": null,
+      "gradientFrom": "#f97316",
+      "gradientTo": "#e11d48",
+      "ctaLink": "",
+      "ctaLabel": ""
+    },
+    "planTrip": {
+      "heading": "Plan Your Dream Trip",
+      "subheading": "Easy as 1-2-3-4",
+      "steps": [
+        {
+          "link": "",
+          "icon": "Map",
+          "title": "Pick Destination",
+          "description": "Browse tours and destinations"
+        },
+        {
+          "link": "",
+          "icon": "Calendar",
+          "title": "Select Dates",
+          "description": "Pick the dates that suit you"
+        },
+        {
+          "link": "",
+          "icon": "Settings",
+          "title": "Custom Addons",
+          "description": "Add extras that suit your trip"
+        },
+        {
+          "link": "",
+          "icon": "CheckCircle2",
+          "title": "Confirm Travel",
+          "description": "Book securely and get ready to explore"
+        }
+      ]
+    },
+    "supportSection": {
+      "heading": "You Travel, We Handle The Rest.",
+      "subheading": "Support Beyond Booking",
+      "paragraph": "From the moment you click book until you're back home, our team is a message away.",
+      "features": [
+        {
+          "icon": "MessageCircle",
+          "title": "Ask Us Anything",
+          "description": "Travel queries, visa help or itinerary tweaks: send a message from any page."
+        },
+        {
+          "icon": "Clock",
+          "title": "Replies Within 24 Hours",
+          "description": "A real travel specialist answers every message, usually the same day."
+        },
+        {
+          "icon": "Route",
+          "title": "Trips Made to Measure",
+          "description": "Tell us what you love and we will shape an itinerary around it."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Secure Booking",
+          "description": "Payments handled by Stripe, and your booking details in your dashboard."
+        }
+      ],
+      "chatMessages": [
+        {
+          "sender": "assistant",
+          "text": "Hi! Tell us where you would like to go, or ask anything about a booking. A travel specialist will reply by email."
+        }
+      ]
+    },
+    "aboutPage": {
+      "heroImage": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80",
+      "heroHeadline": "We turn wanderlust into unforgettable journeys",
+      "heroSubtext": "Wandeazy was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.",
+      "storyParagraph1": "What started as a small group of travel obsessives sketching itineraries on napkins has grown into a platform trusted by travelers worldwide. We've walked the trails, tasted the food, and slept under the stars — so we know exactly what makes a trip worth taking.",
+      "storyParagraph2": "Today, we partner with the best local operators on the planet to bring you experiences that are authentic, responsible, and unforgettable.",
+      "ctaHeading": "Ready to start your journey?",
+      "ctaSubtext": "Browse our curated tours or tell us about your dream trip — we'll handle the rest.",
+      "ctaBtn1Label": "Explore Tours",
+      "ctaBtn1Link": "/tours",
+      "ctaBtn2Label": "Plan My Trip",
+      "ctaBtn2Link": "/contact",
+      "stats": [],
+      "values": [
+        {
+          "icon": "Globe2",
+          "title": "Global Reach",
+          "description": "Hand-picked experiences in destinations around the world."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Travel With Confidence",
+          "description": "Secure payments, trusted local partners and clear cancellation terms."
+        },
+        {
+          "icon": "Heart",
+          "title": "Crafted With Care",
+          "description": "Every itinerary is curated by travel specialists, not algorithms."
+        },
+        {
+          "icon": "Users",
+          "title": "Real Support",
+          "description": "A real team that answers every message within 24 hours."
+        }
+      ]
+    },
+    "features": {
+      "flights": false,
+      "hotels": false
+    },
+    "currency": {
+      "rates": {
+        "USD": 1,
+        "INR": 83.5,
+        "EUR": 0.92,
+        "GBP": 0.79,
+        "AED": 3.67
+      },
+      "base": "INR",
+      "enabled": [
+        "INR",
+        "USD",
+        "EUR",
+        "GBP",
+        "AED"
+      ],
+      "ratesUpdatedAt": null
+    },
+    "travelMarkup": {
+      "flightPct": 5,
+      "hotelPct": 8
+    },
+    "companyName": "Wandeazy Travels",
+    "contactEmail": "hello@wandeazy.com",
+    "contactPhone": "",
+    "address": "",
+    "footerExploreLinks": [
+      {
+        "label": "Destinations",
+        "path": "/destinations"
+      },
+      {
+        "label": "Tours",
+        "path": "/tours"
+      },
+      {
+        "label": "Collections",
+        "path": "/collections"
+      },
+      {
+        "label": "Plan a Custom Trip",
+        "path": "/contact?topic=trip"
+      }
+    ],
+    "footerCompanyLinks": [
+      {
+        "label": "About Us",
+        "path": "/about"
+      },
+      {
+        "label": "Contact",
+        "path": "/contact"
+      },
+      {
+        "label": "Travel Blog",
+        "path": "/blog"
+      },
+      {
+        "label": "FAQ",
+        "path": "/faq"
+      },
+      {
+        "label": "Privacy Policy",
+        "path": "/privacy"
+      }
+    ],
+    "navLinks": [
+      {
+        "label": "Destinations",
+        "path": "/destinations",
+        "order": 0
+      },
+      {
+        "label": "Tours",
+        "path": "/tours",
+        "order": 1
+      },
+      {
+        "label": "Collections",
+        "path": "/collections",
+        "order": 2
+      },
+      {
+        "label": "Magazine",
+        "path": "/blog",
+        "order": 3
+      },
+      {
+        "label": "About",
+        "path": "/about",
+        "order": 4
+      }
+    ],
+    "heroSlides": [
+      {
+        "title": "Paradise Found",
+        "subtitle": "Pristine Beaches",
+        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
+        "color": "from-blue-500/80",
+        "ctaLink": "/tours?category=Beach",
+        "ctaLabel": "Explore Beaches"
+      },
+      {
+        "title": "Alpine Peaks",
+        "subtitle": "Mountain Escapes",
+        "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
+        "color": "from-emerald-600/80",
+        "ctaLink": "/tours?category=Trekking",
+        "ctaLabel": "Explore Mountains"
+      },
+      {
+        "title": "Urban Lights",
+        "subtitle": "City Breaks",
+        "image": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2144&auto=format&fit=crop",
+        "color": "from-purple-600/80",
+        "ctaLink": "/tours?category=City",
+        "ctaLabel": "Explore Cities"
+      },
+      {
+        "title": "Golden Sands",
+        "subtitle": "Desert Safaris",
+        "image": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=2070&auto=format&fit=crop",
+        "color": "from-orange-600/80",
+        "ctaLink": "/tours?q=Dubai",
+        "ctaLabel": "Explore Deserts"
+      },
+      {
+        "title": "Deep Wilds",
+        "subtitle": "Jungle Trekking",
+        "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop",
+        "color": "from-green-800/80",
+        "ctaLink": "/tours?category=Adventure",
+        "ctaLabel": "Explore Jungles"
+      }
+    ],
+    "promoSlides": [
+      {
+        "partner": "Singapore Tourism",
+        "title": "The Garden City Awaits",
+        "subtitle": "Experience the magic of Sentosa and the Gardens by the Bay.",
+        "image": "https://images.unsplash.com/photo-1565967511849-76a60a516170?q=80&w=1600",
+        "accentColor": "text-emerald-400",
+        "discount": "",
+        "fromPrice": 1200,
+        "searchQuery": "Singapore"
+      },
+      {
+        "partner": "Visit Dubai",
+        "title": "Golden Sands & Skyscrapers",
+        "subtitle": "Discover the future of luxury in the heart of the desert.",
+        "image": "https://images.unsplash.com/photo-1603521097795-3b798129197f?q=80&w=1600",
+        "accentColor": "text-amber-400",
+        "discount": "",
+        "fromPrice": 1500,
+        "searchQuery": "Dubai"
+      },
+      {
+        "partner": "Switzerland Tourism",
+        "title": "Alpine Peaks & Valleys",
+        "subtitle": "Breathe in the freshest air atop the world's most famous mountains.",
+        "image": "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1600",
+        "accentColor": "text-blue-200",
+        "discount": "",
+        "fromPrice": 1800,
+        "searchQuery": "Switzerland"
+      }
+    ],
+    "testimonials": [],
+    "faqs": [
+      {
+        "question": "How do I book a tour?",
+        "answer": "Browse our tours, pick the one you love, choose your travel date and number of guests, then complete the secure checkout. You'll receive a confirmation with all your booking details.",
+        "order": 0
+      },
+      {
+        "question": "Can I cancel or change my booking?",
+        "answer": "Yes. Most tours offer free cancellation up to 24 hours before departure. You can cancel directly from your dashboard, and refunds are processed according to each tour's cancellation policy.",
+        "order": 1
+      },
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all major credit and debit cards through our secure, PCI-compliant payment provider. Your payment information is encrypted and never stored on our servers.",
+        "order": 2
+      },
+      {
+        "question": "Are flights included in the tour price?",
+        "answer": "Unless explicitly stated in the tour inclusions, international flights are not included. Each tour page lists exactly what's covered so there are no surprises.",
+        "order": 3
+      },
+      {
+        "question": "Do I need travel insurance?",
+        "answer": "We strongly recommend travel insurance for all trips. While not mandatory, it protects you against unexpected cancellations, medical emergencies, and lost belongings.",
+        "order": 4
+      },
+      {
+        "question": "How can I contact support?",
+        "answer": "Send us a message from the Contact page or the message box on the homepage, or email us. We reply within 24 hours.",
+        "order": 5
+      },
+      {
+        "question": "Can you create a custom itinerary?",
+        "answer": "Absolutely! Head to our Contact page, tell us about your dream trip, and our specialists will craft a personalized itinerary just for you.",
+        "order": 6
+      }
+    ],
+    "contentSections": []
+  },
+  "items": {
+    "footerExploreLinks": {
+      "label": "",
+      "path": "/"
+    },
+    "footerCompanyLinks": {
+      "label": "",
+      "path": "/"
+    },
+    "navLinks": {
+      "label": "",
+      "path": "/",
+      "order": 0
+    },
+    "heroSlides": {
+      "title": "",
+      "subtitle": "",
+      "image": "",
+      "color": "from-blue-500/80",
+      "ctaLink": "/destinations",
+      "ctaLabel": "Explore"
+    },
+    "promoSlides": {
+      "partner": "",
+      "title": "",
+      "subtitle": "",
+      "image": "",
+      "accentColor": "text-emerald-400",
+      "discount": "",
+      "fromPrice": 999,
+      "searchQuery": ""
+    },
+    "planTrip.steps": {
+      "icon": "Map",
+      "title": "",
+      "description": "",
+      "link": ""
+    },
+    "testimonials": {
+      "name": "",
+      "role": "",
+      "image": "",
+      "quote": "",
+      "rating": 5,
+      "location": ""
+    },
+    "supportSection.features": {
+      "icon": "Zap",
+      "title": "",
+      "description": ""
+    },
+    "supportSection.chatMessages": {
+      "sender": "assistant",
+      "text": ""
+    },
+    "faqs": {
+      "question": "",
+      "answer": "",
+      "order": 0
+    },
+    "aboutPage.stats": {
+      "value": "",
+      "label": ""
+    },
+    "aboutPage.values": {
+      "icon": "Globe2",
+      "title": "",
+      "description": ""
+    },
+    "contentSections": {
+      "isVisible": true
+    }
+  }
+}

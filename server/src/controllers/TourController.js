@@ -1,8 +1,10 @@
-const mongoose = require('mongoose');
+const { all, run } = require('../db');
+const { isId } = require('../db/ids');
+const { Where, containsAny, wordMatch, populate } = require('../db/sql');
+const { validationText } = require('../db/errors');
 const TravelDestination = require('../models/TravelDestination');
-const Booking = require('../models/Booking');
-const Collection = require('../models/Collection');
 const Destination = require('../models/Destination');
+const User = require('../models/User');
 const { destinationTourQuery } = require('../services/destination-match');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
@@ -10,28 +12,33 @@ const config = require('../config');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 const { getCurrencyConfig, convert, isSupported, normalizeCode } = require('../services/currency');
 
-// The tour's price in USD at today's rates, for filters and sorting across currencies
-const priceInUSD = (tour, rates) => convert(tour.price || 0, tour.currency || 'USD', 'USD', rates);
-
 // Catalog staff can list and preview tours that are not live yet
 const canSeeAll = (user) => hasPermission(user, PERMISSIONS.CATALOG);
 
-const SEARCH_FIELDS = ['title', 'location', 'categories', 'overview.about'];
-const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const SEARCH_COLUMNS = ['title', 'location', 'categories', 'overview_about'];
 
 // Every word must appear in at least one field (title, location, category or description),
 // so "Japan", "Nepal trek" and partial words like "Toky" all find their tours.
-function buildSearchQuery(search) {
+function addSearch(where, search) {
     const words = String(search).trim().split(/\s+/).filter(Boolean).slice(0, 8);
-    if (words.length === 0) return {};
-    return {
-        $and: words.map((word) => {
-            const re = new RegExp(escapeRegex(word), 'i');
-            return { $or: SEARCH_FIELDS.map((field) => ({ [field]: re })) };
-        }),
-    };
+    for (const word of words) {
+        const { sql, args } = containsAny(SEARCH_COLUMNS, word);
+        where.add(sql, ...args);
+    }
+    return where;
 }
-exports.buildSearchQuery = buildSearchQuery;
+exports.addSearch = addSearch;
+
+const SORTS = {
+    price_low: 'price_usd ASC',
+    price_high: 'price_usd DESC',
+    rating: 'reviews_rating DESC',
+    newest: 'created_at DESC',
+    updated: 'updated_at DESC',
+    title: 'title COLLATE NOCASE ASC',
+};
+const DEFAULT_SORT = 'reviews_rating DESC, price_usd ASC';
+const csv = (v) => String(v).split(',').map((x) => x.trim()).filter(Boolean);
 
 // GET /tours - List with filters & pagination
 exports.getTours = async (req, res) => {
@@ -55,89 +62,55 @@ exports.getTours = async (req, res) => {
             place
         } = req.query;
 
-        const query = {};
+        const where = new Where();
 
         if (category) {
-            query.categories = { $in: category.split(',') };
+            const list = csv(category);
+            where.add(`EXISTS (SELECT 1 FROM json_each(tours.categories) WHERE json_each.value IN (${list.map(() => '?').join(', ')}))`, ...list);
         }
-        if (country) {
-            query.location = { $in: country.split(',') };
-        }
+        if (country) where.in('location', csv(country));
         // A whole place name inside the location ("Japan" matches "Tokyo, Japan")
         if (place) {
-            query.location = { $regex: `\\b${escapeRegex(String(place))}\\b`, $options: 'i' };
+            const { sql, args } = wordMatch('location', String(place));
+            where.add(sql, ...args);
         }
         // Price filters arrive in USD (or ?priceCurrency=) and are compared on the USD price index
         if (minPrice || maxPrice) {
             const { rates } = await getCurrencyConfig();
             const from = isSupported(req.query.priceCurrency) ? String(req.query.priceCurrency).toUpperCase() : 'USD';
-            query.priceUSD = {};
-            if (minPrice) query.priceUSD.$gte = convert(Number(minPrice), from, 'USD', rates);
-            if (maxPrice) query.priceUSD.$lte = convert(Number(maxPrice), from, 'USD', rates);
+            if (minPrice) where.add('price_usd >= ?', convert(Number(minPrice), from, 'USD', rates));
+            if (maxPrice) where.add('price_usd <= ?', convert(Number(maxPrice), from, 'USD', rates));
         }
-        if (minDays || maxDays) {
-            query['duration.days'] = {};
-            if (minDays) query['duration.days'].$gte = Number(minDays);
-            if (maxDays) query['duration.days'].$lte = Number(maxDays);
-        }
-        if (minRating) {
-            query['reviews.rating'] = { $gte: Number(minRating) };
-        }
-        if (validFrom || validTo) {
-            query.validity = {};
-            if (validFrom) query.validity.$gte = new Date(validFrom);
-            if (validTo) query.validity.$lte = new Date(validTo);
-        }
-        if (search) {
-            Object.assign(query, buildSearchQuery(search));
-        }
+        if (minDays) where.add('duration_days >= ?', Number(minDays));
+        if (maxDays) where.add('duration_days <= ?', Number(maxDays));
+        if (minRating) where.add('reviews_rating >= ?', Number(minRating));
+        if (validFrom) where.add('validity >= ?', new Date(validFrom).toISOString());
+        if (validTo) where.add('validity <= ?', new Date(validTo).toISOString());
+        if (search) addSearch(where, search);
         // Specific tours by id (e.g. a visitor's recently viewed list), always with current data
-        if (req.query.ids) {
-            const ids = String(req.query.ids).split(',').filter((id) => /^[a-f0-9]{24}$/i.test(id)).slice(0, 50);
-            query._id = { $in: ids };
-        }
+        if (req.query.ids) where.in('id', csv(req.query.ids).filter(isId).slice(0, 50));
         // The tours of one destination, by the same rule as its tour count
         if (req.query.destination) {
-            const destination = await Destination.findOne({ slug: String(req.query.destination) }).lean();
-            query.$and = [...(query.$and || []), destination ? destinationTourQuery(destination) : { _id: null }];
+            const destination = await Destination.findOne('slug = ?', [String(req.query.destination)]);
+            const { sql, args } = destination ? destinationTourQuery(destination) : { sql: '0', args: [] };
+            where.add(sql, ...args);
         }
-        if (isFeatured === 'true') {
-            query.isFeatured = true;
-        }
+        if (isFeatured === 'true') where.add('is_featured = 1');
+
         // Everyone sees live tours only; the admin list (?scope=admin) also shows drafts and hidden ones
         const admin = req.query.scope === 'admin' && canSeeAll(req.user);
-        if (admin) {
-            if (status && status !== 'all') query.status = status;
-        } else {
-            query.status = 'active';
-        }
-
-        let sortOptions = { 'reviews.rating': -1, priceUSD: 1 };
-        if (sortParam === 'price_low') sortOptions = { priceUSD: 1 };
-        else if (sortParam === 'price_high') sortOptions = { priceUSD: -1 };
-        else if (sortParam === 'rating') sortOptions = { 'reviews.rating': -1 };
-        else if (sortParam === 'newest') sortOptions = { createdAt: -1 };
-        else if (sortParam === 'updated') sortOptions = { updatedAt: -1 };
-        else if (sortParam === 'title') sortOptions = { title: 1 };
-
-        const pageNum = Number(page);
-        const limitNum = Number(limit);
-
-        const tours = await TravelDestination.find(query)
-            .skip((pageNum - 1) * limitNum)
-            .limit(limitNum)
-            .sort(sortOptions)
-            .populate(admin ? { path: 'updatedBy', select: 'displayName' } : []);
-
-        const total = await TravelDestination.countDocuments(query);
-
         // Tab counts for the admin list (same filters, every status)
-        let statusCounts;
-        if (admin) {
-            const { status: ignored, ...rest } = query;
-            const rows = await TravelDestination.aggregate([{ $match: rest }, { $group: { _id: '$status', count: { $sum: 1 } } }]);
-            statusCounts = Object.fromEntries(rows.map((r) => [r._id, r.count]));
-        }
+        const statusCounts = admin ? await TravelDestination.countBy('status', where.sql, where.args) : undefined;
+        if (!admin) where.add("status = 'active'");
+        else if (status && status !== 'all') where.add('status = ?', status);
+
+        const pageNum = Math.max(1, Number(page) || 1);
+        const limitNum = Math.max(1, Number(limit) || config.pagination.defaultLimit);
+        const [tours, total] = await Promise.all([
+            TravelDestination.find({ where: where.sql, args: where.args, order: SORTS[sortParam] || DEFAULT_SORT, limit: limitNum, offset: (pageNum - 1) * limitNum }),
+            TravelDestination.count(where.sql, where.args),
+        ]);
+        if (admin) await populate(tours, 'updatedBy', User, 'displayName');
 
         return ResponseHandler.success(res, {
             tours,
@@ -158,13 +131,9 @@ exports.getTours = async (req, res) => {
 // GET /tours/recommended — returns admin-featured tours first, falls back to top-rated
 exports.getRecommendedTours = async (req, res) => {
     try {
-        let tours = await TravelDestination.find({ isFeatured: true, status: 'active' })
-            .sort({ 'reviews.rating': -1 })
-            .limit(config.tours.recommendedFeaturedLimit);
+        let tours = await TravelDestination.find({ where: "is_featured = 1 AND status = 'active'", order: 'reviews_rating DESC', limit: config.tours.recommendedFeaturedLimit });
         if (tours.length === 0) {
-            tours = await TravelDestination.find({ status: 'active' })
-                .sort({ 'reviews.rating': -1 })
-                .limit(config.tours.recommendedFallbackLimit);
+            tours = await TravelDestination.find({ where: "status = 'active'", order: 'reviews_rating DESC', limit: config.tours.recommendedFallbackLimit });
         }
         return ResponseHandler.success(res, { tours }, 'Recommended tours fetched successfully');
     } catch (err) {
@@ -177,7 +146,7 @@ exports.getRecommendedTours = async (req, res) => {
 // The categories and places live tours actually cover, with counts, for the search filters
 exports.getTourFacets = async (req, res) => {
     try {
-        const tours = await TravelDestination.find({ status: 'active' }, 'categories location').lean();
+        const rows = await all("SELECT categories, location FROM tours WHERE status = 'active'");
         const tally = (values) => {
             const counts = new Map();
             for (const v of values) {
@@ -186,10 +155,11 @@ exports.getTourFacets = async (req, res) => {
             }
             return [...counts].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
         };
+        const parse = (json) => { try { return JSON.parse(json || '[]'); } catch { return []; } };
         return ResponseHandler.success(res, {
-            categories: tally(tours.flatMap((t) => t.categories || [])),
+            categories: tally(rows.flatMap((t) => parse(t.categories))),
             // "Tokyo, Japan" → "Japan": the country (or the place itself when there is no comma)
-            places: tally(tours.map((t) => (t.location || '').split(',').pop())),
+            places: tally(rows.map((t) => (t.location || '').split(',').pop())),
         }, 'Tour facets fetched successfully');
     } catch (err) {
         logger.error('Error fetching tour facets', { error: err.message });
@@ -212,7 +182,7 @@ exports.getTourById = async (req, res) => {
     }
 };
 
-// Turns an editor's form (or an import row) into a clean tour document
+// Turns an editor's form (or an import row) into a clean tour record
 function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {}) {
     const data = { ...input };
     // Ratings come from real reviews and the audit fields from the session, never from the form
@@ -220,6 +190,8 @@ function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {
     delete data.createdBy;
     delete data.updatedBy;
     delete data._id;
+    delete data.createdAt;
+    delete data.updatedAt;
 
     // Codes only; a missing or unknown currency falls back to the site's base currency
     if ('currency' in data || !partial) {
@@ -242,12 +214,17 @@ function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {
     if (Array.isArray(data.categories)) data.categories = [...new Set(data.categories.map((c) => String(c).trim()).filter(Boolean))];
     if (Array.isArray(data.images)) data.images = data.images.map((u) => String(u || '').trim()).filter(Boolean);
     // Half-filled rows are dropped instead of failing the whole save
-    if (Array.isArray(data.inclusions)) data.inclusions = data.inclusions.filter((x) => x && String(x.title || '').trim());
+    if (Array.isArray(data.inclusions)) {
+        data.inclusions = data.inclusions
+            .filter((x) => x && String(x.title || '').trim())
+            .map((x) => ({ ...x, title: String(x.title).trim(), included: x.included !== false && x.included !== 'false' }));
+    }
     if (Array.isArray(data.itinerary)) {
         const fallbackPlace = String(data.location || '').trim() || 'See itinerary';
         data.itinerary = data.itinerary
             .filter((d) => d && (String(d.activity || '').trim() || String(d.location || '').trim()))
             .map((d, i) => ({
+                ...(d._id ? { _id: d._id } : {}),
                 day: i + 1,
                 activity: String(d.activity || '').trim() || 'Free time',
                 location: String(d.location || '').trim() || fallbackPlace,
@@ -255,7 +232,7 @@ function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {
     }
     if (data.overview) {
         data.overview = {
-            ...data.overview,
+            about: data.overview.about,
             gallery: (data.overview.gallery || []).filter((g) => g && String(g.imageURL || '').trim()),
         };
     }
@@ -272,27 +249,24 @@ function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {
 }
 exports.normalizeTour = normalizeTour;
 
-const FIELD_NAMES = {
-    'duration.days': 'Days', 'duration.nights': 'Nights', price: 'Price', validity: 'Last available date',
-    maxGroupSize: 'Max group size', 'coordinates.lat': 'Latitude', 'coordinates.lng': 'Longitude',
-};
-
-function validationMessage(err) {
-    return Object.values(err.errors).map((e) => {
-        if (e.name === 'CastError') return `${FIELD_NAMES[e.path] || e.path} has an invalid value`;
-        return e.message.replace(/^Path `([^`]+)` is required\.$/, (m, path) => `${FIELD_NAMES[path] || path} is required`);
-    }).join(', ');
+// A partial update replaces whole sections (duration, overview…), keeping the parts the form didn't send
+function applyChanges(tour, data) {
+    for (const [key, value] of Object.entries(data)) {
+        if (key === 'overview' && value) tour.overview = { ...tour.overview, ...Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined)) };
+        else tour[key] = value;
+    }
+    return tour;
 }
 
 // POST /tours
 exports.createTour = async (req, res) => {
     try {
-        const { base, rates } = await getCurrencyConfig();
+        const { base } = await getCurrencyConfig();
         const data = normalizeTour(req.body, { baseCurrency: base });
-        const tour = await TravelDestination.create({ ...data, priceUSD: priceInUSD(data, rates), createdBy: req.user._id, updatedBy: req.user._id });
+        const tour = await TravelDestination.insert({ ...data, createdBy: req.user._id, updatedBy: req.user._id });
         return ResponseHandler.success(res, { tour }, 'Tour created successfully');
     } catch (err) {
-        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationMessage(err));
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Error creating tour', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to create tour');
     }
@@ -301,18 +275,16 @@ exports.createTour = async (req, res) => {
 // PUT /tours/:id
 exports.updateTour = async (req, res) => {
     try {
-        // Loaded and saved as a document, so "required once live" rules see the tour's real status
+        // Loaded and saved whole, so "required once live" rules see the tour's real status
         const tour = await TravelDestination.findById(req.params.id);
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
-        const { base, rates } = await getCurrencyConfig();
-        tour.set({ ...normalizeTour(req.body, { partial: true, baseCurrency: base }), updatedBy: req.user._id });
-        tour.priceUSD = priceInUSD(tour, rates);
-        await tour.save();
-        await tour.populate('updatedBy', 'displayName');
+        const { base } = await getCurrencyConfig();
+        applyChanges(tour, { ...normalizeTour(req.body, { partial: true, baseCurrency: base }), updatedBy: req.user._id });
+        await TravelDestination.save(tour);
+        await populate(tour, 'updatedBy', User, 'displayName');
         return ResponseHandler.success(res, { tour }, 'Tour updated successfully');
     } catch (err) {
-        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationMessage(err));
-        if (err.name === 'CastError') return ResponseHandler.fail(res, 400, `${FIELD_NAMES[err.path] || err.path} has an invalid value`);
+        if (err.name === 'ValidationError') return ResponseHandler.fail(res, 400, validationText(err));
         logger.error('Error updating tour', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to update tour');
     }
@@ -320,18 +292,21 @@ exports.updateTour = async (req, res) => {
 
 // A tour with bookings is part of someone's trip history: hide it instead of deleting it
 async function bookingCounts(ids) {
-    const rows = await Booking.aggregate([
-        { $match: { tour: { $in: ids.map((id) => new mongoose.Types.ObjectId(String(id))) } } },
-        { $group: { _id: '$tour', count: { $sum: 1 } } },
-    ]);
-    return new Map(rows.map((r) => [String(r._id), r.count]));
+    if (ids.length === 0) return new Map();
+    const rows = await all(`SELECT tour_id, COUNT(*) AS n FROM bookings WHERE tour_id IN (${ids.map(() => '?').join(',')}) GROUP BY tour_id`, ids);
+    return new Map(rows.map((r) => [r.tour_id, Number(r.n)]));
 }
 
 async function removeTours(ids) {
     if (ids.length === 0) return;
-    await TravelDestination.deleteMany({ _id: { $in: ids } });
+    const marks = ids.map(() => '?').join(',');
+    await run(`DELETE FROM tours WHERE id IN (${marks})`, ids);
     // Collections should not keep pointing at tours that no longer exist
-    await Collection.updateMany({ tours: { $in: ids } }, { $pull: { tours: { $in: ids } } });
+    await run(
+        `UPDATE collections SET tours = (SELECT json_group_array(value) FROM json_each(collections.tours) WHERE value NOT IN (${marks}))
+         WHERE EXISTS (SELECT 1 FROM json_each(collections.tours) WHERE value IN (${marks}))`,
+        [...ids, ...ids],
+    );
 }
 
 // DELETE /tours/:id
@@ -339,7 +314,7 @@ exports.deleteTour = async (req, res) => {
     try {
         const tour = await TravelDestination.findById(req.params.id);
         if (!tour) return ResponseHandler.fail(res, 404, 'Tour not found');
-        const booked = (await bookingCounts([tour._id])).get(String(tour._id)) || 0;
+        const booked = (await bookingCounts([tour._id])).get(tour._id) || 0;
         if (booked > 0) {
             return ResponseHandler.fail(res, 409, `"${tour.title}" has ${booked} booking${booked === 1 ? '' : 's'}, so it can't be deleted. Set its status to Hidden to take it off the site.`);
         }
@@ -354,11 +329,11 @@ exports.deleteTour = async (req, res) => {
 // POST /tours/:id/duplicate — a draft copy to build a similar listing from
 exports.duplicateTour = async (req, res) => {
     try {
-        const source = await TravelDestination.findById(req.params.id).lean();
+        const source = await TravelDestination.findById(req.params.id);
         if (!source) return ResponseHandler.fail(res, 404, 'Tour not found');
-        const { _id, createdAt, updatedAt, reviews, __v, ...rest } = source;
+        const { _id, createdAt, updatedAt, reviews, ...rest } = source;
         const strip = (list = []) => list.map(({ _id: ignored, ...item }) => item);
-        const tour = await TravelDestination.create({
+        const tour = await TravelDestination.insert({
             ...rest,
             title: `Copy of ${source.title}`,
             status: 'draft',
@@ -387,7 +362,7 @@ const BULK_ACTIONS = {
 // POST /tours/bulk-action — { ids: [...], action: 'active' | 'draft' | 'inactive' | 'feature' | 'unfeature' | 'delete' }
 exports.bulkTourAction = async (req, res) => {
     try {
-        const ids = [...new Set((req.body?.ids || []).map(String).filter((id) => /^[a-f0-9]{24}$/i.test(id)))].slice(0, 500);
+        const ids = [...new Set((req.body?.ids || []).map(String).filter(isId))].slice(0, 500);
         const { action } = req.body || {};
         if (ids.length === 0) return ResponseHandler.fail(res, 400, 'Select at least one tour.');
 
@@ -404,15 +379,15 @@ exports.bulkTourAction = async (req, res) => {
 
         // Publishing checks each tour has what a live listing needs
         if (action === 'active') {
-            const tours = await TravelDestination.find({ _id: { $in: ids } });
+            const tours = await TravelDestination.findByIds(ids);
             const incomplete = [];
             let affected = 0;
             for (const tour of tours) {
                 if (tour.status === 'active') continue;
-                tour.set({ status: 'active', updatedBy: req.user._id });
-                const err = tour.validateSync();
-                if (err) { incomplete.push({ _id: tour._id, title: tour.title, error: validationMessage(err) }); continue; }
-                await tour.save();
+                const next = { ...tour, status: 'active', updatedBy: req.user._id };
+                const err = await TravelDestination.check(next, { isNew: false });
+                if (err) { incomplete.push({ _id: tour._id, title: tour.title, error: validationText(err) }); continue; }
+                await TravelDestination.save(next);
                 affected += 1;
             }
             const message = incomplete.length
@@ -421,8 +396,8 @@ exports.bulkTourAction = async (req, res) => {
             return ResponseHandler.success(res, { affected, skipped: incomplete.length, incomplete }, message);
         }
 
-        const result = await TravelDestination.updateMany({ _id: { $in: ids } }, { ...update, updatedBy: req.user._id });
-        return ResponseHandler.success(res, { affected: result.modifiedCount, skipped: 0 }, `Updated ${result.modifiedCount} tour(s).`);
+        const affected = await TravelDestination.setWhere({ ...update, updatedBy: req.user._id }, `id IN (${ids.map(() => '?').join(',')})`, ids);
+        return ResponseHandler.success(res, { affected, skipped: 0 }, `Updated ${affected} tour(s).`);
     } catch (err) {
         logger.error('Error in bulk tour action', { error: err.message });
         return ResponseHandler.error(res, 500, 'Bulk action failed');
@@ -438,16 +413,15 @@ exports.bulkCreateTours = async (req, res) => {
         }
         if (rows.length > 500) return ResponseHandler.fail(res, 400, 'Import at most 500 tours at a time.');
 
-        const { base, rates } = await getCurrencyConfig();
+        const { base } = await getCurrencyConfig();
         const valid = [];
         const failed = [];
-        rows.forEach((row, index) => {
-            const data = normalizeTour(row, { baseCurrency: base });
-            const doc = new TravelDestination({ ...data, priceUSD: priceInUSD(data, rates), createdBy: req.user._id, updatedBy: req.user._id });
-            const err = doc.validateSync();
-            if (err) failed.push({ row: index + 1, title: row?.title || '(no title)', error: validationMessage(err) });
-            else valid.push(doc);
-        });
+        for (const [index, row] of rows.entries()) {
+            const data = { ...normalizeTour(row, { baseCurrency: base }), createdBy: req.user._id, updatedBy: req.user._id };
+            const err = await TravelDestination.check(data);
+            if (err) failed.push({ row: index + 1, title: row?.title || '(no title)', error: validationText(err) });
+            else valid.push(data);
+        }
         const created = valid.length ? await TravelDestination.insertMany(valid) : [];
 
         return ResponseHandler.success(res, { created: created.length, failed, tours: created },

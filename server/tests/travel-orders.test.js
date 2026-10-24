@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { newId } = require('../src/db/ids');
 const request = require('supertest');
 const app = require('../src/app');
 const TravelOrder = require('../src/models/TravelOrder');
@@ -42,10 +42,10 @@ const createOrder = (body, c = cookie) => request(app).post('/api/v1/travel-orde
 
 describe('payment model', () => {
     it('requires exactly one of booking or order', async () => {
-        const base = { user: new mongoose.Types.ObjectId(), amount: 10 };
-        await expect(Payment.create(base)).rejects.toThrow(/exactly one/);
-        await expect(Payment.create({ ...base, booking: new mongoose.Types.ObjectId(), order: new mongoose.Types.ObjectId() })).rejects.toThrow(/exactly one/);
-        await expect(Payment.create({ ...base, order: new mongoose.Types.ObjectId() })).resolves.toBeTruthy();
+        const base = { user: newId(), amount: 10 };
+        await expect(Payment.insert(base)).rejects.toThrow(/exactly one/);
+        await expect(Payment.insert({ ...base, booking: newId(), order: newId() })).rejects.toThrow(/exactly one/);
+        await expect(Payment.insert({ ...base, order: newId() })).resolves.toBeTruthy();
     });
 });
 
@@ -79,7 +79,7 @@ describe('creating orders (no Stripe configured)', () => {
         const offer = await firstFlight();
         const changed = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact, quotedTotal: offer.price - 5 });
         expect(changed.body.data).toEqual({ priceChanged: true, newTotal: offer.price });
-        expect(await TravelOrder.countDocuments()).toBe(0);
+        expect(await TravelOrder.count()).toBe(0);
         const accepted = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact, quotedTotal: offer.price - 5, acceptPriceChange: true });
         expect(accepted.body.data.order.status).toBe('confirmed');
     });
@@ -101,8 +101,8 @@ describe('creating orders (no Stripe configured)', () => {
 
     it('only links trips the user owns', async () => {
         const other = await createUser();
-        const theirs = await Booking.create({ user: other._id, tour: new mongoose.Types.ObjectId(), travelDate: new Date(), numberOfTravelers: 1, totalAmount: 100, contactInfo: { firstName: 'A', lastName: 'R', email: 'a@example.com', phone: '1' } });
-        const mine = await Booking.create({ user: user._id, tour: new mongoose.Types.ObjectId(), travelDate: new Date(), numberOfTravelers: 1, totalAmount: 100, contactInfo: { firstName: 'A', lastName: 'R', email: 'a@example.com', phone: '1' } });
+        const theirs = await Booking.insert({ user: other._id, tour: newId(), travelDate: new Date(), numberOfTravelers: 1, totalAmount: 100, contactInfo: { firstName: 'A', lastName: 'R', email: 'a@example.com', phone: '1' } });
+        const mine = await Booking.insert({ user: user._id, tour: newId(), travelDate: new Date(), numberOfTravelers: 1, totalAmount: 100, contactInfo: { firstName: 'A', lastName: 'R', email: 'a@example.com', phone: '1' } });
         const room = await firstHotelRoom('DLX');
         const bad = await createOrder({ kind: 'hotel', offerId: room.id, travellers: [traveller], contact, linkedBooking: theirs._id });
         expect(bad.status).toBe(400);

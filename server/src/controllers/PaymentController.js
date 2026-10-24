@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { isId } = require('../db/ids');
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
 const { confirmBooking } = require('../services/booking-service');
@@ -30,11 +30,11 @@ exports.handleWebhook = async (req, res) => {
         case 'payment_intent.succeeded': {
             const paymentIntent = event.data.object;
             try {
-                const payment = await Payment.findOne({ stripePaymentIntentId: paymentIntent.id });
+                const payment = await Payment.findOne('stripe_payment_intent_id = ?', [paymentIntent.id]);
                 if (payment) {
                     payment.status = 'completed';
                     payment.gatewayResponse = paymentIntent;
-                    await payment.save();
+                    await Payment.save(payment);
 
                     if (payment.booking) {
                         const booking = await Booking.findById(payment.booking);
@@ -54,11 +54,11 @@ exports.handleWebhook = async (req, res) => {
         case 'payment_intent.payment_failed': {
             const paymentIntent = event.data.object;
             try {
-                const payment = await Payment.findOne({ stripePaymentIntentId: paymentIntent.id });
+                const payment = await Payment.findOne('stripe_payment_intent_id = ?', [paymentIntent.id]);
                 if (payment) {
                     payment.status = 'failed';
                     payment.gatewayResponse = paymentIntent;
-                    await payment.save();
+                    await Payment.save(payment);
                     logger.warn('Payment failed', { paymentId: payment._id });
                 }
             } catch (err) {
@@ -78,8 +78,8 @@ exports.handleWebhook = async (req, res) => {
 exports.confirmPayment = async (req, res) => {
     try {
         const { bookingId } = req.body;
-        if (!mongoose.isValidObjectId(bookingId)) return ResponseHandler.fail(res, 404, 'Booking not found');
-        const booking = await Booking.findOne({ _id: bookingId, user: req.user._id });
+        if (!isId(String(bookingId || ''))) return ResponseHandler.fail(res, 404, 'Booking not found');
+        const booking = await Booking.findOne('id = ? AND user_id = ?', [String(bookingId), req.user._id]);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
         if (booking.status !== 'pending') return ResponseHandler.success(res, { booking }, 'Booking already processed');
 
@@ -91,7 +91,7 @@ exports.confirmPayment = async (req, res) => {
             if (intent.status !== 'succeeded') return ResponseHandler.fail(res, 400, 'Payment not completed');
             payment.status = 'completed';
             payment.gatewayResponse = intent;
-            await payment.save();
+            await Payment.save(payment);
         }
 
         await confirmBooking(booking);

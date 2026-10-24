@@ -1,258 +1,117 @@
-const mongoose = require('mongoose');
+/**
+ * Site-wide settings and page content: one record, stored as JSON in the site_settings table.
+ * Every gap is filled from site-settings-defaults.json (the defaults the site has always used),
+ * and every list item gets its own _id so the admin editors can track rows.
+ */
+const { get, run } = require('../db');
+const { newId, isId } = require('../db/ids');
+const { getPath, setPath } = require('../db/table');
+const { ValidationError } = require('../db/errors');
+const { defaults: DEFAULTS, items: ITEM_DEFAULTS } = require('./site-settings-defaults.json');
 
-// ── Reusable sub-schemas ──────────────────────────────────────────────────────
+const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'AED'];
 
-const heroSlideSchema = new mongoose.Schema({
-    title: { type: String, default: '' },
-    subtitle: { type: String, default: '' },
-    image: { type: String, default: '' },
-    color: { type: String, default: 'from-blue-500/80' },
-    ctaLink: { type: String, default: '/destinations' },
-    ctaLabel: { type: String, default: 'Explore' },
-}, { _id: true });
+const DEFAULT_SECTIONS = [
+    { sectionId: 'hero',         name: 'Hero Banner',    description: 'Main banner section on the homepage.', isVisible: true },
+    { sectionId: 'promo',        name: 'Special Offers', description: 'Promotional carousel with partner deals.', isVisible: true },
+    { sectionId: 'featured',     name: 'Featured Tours', description: 'Showcase hand-picked tours on the homepage.', isVisible: true },
+    { sectionId: 'testimonials', name: 'Testimonials',   description: 'Customer reviews and testimonials section.', isVisible: true },
+    { sectionId: 'plantrip',     name: 'Plan Your Trip', description: 'Step-by-step trip planning guide.', isVisible: true },
+    { sectionId: 'support',      name: 'Support Section', description: '24/7 support concierge feature display.', isVisible: true },
+    { sectionId: 'faq',          name: 'FAQ Section',    description: 'Frequently asked questions preview.', isVisible: true },
+];
 
-const promoSlideSchema = new mongoose.Schema({
-    partner: { type: String, default: '' },
-    title: { type: String, default: '' },
-    subtitle: { type: String, default: '' },
-    image: { type: String, default: '' },
-    accentColor: { type: String, default: 'text-emerald-400' },
-    discount: { type: String, default: '' },   // only shown when a real discount exists
-    fromPrice: { type: Number, default: 999 },
-    searchQuery: { type: String, default: '' },
-}, { _id: true });
+const clone = (v) => JSON.parse(JSON.stringify(v));
+const isPlainObject = (v) => v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Date);
 
-const testimonialSchema = new mongoose.Schema({
-    name: { type: String, default: '' },
-    role: { type: String, default: '' },
-    image: { type: String, default: '' },
-    quote: { type: String, default: '' },
-    rating: { type: Number, default: 5, min: 1, max: 5 },
-    location: { type: String, default: '' },
-}, { _id: true });
+// Stored values win; objects merge with their defaults, lists replace them
+function withDefaults(stored, defaults) {
+    if (!isPlainObject(defaults)) return stored === undefined ? clone(defaults) : stored;
+    const out = clone(defaults);
+    for (const [k, v] of Object.entries(stored || {})) {
+        out[k] = isPlainObject(v) && isPlainObject(defaults[k]) ? withDefaults(v, defaults[k]) : v;
+    }
+    return out;
+}
 
-const faqSchema = new mongoose.Schema({
-    question: { type: String, default: '' },
-    answer: { type: String, default: '' },
-    order: { type: Number, default: 0 },
-}, { _id: true });
+// Each list row gets the fields its editor expects, plus an _id
+function normalizeLists(s) {
+    for (const [path, itemDefaults] of Object.entries(ITEM_DEFAULTS)) {
+        const list = getPath(s, path);
+        if (!Array.isArray(list)) continue;
+        setPath(s, path, list.map((item) => ({
+            ...itemDefaults,
+            ...(isPlainObject(item) ? item : {}),
+            _id: isId(String(item?._id || '')) ? String(item._id) : newId(),
+        })));
+    }
+    return s;
+}
 
-const planTripStepSchema = new mongoose.Schema({
-    icon: { type: String, default: 'Map' },   // lucide icon name
-    title: { type: String, default: '' },
-    description: { type: String, default: '' },
-    link: { type: String, default: '' },     // '' = a sensible page for the step's position
-}, { _id: true });
+function check(s) {
+    const errors = {};
+    const c = s.currency || {};
+    if (!CURRENCIES.includes(c.base)) errors['currency.base'] = { message: 'Unknown base currency.' };
+    for (const code of CURRENCIES) {
+        if (c.rates && c.rates[code] !== undefined && !(Number(c.rates[code]) > 0)) errors[`currency.rates.${code}`] = { message: `Enter a rate above 0 for ${code}.` };
+    }
+    for (const k of ['flightPct', 'hotelPct']) {
+        const v = Number(s.travelMarkup?.[k]);
+        if (!Number.isFinite(v) || v < 0 || v > 50) errors[`travelMarkup.${k}`] = { message: 'Markup must be between 0 and 50%.' };
+    }
+    if ((s.testimonials || []).some((t) => !(Number(t.rating) >= 1 && Number(t.rating) <= 5))) errors.testimonials = { message: 'Testimonial ratings go from 1 to 5.' };
+    if ((s.supportSection?.chatMessages || []).some((m) => !['user', 'assistant'].includes(m.sender))) errors['supportSection.chatMessages'] = { message: 'Chat messages come from the user or the assistant.' };
+    if ((s.contentSections || []).some((x) => !x.sectionId || !x.name)) errors.contentSections = { message: 'Every section needs an id and a name.' };
+    if (s.offerBar?.countdownEnd && Number.isNaN(new Date(s.offerBar.countdownEnd).getTime())) errors['offerBar.countdownEnd'] = { message: 'The countdown end is not a valid date.' };
+    if (Object.keys(errors).length) throw new ValidationError(errors);
+}
 
-const supportFeatureSchema = new mongoose.Schema({
-    icon: { type: String, default: 'Zap' },
-    title: { type: String, default: '' },
-    description: { type: String, default: '' },
-}, { _id: true });
+function fromRow(row) {
+    const stored = JSON.parse(row.data || '{}');
+    const s = normalizeLists(withDefaults(stored, DEFAULTS));
+    s._id = 'site';
+    s.createdAt = new Date(row.created_at);
+    s.updatedAt = new Date(row.updated_at);
+    return s;
+}
 
-const chatMessageSchema = new mongoose.Schema({
-    sender: { type: String, enum: ['user', 'assistant'], default: 'assistant' },
-    text: { type: String, default: '' },
-}, { _id: true });
+/** The settings, or null when the site has none saved yet. */
+async function find() {
+    const row = await get('SELECT data, created_at, updated_at FROM site_settings WHERE id = 1');
+    return row ? fromRow(row) : null;
+}
 
-const aboutStatSchema = new mongoose.Schema({
-    value: { type: String, default: '' },
-    label: { type: String, default: '' },
-}, { _id: true });
+/** Validates and writes the whole settings record. */
+async function save(settings) {
+    const s = normalizeLists(withDefaults(settings, DEFAULTS));
+    for (const [k, v] of Object.entries(s.currency.rates || {})) s.currency.rates[k] = Number(v);
+    check(s);
+    const { _id, createdAt, updatedAt, ...data } = s;
+    const now = new Date().toISOString();
+    await run(
+        `INSERT INTO site_settings (id, data, created_at, updated_at) VALUES (1, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`,
+        [JSON.stringify(data), now, now],
+    );
+    return find();
+}
 
-const aboutValueSchema = new mongoose.Schema({
-    icon: { type: String, default: 'Globe2' },
-    title: { type: String, default: '' },
-    description: { type: String, default: '' },
-}, { _id: true });
+/** The settings, created with the default page sections on first use. */
+async function load() {
+    return (await find()) || save({ contentSections: DEFAULT_SECTIONS });
+}
 
-const navLinkSchema = new mongoose.Schema({
-    label: { type: String, default: '' },
-    path: { type: String, default: '/' },
-    order: { type: Number, default: 0 },
-}, { _id: true });
+/** Changes top-level keys (objects merge into what is there) and saves. */
+async function update(changes) {
+    const current = (await find()) || { contentSections: DEFAULT_SECTIONS };
+    for (const [key, value] of Object.entries(changes)) {
+        current[key] = isPlainObject(value) && isPlainObject(current[key]) ? { ...current[key], ...value } : value;
+    }
+    return save(current);
+}
 
-const footerLinkSchema = new mongoose.Schema({
-    label: { type: String, default: '' },
-    path: { type: String, default: '/' },
-}, { _id: true });
+async function remove() {
+    await run('DELETE FROM site_settings');
+}
 
-// ── Main schema ───────────────────────────────────────────────────────────────
-
-const siteSettingsSchema = new mongoose.Schema({
-    // ── Company / Contact ────────────────────────────────────────────────────
-    companyName: { type: String, default: 'Wandeazy Travels' },
-    contactEmail: { type: String, default: 'hello@wandeazy.com' },
-    // No stand-in phone or address: the site hides them until the real ones are entered
-    contactPhone: { type: String, default: '' },
-    address: { type: String, default: '' },
-
-    // ── Social Links ─────────────────────────────────────────────────────────
-    socialLinks: {
-        facebook:  { type: String, default: '' },
-        instagram: { type: String, default: '' },
-        twitter:   { type: String, default: '' },
-    },
-
-    // ── Footer ───────────────────────────────────────────────────────────────
-    footer: {
-        showQuickLinks:  { type: Boolean, default: true },
-        showNewsletter:  { type: Boolean, default: true },
-        copyrightText:   { type: String,  default: '' },   // '' = "© <this year> <company>. All rights reserved."
-    },
-    footerExploreLinks: { type: [footerLinkSchema], default: [
-        { label: 'Destinations', path: '/destinations' },
-        { label: 'Tours',        path: '/tours' },
-        { label: 'Collections',  path: '/collections' },
-        { label: 'Plan a Custom Trip', path: '/contact?topic=trip' },
-    ]},
-    footerCompanyLinks: { type: [footerLinkSchema], default: [
-        { label: 'About Us',        path: '/about' },
-        { label: 'Contact',         path: '/contact' },
-        { label: 'Travel Blog',     path: '/blog' },
-        { label: 'FAQ',             path: '/faq' },
-        { label: 'Privacy Policy',  path: '/privacy' },
-    ]},
-
-    // ── Navbar ────────────────────────────────────────────────────────────────
-    navLinks: { type: [navLinkSchema], default: [
-        { label: 'Destinations', path: '/destinations', order: 0 },
-        { label: 'Tours',        path: '/tours',        order: 1 },
-        { label: 'Collections',  path: '/collections',  order: 2 },
-        { label: 'Magazine',     path: '/blog',         order: 3 },
-        { label: 'About',        path: '/about',        order: 4 },
-    ]},
-
-    // ── Offer / Announcement Bar ──────────────────────────────────────────────
-    offerBar: {
-        // Off until there is a real offer to announce
-        enabled:       { type: Boolean, default: false },
-        badgeLabel:    { type: String,  default: '' },
-        text:          { type: String,  default: '' },
-        countdownEnd:  { type: Date,    default: null },    // null = no countdown
-        gradientFrom:  { type: String,  default: '#f97316' },
-        gradientTo:    { type: String,  default: '#e11d48' },
-        ctaLink:       { type: String,  default: '' },
-        ctaLabel:      { type: String,  default: '' },
-    },
-
-    // ── Hero Slides ───────────────────────────────────────────────────────────
-    heroSlides: { type: [heroSlideSchema], default: [
-        { title: 'Paradise Found',  subtitle: 'Pristine Beaches',  image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop', color: 'from-blue-500/80',    ctaLink: '/tours?category=Beach', ctaLabel: 'Explore Beaches' },
-        { title: 'Alpine Peaks',    subtitle: 'Mountain Escapes',  image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop', color: 'from-emerald-600/80', ctaLink: '/tours?category=Trekking', ctaLabel: 'Explore Mountains' },
-        { title: 'Urban Lights',    subtitle: 'City Breaks',       image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2144&auto=format&fit=crop', color: 'from-purple-600/80', ctaLink: '/tours?category=City', ctaLabel: 'Explore Cities' },
-        { title: 'Golden Sands',    subtitle: 'Desert Safaris',    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=2070&auto=format&fit=crop', color: 'from-orange-600/80', ctaLink: '/tours?q=Dubai', ctaLabel: 'Explore Deserts' },
-        { title: 'Deep Wilds',      subtitle: 'Jungle Trekking',   image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop', color: 'from-green-800/80',  ctaLink: '/tours?category=Adventure', ctaLabel: 'Explore Jungles' },
-    ]},
-
-    // ── Promotional Carousel ──────────────────────────────────────────────────
-    promoSlides: { type: [promoSlideSchema], default: [
-        { partner: 'Singapore Tourism', title: 'The Garden City Awaits',      subtitle: 'Experience the magic of Sentosa and the Gardens by the Bay.',      image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?q=80&w=1600', accentColor: 'text-emerald-400', discount: '', fromPrice: 1200, searchQuery: 'Singapore' },
-        { partner: 'Visit Dubai',       title: 'Golden Sands & Skyscrapers', subtitle: 'Discover the future of luxury in the heart of the desert.',          image: 'https://images.unsplash.com/photo-1603521097795-3b798129197f?q=80&w=1600', accentColor: 'text-amber-400',   discount: '', fromPrice: 1500, searchQuery: 'Dubai' },
-        { partner: 'Switzerland Tourism', title: 'Alpine Peaks & Valleys',   subtitle: 'Breathe in the freshest air atop the world\'s most famous mountains.', image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1600', accentColor: 'text-blue-200',    discount: '', fromPrice: 1800, searchQuery: 'Switzerland' },
-    ]},
-
-    // ── Plan Trip Steps ───────────────────────────────────────────────────────
-    planTrip: {
-        heading:    { type: String, default: 'Plan Your Dream Trip' },
-        subheading: { type: String, default: 'Easy as 1-2-3-4' },
-        steps: { type: [planTripStepSchema], default: [
-            { icon: 'Map',          title: 'Pick Destination', description: 'Browse tours and destinations' },
-            { icon: 'Calendar',     title: 'Select Dates',     description: 'Pick the dates that suit you' },
-            { icon: 'Settings',     title: 'Custom Addons',    description: 'Add extras that suit your trip' },
-            { icon: 'CheckCircle2', title: 'Confirm Travel',   description: 'Book securely and get ready to explore' },
-        ]},
-    },
-
-    // ── Testimonials ──────────────────────────────────────────────────────────
-    // Empty by default: the homepage then shows real traveller reviews
-    testimonials: { type: [testimonialSchema], default: [] },
-
-    // ── Support / Concierge Section ───────────────────────────────────────────
-    supportSection: {
-        heading:     { type: String, default: 'You Travel, We Handle The Rest.' },
-        subheading:  { type: String, default: 'Support Beyond Booking' },
-        paragraph:   { type: String, default: 'From the moment you click book until you\'re back home, our team is a message away.' },
-        features: { type: [supportFeatureSchema], default: [
-            { icon: 'MessageCircle', title: 'Ask Us Anything',      description: 'Travel queries, visa help or itinerary tweaks: send a message from any page.' },
-            { icon: 'Clock',        title: 'Replies Within 24 Hours', description: 'A real travel specialist answers every message, usually the same day.' },
-            { icon: 'Route',        title: 'Trips Made to Measure', description: 'Tell us what you love and we will shape an itinerary around it.' },
-            { icon: 'ShieldCheck',  title: 'Secure Booking',       description: 'Payments handled by Stripe, and your booking details in your dashboard.' },
-        ]},
-        // Greeting shown above the live message box on the homepage
-        chatMessages: { type: [chatMessageSchema], default: [
-            { sender: 'assistant', text: 'Hi! Tell us where you would like to go, or ask anything about a booking. A travel specialist will reply by email.' },
-        ]},
-    },
-
-    // ── FAQs ──────────────────────────────────────────────────────────────────
-    faqs: { type: [faqSchema], default: [
-        { question: 'How do I book a tour?',               answer: 'Browse our tours, pick the one you love, choose your travel date and number of guests, then complete the secure checkout. You\'ll receive a confirmation with all your booking details.', order: 0 },
-        { question: 'Can I cancel or change my booking?',  answer: 'Yes. Most tours offer free cancellation up to 24 hours before departure. You can cancel directly from your dashboard, and refunds are processed according to each tour\'s cancellation policy.', order: 1 },
-        { question: 'What payment methods do you accept?', answer: 'We accept all major credit and debit cards through our secure, PCI-compliant payment provider. Your payment information is encrypted and never stored on our servers.', order: 2 },
-        { question: 'Are flights included in the tour price?', answer: 'Unless explicitly stated in the tour inclusions, international flights are not included. Each tour page lists exactly what\'s covered so there are no surprises.', order: 3 },
-        { question: 'Do I need travel insurance?',         answer: 'We strongly recommend travel insurance for all trips. While not mandatory, it protects you against unexpected cancellations, medical emergencies, and lost belongings.', order: 4 },
-        { question: 'How can I contact support?',          answer: 'Send us a message from the Contact page or the message box on the homepage, or email us. We reply within 24 hours.', order: 5 },
-        { question: 'Can you create a custom itinerary?',  answer: 'Absolutely! Head to our Contact page, tell us about your dream trip, and our specialists will craft a personalized itinerary just for you.', order: 6 },
-    ]},
-
-    // ── About Page ────────────────────────────────────────────────────────────
-    aboutPage: {
-        heroImage:       { type: String, default: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80' },
-        heroHeadline:    { type: String, default: 'We turn wanderlust into unforgettable journeys' },
-        heroSubtext:     { type: String, default: 'Wandeazy was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.' },
-        storyParagraph1: { type: String, default: 'What started as a small group of travel obsessives sketching itineraries on napkins has grown into a platform trusted by travelers worldwide. We\'ve walked the trails, tasted the food, and slept under the stars — so we know exactly what makes a trip worth taking.' },
-        storyParagraph2: { type: String, default: 'Today, we partner with the best local operators on the planet to bring you experiences that are authentic, responsible, and unforgettable.' },
-        // Empty = the About page shows live numbers worked out from real tours, reviews and bookings
-        stats: { type: [aboutStatSchema], default: [] },
-        values: { type: [aboutValueSchema], default: [
-            { icon: 'Globe2',      title: 'Global Reach',            description: 'Hand-picked experiences in destinations around the world.' },
-            { icon: 'ShieldCheck', title: 'Travel With Confidence',   description: 'Secure payments, trusted local partners and clear cancellation terms.' },
-            { icon: 'Heart',       title: 'Crafted With Care',        description: 'Every itinerary is curated by travel specialists, not algorithms.' },
-            { icon: 'Users',       title: 'Real Support',             description: 'A real team that answers every message within 24 hours.' },
-        ]},
-        ctaHeading:  { type: String, default: 'Ready to start your journey?' },
-        ctaSubtext:  { type: String, default: 'Browse our curated tours or tell us about your dream trip — we\'ll handle the rest.' },
-        ctaBtn1Label: { type: String, default: 'Explore Tours' },
-        ctaBtn1Link:  { type: String, default: '/tours' },
-        ctaBtn2Label: { type: String, default: 'Plan My Trip' },
-        ctaBtn2Link:  { type: String, default: '/contact' },
-    },
-
-    // ── Booking services (admin-only switches) ────────────────────────────────
-    // Off by default: when a service is off it does not exist on the public site.
-    features: {
-        flights: { type: Boolean, default: false },
-        hotels:  { type: Boolean, default: false },
-    },
-    // ── Currencies ────────────────────────────────────────────────────────────
-    // base: the currency revenue is reported in and new tours are priced in.
-    // enabled: what travellers can pick (and be charged in). rates: units per 1 USD.
-    currency: {
-        base: { type: String, enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'], default: 'INR' },
-        enabled: { type: [String], default: ['INR', 'USD', 'EUR', 'GBP', 'AED'] },
-        rates: {
-            USD: { type: Number, default: 1 },
-            INR: { type: Number, default: 83.5, min: 0.000001 },
-            EUR: { type: Number, default: 0.92, min: 0.000001 },
-            GBP: { type: Number, default: 0.79, min: 0.000001 },
-            AED: { type: Number, default: 3.67, min: 0.000001 },
-        },
-        ratesUpdatedAt: { type: Date, default: null },
-    },
-    travelMarkup: {
-        flightPct: { type: Number, default: 5, min: 0, max: 50 },
-        hotelPct:  { type: Number, default: 8, min: 0, max: 50 },
-    },
-
-    // ── Content Section Visibility ────────────────────────────────────────────
-    contentSections: [{
-        sectionId:   { type: String, required: true },
-        name:        { type: String, required: true },
-        description: String,
-        isVisible:   { type: Boolean, default: true },
-    }],
-
-}, { timestamps: true });
-
-module.exports = mongoose.model('SiteSettings', siteSettingsSchema);
+module.exports = { DEFAULTS, DEFAULT_SECTIONS, find, load, save, update, remove };

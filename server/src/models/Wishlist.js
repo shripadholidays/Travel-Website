@@ -1,16 +1,11 @@
-const mongoose = require('mongoose');
+const { defineTable } = require('../db/table');
 
-const wishlistSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-        unique: true
+const Wishlist = defineTable({
+    table: 'wishlists',
+    fields: {
+        user: { type: 'ref', required: true, unique: true, col: 'user_id' },
+        tours: { type: 'refs', default: [] },
     },
-    tours: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Travel_Destination'
-    }]
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model('Wishlist', wishlistSchema);
+module.exports = Wishlist;

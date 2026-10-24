@@ -11,7 +11,7 @@ const REQUIRED_ACCOUNT_AGE_DAYS = 30;
 
 // GET /users/profile
 exports.getProfile = (req, res) => {
-    const user = req.user.toObject ? req.user.toObject() : { ...req.user };
+    const user = { ...req.user };
     // Google has already verified these addresses (older accounts were saved without the flag)
     if (user.authProvider === 'google') user.isEmailVerified = true;
     // What this person may open in the admin area (the client builds its menus from it)
@@ -40,8 +40,8 @@ exports.getWriteEligibility = async (req, res) => {
 
         await completePastBookings({ user: user._id });
         const [reviewCount, completedBookings] = await Promise.all([
-            Review.countDocuments({ user: user._id }),
-            Booking.countDocuments({ user: user._id, status: 'completed' }),
+            Review.count('user_id = ?', [user._id]),
+            Booking.count("user_id = ? AND status = 'completed'", [user._id]),
         ]);
 
         const ageOk = accountAgeDays >= REQUIRED_ACCOUNT_AGE_DAYS;
@@ -69,11 +69,7 @@ exports.updateProfile = async (req, res) => {
         if (displayName) updates.displayName = displayName;
         if (profilePicture) updates.profilePicture = profilePicture;
 
-        const user = await User.findByIdAndUpdate(
-            req.user._id,
-            updates,
-            { new: true, runValidators: true }
-        );
+        const user = await User.update(req.user._id, updates);
 
         return ResponseHandler.success(res, { user }, 'Profile updated successfully');
     } catch (err) {

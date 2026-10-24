@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
             return ResponseHandler.fail(res, 400, 'Password must be at least 6 characters.');
         }
 
-        const existing = await User.findOne({ email: email.toLowerCase() });
+        const existing = await User.findByEmail(email);
         if (existing) {
             return ResponseHandler.fail(res, 409, 'An account with this email already exists.');
         }
@@ -61,10 +61,10 @@ exports.register = async (req, res) => {
         const verificationToken = crypto.randomBytes(32).toString('hex');
         const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 h
 
-        const user = await User.create({
+        const user = await User.insert({
             displayName: displayName.trim(),
             email: email.toLowerCase().trim(),
-            password,
+            password: await User.hashPassword(password),
             authProvider: 'local',
             emailVerificationToken: verificationToken,
             emailVerificationTokenExpiry: verificationExpiry,
@@ -91,12 +91,12 @@ exports.login = async (req, res) => {
             return ResponseHandler.fail(res, 400, 'Email and password are required.');
         }
 
-        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+        const user = await User.findByEmail(email, { secrets: true });
         if (!user || !user.password) {
             return ResponseHandler.fail(res, 401, 'Invalid email or password.');
         }
 
-        const valid = await user.comparePassword(password);
+        const valid = await User.comparePassword(user, password);
         if (!valid) {
             return ResponseHandler.fail(res, 401, 'Invalid email or password.');
         }
@@ -148,9 +148,9 @@ exports.googleCallback = async (req, res) => {
         const decoded = jwt.decode(tokenData.id_token);
         const { email, name, picture, sub: googleId } = decoded;
 
-        let user = await User.findOne({ email });
+        let user = await User.findByEmail(email);
         if (!user) {
-            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
+            user = await User.insert({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
         }
 
         const cookieOpts = {
@@ -192,9 +192,9 @@ exports.exchangeToken = async (req, res) => {
         const decoded = jwt.decode(tokenData.id_token);
         const { email, name, picture, sub: googleId } = decoded;
 
-        let user = await User.findOne({ email });
+        let user = await User.findByEmail(email);
         if (!user) {
-            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
+            user = await User.insert({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
         }
 
         const cookieOpts = {
@@ -232,9 +232,9 @@ exports.googleOneTap = async (req, res) => {
         const payload = ticket.getPayload();
         const { email, name, picture, sub: googleId } = payload;
 
-        let user = await User.findOne({ email });
+        let user = await User.findByEmail(email);
         if (!user) {
-            user = await User.create({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
+            user = await User.insert({ googleId, displayName: name, email, profilePicture: picture, authProvider: 'google', isEmailVerified: true });
         }
 
         res.cookie(cookieName, credential, {
@@ -277,7 +277,7 @@ exports.forgotPassword = async (req, res) => {
         const { email } = req.body || {};
         if (!email) return ResponseHandler.fail(res, 400, 'Email is required.');
 
-        const user = await User.findOne({ email: email.toLowerCase() });
+        const user = await User.findByEmail(email, { secrets: true });
         // Always respond the same way — don't reveal whether the account exists
         if (!user || user.authProvider !== 'local') {
             return ResponseHandler.success(res, null, 'If an account with that email exists, a reset link has been sent.');
@@ -286,7 +286,7 @@ exports.forgotPassword = async (req, res) => {
         const token = crypto.randomBytes(32).toString('hex');
         user.resetPasswordToken = token;
         user.resetPasswordExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-        await user.save();
+        await User.save(user);
 
         const isProd = config.app.nodeEnv === 'production';
         const frontendOrigin = isProd ? config.cors.productionOrigin : config.cors.localOrigin;
@@ -308,17 +308,14 @@ exports.resetPassword = async (req, res) => {
         if (!password) return ResponseHandler.fail(res, 400, 'New password is required.');
         if (password.length < 6) return ResponseHandler.fail(res, 400, 'Password must be at least 6 characters.');
 
-        const user = await User.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpiry: { $gt: new Date() },
-        }).select('+resetPasswordToken +resetPasswordExpiry');
+        const user = await User.findOne('reset_password_token = ? AND reset_password_expiry > ?', [String(token), new Date().toISOString()], { secrets: true });
 
         if (!user) return ResponseHandler.fail(res, 400, 'Reset link is invalid or has expired.');
 
-        user.password = password;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpiry = undefined;
-        await user.save();
+        user.password = await User.hashPassword(password);
+        user.resetPasswordToken = null;
+        user.resetPasswordExpiry = null;
+        await User.save(user);
 
         return ResponseHandler.success(res, null, 'Password reset successfully. You can now sign in.');
     } catch (err) {
@@ -331,7 +328,7 @@ exports.resetPassword = async (req, res) => {
 // POST /auth/resend-verification — a fresh link for the signed-in, unverified account
 exports.resendVerification = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id, { secrets: true });
         if (!user) return ResponseHandler.fail(res, 404, 'Account not found.');
         if (user.isEmailVerified || user.authProvider === 'google') {
             return ResponseHandler.success(res, { alreadyVerified: true }, 'Your email is already verified.');
@@ -339,7 +336,7 @@ exports.resendVerification = async (req, res) => {
 
         user.emailVerificationToken = crypto.randomBytes(32).toString('hex');
         user.emailVerificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        await user.save();
+        await User.save(user);
 
         const isProd = config.app.nodeEnv === 'production';
         const frontendOrigin = isProd ? config.cors.productionOrigin : config.cors.localOrigin;
@@ -356,17 +353,14 @@ exports.verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
 
-        const user = await User.findOne({
-            emailVerificationToken: token,
-            emailVerificationTokenExpiry: { $gt: new Date() },
-        }).select('+emailVerificationToken +emailVerificationTokenExpiry');
+        const user = await User.findOne('email_verification_token = ? AND email_verification_token_expiry > ?', [String(token), new Date().toISOString()], { secrets: true });
 
         if (!user) return ResponseHandler.fail(res, 400, 'Verification link is invalid or has expired.');
 
         user.isEmailVerified = true;
-        user.emailVerificationToken = undefined;
-        user.emailVerificationTokenExpiry = undefined;
-        await user.save();
+        user.emailVerificationToken = null;
+        user.emailVerificationTokenExpiry = null;
+        await User.save(user);
 
         return ResponseHandler.success(res, { user: publicUser(user) }, 'Email verified successfully!');
     } catch (err) {

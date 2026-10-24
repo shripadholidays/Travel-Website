@@ -9,3 +9,5 @@ logs
 Dockerfile
 .dockerignore
 README.md
+data
+uploads/*
