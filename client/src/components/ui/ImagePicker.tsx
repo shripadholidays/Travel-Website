@@ -99,7 +99,7 @@ export function ImagePicker({ value, onChange, label = 'Image', className }: Ima
             {/* Upload tab */}
             {tab === 'upload' && (
                 <div>
-                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+                    <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic" className="hidden" onChange={handleFile} />
                     <button
                         type="button"
                         onClick={() => fileRef.current?.click()}

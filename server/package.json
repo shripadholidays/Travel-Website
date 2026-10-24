@@ -23,6 +23,7 @@
     "content:clean": "node scripts/clean-placeholder-content.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1096.0",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
@@ -42,6 +43,7 @@
     "nodemailer": "^8.0.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "sharp": "^0.35.5",
     "stripe": "^20.3.1",
     "winston": "^3.19.0"
   },

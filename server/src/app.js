@@ -86,8 +86,15 @@ app.use(morgan(
 // Stripe webhook needs raw body - must come BEFORE json parser
 app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));
 
-// Serve uploaded files (local storage — swap for S3/R2 CDN URL in production)
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// Uploads saved to local disk (dev, or production without R2). With R2 the image URLs point straight at the bucket.
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), {
+    maxAge: '365d',
+    immutable: true,
+    setHeaders: (res) => {
+        res.set('X-Content-Type-Options', 'nosniff');
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    },
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: config.app.bodyLimit }));

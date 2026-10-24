@@ -10,6 +10,6 @@ const router = express.Router();
 router.use(isLoggedIn, can(PERMISSIONS.CATALOG, PERMISSIONS.CONTENT, PERMISSIONS.ARTICLES, PERMISSIONS.SETTINGS));
 
 router.post('/', uploadMiddleware, uploadFile);
-router.delete('/:filename', can(PERMISSIONS.CATALOG, PERMISSIONS.CONTENT), deleteFile);
+router.delete('/:folder/:filename', can(PERMISSIONS.CATALOG, PERMISSIONS.CONTENT), deleteFile);
 
 module.exports = router;

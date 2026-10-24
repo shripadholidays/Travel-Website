@@ -101,6 +101,18 @@ const config = {
         recommendedFallbackLimit: Number(e.TOURS_FALLBACK_LIMIT)        || 6,
     },
 
+    // Uploaded images: Cloudflare R2 when all five R2 values are set, otherwise the server's own uploads/ folder
+    storage: {
+        r2AccountId:       e.R2_ACCOUNT_ID         || '',
+        r2AccessKeyId:     e.R2_ACCESS_KEY_ID      || '',
+        r2SecretAccessKey: e.R2_SECRET_ACCESS_KEY  || '',
+        r2Bucket:          e.R2_BUCKET_NAME        || '',
+        r2PublicUrl:       (e.R2_PUBLIC_URL        || '').replace(/\/$/, ''),
+        // Public address of this API, used for local-disk upload URLs (Render sets RENDER_EXTERNAL_URL)
+        publicApiUrl:      (e.PUBLIC_API_URL || e.RENDER_EXTERNAL_URL || '').replace(/\/$/, ''),
+        maxUploadMb:       Number(e.MAX_UPLOAD_MB) || 10,
+    },
+
     mock: {
         userId:      e.MOCK_USER_ID           || 'mock-user-id',
         email:       e.MOCK_USER_EMAIL        || 'test@wandeazy.com',
