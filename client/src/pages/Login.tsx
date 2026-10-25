@@ -1,3 +1,4 @@
+import { config } from "@/config";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -54,7 +55,7 @@ export const LoginPage = () => {
 
     // Initialize Google Sign-In
     useEffect(() => {
-        const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
+        const clientId = config.googleClientId;
         if (!clientId) return;
 
         const script = document.createElement('script');
