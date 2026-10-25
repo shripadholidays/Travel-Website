@@ -83,7 +83,7 @@ app.use(morgan(
     nodeEnv === 'development' ? undefined : { stream: accessLogStream }
 ));
 
-// Stripe webhook needs raw body - must come BEFORE json parser
+// The Razorpay webhook signature covers the exact raw body, so it is read before the JSON parser
 app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));
 
 // Uploads saved to local disk (dev, or production without R2). With R2 the image URLs point straight at the bucket.

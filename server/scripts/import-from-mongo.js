@@ -72,6 +72,8 @@ async function main() {
             if (existing && !replace) { console.log(`  - ${Model.table}: already has ${existing} row(s), skipped`); continue; }
             if (existing) await Model.removeWhere();
             const docs = (await source.collection(name).find().toArray()).map(plain);
+            // Older payments were taken by Stripe; keep their reference in the gateway field
+            if (name === 'payments') for (const d of docs) if (d.stripePaymentIntentId && !d.gatewayOrderId) d.gatewayOrderId = d.stripePaymentIntentId;
             if (docs.length) await Model.insertMany(docs, { trusted: true });
             console.log(`  ✓ ${Model.table}: ${docs.length}`);
         }

@@ -11,7 +11,9 @@ const { applyMarkup } = require('../providers/pricing');
 const { withTimeout } = require('../providers/errors');
 const { toPublicOffer, sendProviderError } = require('../providers/public');
 const { getMarkupPct, isKindEnabled, enabledKinds } = require('../services/travel-config');
-const { getProvider, finalizeOrder, refundPayment, stripeClient } = require('../services/travel-order-service');
+const { getProvider, finalizeOrder, refundPayment } = require('../services/travel-order-service');
+const payments = require('../services/payments');
+const { paymentCaptured } = require('../services/payment-events');
 const { notFound } = require('../middlewares/require-feature');
 const { getCurrencyConfig, convert, rateBetween } = require('../services/currency');
 
@@ -96,67 +98,74 @@ exports.createOrder = async (req, res) => {
             charge,
         });
 
-        const stripe = stripeClient();
-        if (!stripe) {
+        if (!payments.gateway()) {
             // No payment gateway configured (local dev): book straight away.
             await finalizeOrder(order);
             return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) }, 'Booking confirmed');
         }
 
-        let paymentIntent;
+        let checkout;
         try {
-            paymentIntent = await stripe.paymentIntents.create({
-                amount: Math.round(charge.total * 100),
-                currency: charge.currency.toLowerCase(),
-                metadata: { travelOrderId: order._id.toString(), userId: req.user._id.toString() },
+            checkout = await payments.createCheckout({
+                amount: charge.total,
+                currency: charge.currency,
+                receipt: `${kind}_${order._id}`,
+                notes: { travelOrderId: order._id, userId: String(req.user._id), kind },
+                description: kind === 'flight' ? 'Flight booking' : 'Hotel booking',
             });
-        } catch (stripeErr) {
-            logger.error('Stripe payment intent creation failed', { orderId: order._id, error: stripeErr.message });
+        } catch (gatewayErr) {
+            logger.error('Razorpay order creation failed', { orderId: order._id, error: gatewayErr?.error?.description || gatewayErr.message });
             order.status = 'failed';
             order.failureReason = 'Payment could not be started';
             await TravelOrder.save(order);
             return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');
         }
+        checkout.prefill = {
+            name: `${travellers[0].firstName} ${travellers[0].lastName}`.trim(),
+            email: order.contact.email,
+            contact: order.contact.phone || undefined,
+        };
         const payment = await Payment.insert({
             order: order._id,
             user: req.user._id,
             amount: charge.total,
             currency: charge.currency,
-            method: 'stripe',
-            stripePaymentIntentId: paymentIntent.id,
+            method: 'razorpay',
+            gatewayOrderId: checkout.orderId,
             status: 'pending',
         });
         order.paymentId = payment._id;
         await TravelOrder.save(order);
 
-        return ResponseHandler.success(res, { order: TravelOrder.toPublic(order), clientSecret: paymentIntent.client_secret }, 'Order created');
+        return ResponseHandler.success(res, { order: TravelOrder.toPublic(order), checkout }, 'Order created');
     } catch (err) {
         return sendProviderError(res, err, 'Failed to create the booking');
     }
 };
 
-// POST /travel-orders/:id/confirm — called after Stripe confirms on the client (webhook-independent)
+// POST /travel-orders/:id/confirm — the browser reports the Razorpay payment (webhook-independent).
+// Body: { razorpay_payment_id, razorpay_order_id, razorpay_signature }
 exports.confirmOrder = async (req, res) => {
     try {
         const order = await loadOwnOrder(req, res);
         if (!order) return undefined;
         if (order.status !== 'pending') return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) });
 
-        const stripe = stripeClient();
-        const payment = order.paymentId ? await Payment.findById(order.paymentId) : null;
-        if (stripe && payment?.stripePaymentIntentId) {
-            const intent = await stripe.paymentIntents.retrieve(payment.stripePaymentIntentId);
-            if (intent.status !== 'succeeded') return ResponseHandler.fail(res, 400, 'Payment not completed');
-            payment.status = 'completed';
-            payment.gatewayResponse = intent;
-            await Payment.save(payment);
-        } else if (stripe) {
-            return ResponseHandler.fail(res, 400, 'Payment not completed');
+        if (payments.gateway()) {
+            const payment = order.paymentId ? await Payment.findById(order.paymentId) : null;
+            const remote = await payments.settle(payment, {
+                paymentId: req.body?.razorpay_payment_id,
+                orderId: req.body?.razorpay_order_id,
+                signature: req.body?.razorpay_signature,
+            });
+            await paymentCaptured(payment, remote);
+            return ResponseHandler.success(res, { order: TravelOrder.toPublic(await TravelOrder.findById(order._id)) });
         }
 
         await finalizeOrder(order);
         return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) });
     } catch (err) {
+        if (err instanceof payments.PaymentError) return ResponseHandler.fail(res, 400, err.message);
         logger.error('Failed to confirm travel order', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to confirm the booking');
     }

@@ -49,7 +49,7 @@ describe('payment model', () => {
     });
 });
 
-describe('creating orders (no Stripe configured)', () => {
+describe('creating orders (no payment gateway configured)', () => {
     it('books immediately and hides supplier pricing', async () => {
         const offer = await firstFlight();
         const res = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact, quotedTotal: offer.price, currency: 'USD' });
@@ -63,15 +63,16 @@ describe('creating orders (no Stripe configured)', () => {
         expect(saved.pricing.supplierAmount).toBeGreaterThan(0);
     });
 
-    it('treats a placeholder Stripe key as "no gateway"', async () => {
-        process.env.STRIPE_SECRET_KEY = 'sk_test_placeholder';
+    it('treats placeholder Razorpay keys as "no gateway"', async () => {
+        const config = require('../src/config');
+        Object.assign(config.razorpay, { keyId: 'rzp_test_placeholder', keySecret: 'your_secret' });
         try {
             const offer = await firstFlight();
             const res = await createOrder({ kind: 'flight', offerId: offer.id, travellers: [traveller], contact });
             expect(res.body.data.order.status).toBe('confirmed');
-            expect(res.body.data.clientSecret).toBeUndefined();
+            expect(res.body.data.checkout).toBeUndefined();
         } finally {
-            process.env.STRIPE_SECRET_KEY = '';
+            Object.assign(config.razorpay, { keyId: '', keySecret: '' });
         }
     });
 

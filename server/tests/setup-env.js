@@ -3,8 +3,9 @@ process.env.NODE_ENV = 'test';
 // A fresh in-memory database per test file; never the real one
 process.env.TURSO_DATABASE_URL = ':memory:';
 process.env.TURSO_AUTH_TOKEN = '';
-process.env.STRIPE_SECRET_KEY = '';
-process.env.STRIPE_WEBHOOK_SECRET = '';
+process.env.RAZORPAY_KEY_ID = '';
+process.env.RAZORPAY_KEY_SECRET = '';
+process.env.RAZORPAY_WEBHOOK_SECRET = '';
 process.env.RATE_LIMIT_API_MAX = '100000';
 process.env.RATE_LIMIT_SEARCH_MAX = '100000';
 process.env.FLIGHT_PROVIDER = 'mock';

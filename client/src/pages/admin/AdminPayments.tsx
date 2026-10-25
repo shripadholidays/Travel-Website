@@ -21,7 +21,9 @@ interface Payment {
     amount: number;
     currency: string;
     status: 'pending' | 'completed' | 'failed' | 'refunded';
-    stripePaymentIntentId?: string;
+    method?: 'razorpay' | 'stripe';
+    gatewayOrderId?: string;
+    gatewayPaymentId?: string;
     createdAt: string;
 }
 
@@ -99,7 +101,7 @@ export const AdminPayments = () => {
                         { id: 'pending', label: 'Pending', count: s.pending?.count ?? 0 },
                         { id: 'failed', label: 'Failed', count: s.failed?.count ?? 0 },
                     ]} />
-                    <SearchField value={search} onChange={(v) => { setSearch(v); setParam('page', '1'); }} placeholder="Customer or Stripe ID…" className="sm:w-80" />
+                    <SearchField value={search} onChange={(v) => { setSearch(v); setParam('page', '1'); }} placeholder="Customer, or Razorpay order / payment ID…" className="sm:w-80" />
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
@@ -124,7 +126,7 @@ export const AdminPayments = () => {
                                             <TableCell>
                                                 <p className="font-medium text-sm">{p.user?.displayName || '—'}</p>
                                                 <p className="text-xs text-muted-foreground">{p.user?.email || '—'}</p>
-                                                {p.stripePaymentIntentId && <p className="font-mono text-[11px] text-slate-400 truncate max-w-[200px]" title={p.stripePaymentIntentId}>{p.stripePaymentIntentId}</p>}
+                                                {(p.gatewayPaymentId || p.gatewayOrderId) && <p className="font-mono text-[11px] text-slate-400 truncate max-w-[200px]" title={p.gatewayPaymentId || p.gatewayOrderId}>{p.gatewayPaymentId || p.gatewayOrderId}</p>}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell text-sm">
                                                 {p.booking ? (

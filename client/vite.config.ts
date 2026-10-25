@@ -32,7 +32,6 @@ export default defineConfig(({ mode }) => {
                     'query-vendor': ['@tanstack/react-query'],
                     'form-vendor': ['react-hook-form', 'zod', 'date-fns'],
                     'map-vendor': ['leaflet', 'react-leaflet'],
-                    'stripe-vendor': ['@stripe/stripe-js', '@stripe/react-stripe-js'],
                     'animation-vendor': ['framer-motion', 'gsap', '@gsap/react'],
                     'carousel-vendor': ['swiper'],
                 },

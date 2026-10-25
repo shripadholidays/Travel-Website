@@ -21,8 +21,8 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useValidateCoupon, type ValidatedCoupon } from "@/hooks/use-coupons";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Elements } from "@stripe/react-stripe-js";
-import { StripePaymentForm, stripeAppearance, stripePromise } from "@/components/payment/StripePaymentForm";
+import { RazorpayPayButton } from "@/components/payment/RazorpayPayButton";
+import type { RazorpayCheckout, RazorpayPaid } from "@/lib/razorpay";
 import { TripAddons } from "@/components/travel/TripAddons";
 
 const steps = ['Traveller Details', 'Add-ons', 'Review & Pay', 'Success'];
@@ -74,7 +74,7 @@ export const BookingPage = () => {
     });
     const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
     const [specialRequests, setSpecialRequests] = useState("");
-    const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [checkout, setCheckout] = useState<RazorpayCheckout | null>(null);
     const [bookingId, setBookingId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [couponCode, setCouponCode] = useState("");
@@ -184,8 +184,9 @@ export const BookingPage = () => {
             setBookingId(result.booking._id);
             setConfirmed(result.booking);
 
-            if (result.clientSecret && stripePromise) {
-                setClientSecret(result.clientSecret);
+            if (result.checkout) {
+                // Razorpay opens straight away (see RazorpayPayButton autoOpen)
+                setCheckout(result.checkout);
             } else if (result.booking.status === 'confirmed') {
                 setCurrentStep(3);
                 toast.success("Booking confirmed!");
@@ -199,14 +200,18 @@ export const BookingPage = () => {
         }
     };
 
-    // Stripe took the payment; have the server verify it and confirm the booking.
-    const handlePaymentSuccess = async () => {
+    // Razorpay took the payment; the server verifies it with Razorpay and confirms the booking.
+    const handlePaymentSuccess = async (paid: RazorpayPaid) => {
+        setIsSubmitting(true);
         try {
-            const res = await api.post<{ booking: Booking }>('/payments/confirm', { bookingId });
+            const res = await api.post<{ booking: Booking }>('/payments/confirm', { bookingId, ...paid });
             setConfirmed(res.booking);
             toast.success("Payment successful! Booking confirmed.");
         } catch {
-            toast.success("Payment received — your confirmation is on its way.");
+            // Razorpay's webhook confirms it as well, so a paid booking is never lost
+            toast.success("Payment received. Your confirmation is on its way by email.");
+        } finally {
+            setIsSubmitting(false);
         }
         setCurrentStep(3);
     };
@@ -439,12 +444,16 @@ export const BookingPage = () => {
                                     </div>
                                 </div>
 
-                                {clientSecret && stripePromise ? (
+                                {checkout ? (
                                     <div>
                                         <h3 className="font-bold mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-brand-orange" /> Payment</h3>
-                                        <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
-                                            <StripePaymentForm onSuccess={handlePaymentSuccess} isSubmitting={isSubmitting} />
-                                        </Elements>
+                                        <RazorpayPayButton
+                                            checkout={checkout}
+                                            onPaid={handlePaymentSuccess}
+                                            isSubmitting={isSubmitting}
+                                            autoOpen
+                                            label={`Pay ${formatMoney(checkout.amount / 100, checkout.currency)}`}
+                                        />
                                     </div>
                                 ) : (
                                     <p className="text-sm text-muted-foreground bg-slate-50 rounded-xl p-4 text-center">
@@ -497,7 +506,7 @@ export const BookingPage = () => {
                         )}
                     </AnimatePresence>
 
-                    {currentStep < 3 && !(currentStep === 2 && clientSecret) && (
+                    {currentStep < 3 && !(currentStep === 2 && checkout) && (
                         <div className="flex justify-between mt-8 border-t pt-8">
                             <Button
                                 variant="ghost"

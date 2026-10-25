@@ -73,7 +73,7 @@
         {
           "icon": "ShieldCheck",
           "title": "Secure Booking",
-          "description": "Payments handled by Stripe, and your booking details in your dashboard."
+          "description": "Secure payments by Razorpay (cards, UPI, netbanking), and your booking details in your dashboard."
         }
       ],
       "chatMessages": [

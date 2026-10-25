@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Elements } from '@stripe/react-stripe-js';
 import { Check, CheckCircle2, Loader2, MapPin, ShieldCheck, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { PageTitle } from '@/components/PageTitle';
@@ -14,7 +13,8 @@ import { Eyebrow } from '@/components/travel/Eyebrow';
 import { SliceRow, AirlineBadge } from '@/components/travel/FlightCard';
 import { TravellerFields } from '@/components/travel/TravellerFields';
 import { AnimatedPrice } from '@/components/travel/motion';
-import { StripePaymentForm, stripeAppearance, stripePromise } from '@/components/payment/StripePaymentForm';
+import { RazorpayPayButton } from '@/components/payment/RazorpayPayButton';
+import type { RazorpayCheckout, RazorpayPaid } from '@/lib/razorpay';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useConfirmTravelOrder, useCreateTravelOrder, useFlightOffer, useHotelOffer } from '@/hooks/use-travel';
@@ -119,7 +119,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
     const [contact, setContact] = useState({ email: user?.email ?? '', phone: '' });
     const [price, setPrice] = useState<number | null>(null);
     const [newPrice, setNewPrice] = useState<number | null>(null);
-    const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [checkout, setCheckout] = useState<RazorpayCheckout | null>(null);
     const [order, setOrder] = useState<TravelOrder | null>(null);
 
     useEffect(() => {
@@ -147,8 +147,8 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
             }
             setNewPrice(null);
             setOrder(result.order);
-            if (result.clientSecret && stripePromise) {
-                setClientSecret(result.clientSecret);
+            if (result.checkout) {
+                setCheckout(result.checkout);
                 setStep(2);
             } else {
                 setStep(3);
@@ -158,10 +158,10 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
         }
     };
 
-    const onPaid = async () => {
+    const onPaid = async (paid: RazorpayPaid) => {
         if (!order) return;
         try {
-            const result = await confirmOrder.mutateAsync(order._id);
+            const result = await confirmOrder.mutateAsync({ id: order._id, paid });
             setOrder(result.order);
             setStep(3);
         } catch (err) {
@@ -266,12 +266,16 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
                                     </section>
                                 )}
 
-                                {step === 2 && clientSecret && stripePromise && (
+                                {step === 2 && checkout && (
                                     <section className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 md:p-7" aria-label="Payment">
                                         <h2 className="text-2xl font-display font-bold text-brand-blue mb-5">Payment</h2>
-                                        <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
-                                            <StripePaymentForm onSuccess={onPaid} isSubmitting={confirmOrder.isPending} submitLabel={`Pay ${charged(displayPrice)}`} />
-                                        </Elements>
+                                        <RazorpayPayButton
+                                            checkout={checkout}
+                                            onPaid={onPaid}
+                                            isSubmitting={confirmOrder.isPending}
+                                            autoOpen
+                                            label={`Pay ${formatMoney(checkout.amount / 100, checkout.currency)}`}
+                                        />
                                     </section>
                                 )}
 
@@ -339,10 +343,10 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
                                     className="h-14 rounded-full bg-brand-orange font-bold hover:bg-brand-orange/90 transition-colors disabled:opacity-60 inline-flex items-center justify-center gap-2"
                                 >
                                     {createOrder.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                                    {stripePromise ? 'Continue to payment' : 'Confirm booking'}
+                                    Continue to payment
                                 </button>
                             )}
-                            <p className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="w-4 h-4 text-brand-orange" />Secure payment by Stripe. Price re-checked before you pay.</p>
+                            <p className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="w-4 h-4 text-brand-orange" />Secure payment by Razorpay. Price re-checked before you pay.</p>
                         </aside>
                     )}
                 </div>

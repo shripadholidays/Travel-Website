@@ -7,7 +7,7 @@ const TravelDestination = require('../models/TravelDestination');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 const { completePastBookings, populateBooking, BookingError, parseTravelDate, priceBooking, confirmBooking, cancelBooking: cancelBookingWithRefund } = require('../services/booking-service');
-const { stripeClient } = require('../services/travel-order-service');
+const payments = require('../services/payments');
 const config = require('../config');
 const { formatMoney } = require('../services/currency');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
@@ -68,38 +68,41 @@ exports.createBooking = async (req, res) => {
             status: 'pending'
         });
 
-        const stripe = stripeClient();
-        let clientSecret = null;
-        if (!stripe || pricing.totalAmount === 0) {
+        let checkout = null;
+        if (!payments.gateway() || pricing.totalAmount === 0) {
             // No payment gateway (local dev) or nothing to pay: confirm straight away.
             await confirmBooking(booking);
         } else {
             try {
-                const paymentIntent = await stripe.paymentIntents.create({
-                    amount: Math.round(pricing.totalAmount * 100),
-                    currency: currency.toLowerCase(),
-                    metadata: {
-                        bookingId: booking._id,
-                        userId: String(req.user._id)
-                    }
+                // A Razorpay order for exactly this amount; the browser pays it in Razorpay Checkout
+                checkout = await payments.createCheckout({
+                    amount: pricing.totalAmount,
+                    currency,
+                    receipt: `booking_${booking._id}`,
+                    notes: { bookingId: booking._id, userId: String(req.user._id), tour: tour.title.slice(0, 200) },
+                    description: tour.title,
                 });
+                checkout.prefill = {
+                    name: `${booking.contactInfo.firstName} ${booking.contactInfo.lastName}`.trim(),
+                    email: booking.contactInfo.email,
+                    contact: booking.contactInfo.phone,
+                };
 
                 const payment = await Payment.insert({
                     booking: booking._id,
                     user: req.user._id,
                     amount: pricing.totalAmount,
                     currency,
-                    method: 'stripe',
-                    stripePaymentIntentId: paymentIntent.id,
+                    method: 'razorpay',
+                    gatewayOrderId: checkout.orderId,
                     status: 'pending'
                 });
 
                 booking.paymentId = payment._id;
                 await Booking.save(booking);
-                clientSecret = paymentIntent.client_secret;
-            } catch (stripeErr) {
+            } catch (gatewayErr) {
                 // Don't tell the traveller they're booked when payment can't even start.
-                logger.error('Stripe payment intent creation failed', { error: stripeErr.message, bookingId: booking._id });
+                logger.error('Razorpay order creation failed', { error: gatewayErr?.error?.description || gatewayErr.message, bookingId: booking._id });
                 booking.status = 'cancelled';
                 await Booking.save(booking);
                 return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');
@@ -110,7 +113,7 @@ exports.createBooking = async (req, res) => {
 
         return ResponseHandler.success(res, {
             booking: populatedBooking,
-            clientSecret
+            checkout
         }, 'Booking created successfully');
     } catch (err) {
         if (err instanceof BookingError) return ResponseHandler.fail(res, err.status, err.message);

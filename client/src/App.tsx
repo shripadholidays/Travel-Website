@@ -28,7 +28,7 @@ import { CurrencyProvider } from '@/context/CurrencyContext';
 import { Toaster } from 'sonner';
 import { FeatureRoute } from '@/components/FeatureGate';
 
-// Lazily loaded — heavy deps (map, Stripe) or admin-only
+// Lazily loaded — heavy deps (map) or admin-only
 const TourDetails = lazy(() => import('@/pages/TourDetails').then((m) => ({ default: m.TourDetails })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 const BookingPage = lazy(() => import('@/pages/BookingPage').then((m) => ({ default: m.BookingPage })));

@@ -9,8 +9,10 @@ const Payment = defineTable({
         user: { type: 'ref', required: true, col: 'user_id' },
         amount: { type: 'number', required: true },
         currency: { type: 'text', default: 'USD' },
-        method: { type: 'text', enum: ['stripe', 'razorpay'], default: 'stripe' },
-        stripePaymentIntentId: 'text',
+        method: { type: 'text', enum: ['razorpay', 'stripe'], default: 'razorpay' },
+        // Razorpay order (created before checkout) and payment (once the traveller has paid)
+        gatewayOrderId: 'text',
+        gatewayPaymentId: 'text',
         status: { type: 'text', enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
         gatewayResponse: 'json',
     },

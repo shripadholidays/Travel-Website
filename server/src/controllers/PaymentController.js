@@ -1,102 +1,77 @@
 const { isId } = require('../db/ids');
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
+const payments = require('../services/payments');
+const { paymentCaptured, paymentFailed } = require('../services/payment-events');
 const { confirmBooking } = require('../services/booking-service');
-const TravelOrder = require('../models/TravelOrder');
-const { finalizeOrder, stripeClient } = require('../services/travel-order-service');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 
-// POST /payments/webhook - Stripe webhook handler
+// POST /payments/webhook — Razorpay events (set the URL and secret in Razorpay → Webhooks).
+// Subscribe to payment.captured, order.paid and payment.failed.
 exports.handleWebhook = async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-
-    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
-        logger.warn('Stripe not configured, skipping webhook');
-        return res.status(200).json({ received: true });
+    const signature = req.headers['x-razorpay-signature'];
+    const raw = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
+    if (!payments.verifyWebhookSignature(raw, signature)) {
+        logger.warn('Razorpay webhook with a missing or wrong signature');
+        return res.status(400).json({ received: false });
     }
-
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
     let event;
     try {
-        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        event = JSON.parse(raw.toString('utf8'));
+    } catch {
+        return res.status(400).json({ received: false });
+    }
+
+    const remote = event.payload?.payment?.entity;
+    try {
+        if (remote?.order_id && ['payment.captured', 'order.paid', 'payment.failed'].includes(event.event)) {
+            const payment = await Payment.findOne('gateway_order_id = ?', [remote.order_id]);
+            if (!payment) {
+                logger.warn('Webhook for an unknown Razorpay order', { orderId: remote.order_id });
+            } else if (event.event === 'payment.failed') {
+                await paymentFailed(payment, remote);
+            } else if (remote.status === 'captured' && remote.amount === payments.toMinor(payment.amount)) {
+                await paymentCaptured(payment, remote);
+                logger.info('Payment captured (webhook)', { paymentId: payment._id });
+            } else {
+                logger.warn('Webhook payment not captured or amount mismatch', { paymentId: payment._id, status: remote.status });
+            }
+        }
     } catch (err) {
-        logger.error('Webhook signature verification failed', { error: err.message });
-        return res.status(400).send(`Webhook Error: ${err.message}`);
+        // Razorpay retries on a non-2xx; log and accept so one bad record cannot block the queue
+        logger.error('Error processing Razorpay webhook', { error: err.message, event: event.event });
     }
-
-    switch (event.type) {
-        case 'payment_intent.succeeded': {
-            const paymentIntent = event.data.object;
-            try {
-                const payment = await Payment.findOne('stripe_payment_intent_id = ?', [paymentIntent.id]);
-                if (payment) {
-                    payment.status = 'completed';
-                    payment.gatewayResponse = paymentIntent;
-                    await Payment.save(payment);
-
-                    if (payment.booking) {
-                        const booking = await Booking.findById(payment.booking);
-                        if (booking) await confirmBooking(booking);
-                        logger.info('Payment completed and booking confirmed', { paymentId: payment._id });
-                    } else if (payment.order) {
-                        const order = await TravelOrder.findById(payment.order);
-                        if (order) await finalizeOrder(order);
-                        logger.info('Payment completed for travel order', { paymentId: payment._id, status: order?.status });
-                    }
-                }
-            } catch (err) {
-                logger.error('Error processing payment success webhook', { error: err.message });
-            }
-            break;
-        }
-        case 'payment_intent.payment_failed': {
-            const paymentIntent = event.data.object;
-            try {
-                const payment = await Payment.findOne('stripe_payment_intent_id = ?', [paymentIntent.id]);
-                if (payment) {
-                    payment.status = 'failed';
-                    payment.gatewayResponse = paymentIntent;
-                    await Payment.save(payment);
-                    logger.warn('Payment failed', { paymentId: payment._id });
-                }
-            } catch (err) {
-                logger.error('Error processing payment failure webhook', { error: err.message });
-            }
-            break;
-        }
-        default:
-            logger.debug(`Unhandled event type: ${event.type}`);
-    }
-
-    res.status(200).json({ received: true });
+    return res.status(200).json({ received: true });
 };
 
-// POST /payments/confirm - called by the client after Stripe confirms (webhook-independent).
-// Only the booking's owner can call it, and only a payment Stripe reports as succeeded confirms it.
+// POST /payments/confirm — the browser reports a Razorpay payment for the traveller's booking.
+// Body: { bookingId, razorpay_payment_id, razorpay_order_id, razorpay_signature }.
+// Only the booking's owner can call it, and only a payment Razorpay confirms as captured counts.
 exports.confirmPayment = async (req, res) => {
     try {
-        const { bookingId } = req.body;
+        const { bookingId } = req.body || {};
         if (!isId(String(bookingId || ''))) return ResponseHandler.fail(res, 404, 'Booking not found');
         const booking = await Booking.findOne('id = ? AND user_id = ?', [String(bookingId), req.user._id]);
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
         if (booking.status !== 'pending') return ResponseHandler.success(res, { booking }, 'Booking already processed');
 
-        const stripe = stripeClient();
-        const payment = booking.paymentId ? await Payment.findById(booking.paymentId) : null;
-        if (stripe) {
-            if (!payment?.stripePaymentIntentId) return ResponseHandler.fail(res, 400, 'Payment not completed');
-            const intent = await stripe.paymentIntents.retrieve(payment.stripePaymentIntentId);
-            if (intent.status !== 'succeeded') return ResponseHandler.fail(res, 400, 'Payment not completed');
-            payment.status = 'completed';
-            payment.gatewayResponse = intent;
-            await Payment.save(payment);
+        if (payments.gateway()) {
+            const payment = booking.paymentId ? await Payment.findById(booking.paymentId) : null;
+            const remote = await payments.settle(payment, {
+                paymentId: req.body.razorpay_payment_id,
+                orderId: req.body.razorpay_order_id,
+                signature: req.body.razorpay_signature,
+            });
+            await paymentCaptured(payment, remote);
+            return ResponseHandler.success(res, { booking: await Booking.findById(booking._id) }, 'Payment confirmed successfully');
         }
 
         await confirmBooking(booking);
         return ResponseHandler.success(res, { booking }, 'Payment confirmed successfully');
     } catch (err) {
+        if (err instanceof payments.PaymentError) return ResponseHandler.fail(res, 400, err.message);
         logger.error('Error confirming payment', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to confirm payment');
     }

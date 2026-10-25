@@ -1,5 +1,6 @@
 // === Flights & Hotels (public shapes returned by /flights, /hotels, /travel-orders) ===
 // All prices are USD (site base currency) and already include WandEazy's markup.
+import type { RazorpayCheckout } from '@/lib/razorpay';
 
 export type TravelKind = 'flight' | 'hotel';
 export type Cabin = 'economy' | 'premium_economy' | 'business';
@@ -156,4 +157,4 @@ export interface CreateTravelOrderPayload {
 
 export type CreateTravelOrderResult =
     | { priceChanged: true; newTotal: number }
-    | { priceChanged?: undefined; order: TravelOrder; clientSecret?: string };
+    | { priceChanged?: undefined; order: TravelOrder; checkout?: RazorpayCheckout };

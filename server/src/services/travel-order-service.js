@@ -1,4 +1,5 @@
 const Payment = require('../models/Payment');
+const payments = require('./payments');
 const TravelOrder = require('../models/TravelOrder');
 const logger = require('../utils/logger');
 const { getFlightProvider } = require('../providers/flights');
@@ -9,22 +10,12 @@ function getProvider(kind) {
     return kind === 'flight' ? getFlightProvider() : getHotelProvider();
 }
 
-// A missing key or an obvious placeholder (e.g. sk_test_placeholder) means "no gateway" in dev.
-function stripeClient() {
-    const key = process.env.STRIPE_SECRET_KEY || '';
-    if (!key || /placeholder|your_|xxx/i.test(key)) return null;
-    return require('stripe')(key);
-}
-
-// Refunds the order's completed Stripe payment (if any) and marks it refunded.
+// Refunds the order's (or booking's) captured payment, if any, and marks it refunded.
 async function refundPayment(order) {
     if (!order.paymentId) return;
     const payment = await Payment.findById(order.paymentId?._id ?? order.paymentId);
     if (!payment || payment.status !== 'completed') return;
-    const stripe = stripeClient();
-    if (stripe && payment.stripePaymentIntentId) {
-        await stripe.refunds.create({ payment_intent: payment.stripePaymentIntentId });
-    }
+    await payments.refund(payment);
     payment.status = 'refunded';
     await Payment.save(payment);
 }
@@ -54,4 +45,4 @@ async function finalizeOrder(order) {
     return order;
 }
 
-module.exports = { getProvider, finalizeOrder, refundPayment, stripeClient };
+module.exports = { getProvider, finalizeOrder, refundPayment };

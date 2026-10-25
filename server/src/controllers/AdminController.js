@@ -296,7 +296,7 @@ exports.getPayments = async (req, res) => {
         if (req.query.status && req.query.status !== 'all') where.add('status = ?', req.query.status);
         const q = searchText(req.query.search);
         if (q) {
-            const intent = containsAny(['stripe_payment_intent_id'], q);
+            const intent = containsAny(['gateway_order_id', 'gateway_payment_id'], q);
             const ids = await usersMatching(q);
             where.add(ids.length ? `${intent.sql} OR user_id IN (${marks(ids)})` : intent.sql, ...intent.args, ...ids);
         }

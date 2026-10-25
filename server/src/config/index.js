@@ -79,10 +79,13 @@ const config = {
         adminNotifyAddress: e.ADMIN_NOTIFY_EMAIL || '',
     },
 
-    stripe: {
-        secretKey:       e.STRIPE_SECRET_KEY,
-        webhookSecret:   e.STRIPE_WEBHOOK_SECRET,
-        defaultCurrency: e.STRIPE_DEFAULT_CURRENCY || 'USD',
+    // Razorpay (Dashboard → Account & Settings → API Keys / Webhooks). Blank = no gateway: bookings confirm at once (dev only)
+    razorpay: {
+        keyId:         e.RAZORPAY_KEY_ID          || '',
+        keySecret:     e.RAZORPAY_KEY_SECRET      || '',
+        webhookSecret: e.RAZORPAY_WEBHOOK_SECRET  || '',
+        // Shown at the top of the Razorpay payment window
+        brandName:     e.RAZORPAY_BRAND_NAME      || 'Wandeazy',
     },
 
     pagination: {

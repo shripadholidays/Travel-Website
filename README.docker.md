@@ -40,7 +40,7 @@ The services talk to each other over Docker's internal network. Uploaded images 
 ## Optional features (all work without them, just disabled)
 Fill these in `.env` to enable:
 - **Google login** → `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `VITE_GOOGLE_OAUTH_CLIENT_ID`
-- **Stripe payments** → `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `VITE_STRIPE_PUBLISHABLE_KEY`
+- **Razorpay payments** → `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` (server only; the browser gets the public key id from the API)
 - **Email** → the `MAILGUN_*` vars
 
 > ⚠️ The frontend `VITE_*` values are baked in at **build** time. If you change them, rebuild the client:
