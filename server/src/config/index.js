@@ -7,6 +7,7 @@
 const e = process.env;
 
 const isProd = e.NODE_ENV === 'production';
+const origins = (v) => String(v || '').split(',').map((s) => s.trim().replace(/\/+$/, '')).filter(Boolean);
 
 const config = {
     app: {
@@ -40,7 +41,9 @@ const config = {
 
     cors: {
         localOrigin:      e.LOCAL_FRONTEND_ORIGIN      || 'http://localhost:4321',
-        productionOrigin: e.PRODUCTION_FRONTEND_ORIGIN || '',
+        // The site's address(es), comma-separated; the first is used in email links. A trailing slash is ignored.
+        productionOrigins: origins(e.PRODUCTION_FRONTEND_ORIGIN),
+        productionOrigin:  origins(e.PRODUCTION_FRONTEND_ORIGIN)[0] || '',
     },
 
     rateLimit: {

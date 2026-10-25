@@ -50,18 +50,14 @@ app.use((req, res, next) => {
     next();
 });
 
-const allowedOrigins = [
-    config.cors.localOrigin,
-    config.cors.productionOrigin,
-].filter(Boolean);
+const allowedOrigins = [config.cors.localOrigin, ...config.cors.productionOrigins].filter(Boolean);
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        // Other sites get no CORS headers (the browser blocks them); not a server error
+        logger.warn('Blocked request from an origin not in PRODUCTION_FRONTEND_ORIGIN', { origin });
+        return callback(null, false);
     },
     credentials: true,
 }));
