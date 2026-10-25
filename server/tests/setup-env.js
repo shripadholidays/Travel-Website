@@ -10,5 +10,4 @@ process.env.RATE_LIMIT_API_MAX = '100000';
 process.env.RATE_LIMIT_SEARCH_MAX = '100000';
 process.env.FLIGHT_PROVIDER = 'mock';
 process.env.HOTEL_PROVIDER = 'mock';
-process.env.SESSION_SECRET = 'test-session-secret';
 process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'error';

@@ -25,7 +25,6 @@ const config = {
 
     auth: {
         jwtSecret:          e.JWT_SECRET                       || 'dev-only-insecure-secret',
-        sessionSecret:      e.SESSION_SECRET                   || 'dev-only-session-secret',
         tokenMaxAgeDays:    Number(e.JWT_TOKEN_MAX_AGE_DAYS)   || 7,
         oneTapMaxAgeMs:     Number(e.GOOGLE_ONE_TAP_MAX_AGE_MS)|| 3_600_000,
         cookieName:         e.AUTH_COOKIE_NAME                 || 'wandeazy.token',

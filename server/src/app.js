@@ -2,8 +2,6 @@ const express = require('express');
 const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
-const passport = require('passport');
-const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 require('dotenv').config();
@@ -12,7 +10,6 @@ const config = require('./config');
 const ResponseHandler = require('./utils/response-handler');
 const { ping } = require('./db');
 const logger = require('./utils/logger');
-const { initializePassport } = require('./services/auth-service');
 const mockAuth = require('./middlewares/mock-auth');
 const { apiLimiter, authLimiter } = require('./middlewares/rate-limit');
 
@@ -43,7 +40,7 @@ const { nodeEnv } = config.app;
 if (nodeEnv === 'production') app.set('trust proxy', 1);
 // The dev fallbacks would let anyone forge a sign-in: production refuses to start without real secrets
 if (nodeEnv === 'production') {
-    const missing = ['JWT_SECRET', 'SESSION_SECRET'].filter((k) => !process.env[k] || process.env[k].length < 32);
+    const missing = ['JWT_SECRET'].filter((k) => !process.env[k] || process.env[k].length < 32);
     if (missing.length) throw new Error(`${missing.join(' and ')} must be set to a random value of 32+ characters in production`);
 }
 
@@ -107,20 +104,8 @@ app.use(helmet());
 app.use('/api/', apiLimiter);
 app.use('/api/v1/auth', authLimiter);
 
-// Sessions & Passport (skip if MOCK_AUTH=true)
-if (!config.mock.enabled) {
-    app.use(session({
-        secret: config.auth.sessionSecret,
-        resave: false,
-        saveUninitialized: false,
-    }));
-
-    app.use(passport.initialize());
-    app.use(passport.session());
-    initializePassport(passport);
-} else {
-    app.use(mockAuth);
-}
+// Sign-in is a signed cookie (email/password JWT or a Google ID token) checked per request, so no server sessions
+if (config.mock.enabled) app.use(mockAuth);
 
 // --- ROUTES ---
 app.get('/', (req, res) => {

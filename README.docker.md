@@ -11,7 +11,7 @@ This runs the **entire stack** (frontend + API + database) with one command. No 
 # 1. From the project root (the folder containing docker-compose.yml):
 cp .env.example .env
 
-# 2. Open .env and fill in at least JWT_SECRET and SESSION_SECRET.
+# 2. Open .env and fill in at least JWT_SECRET.
 #    Generate a secret with:
 #    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 

@@ -265,9 +265,6 @@ exports.logout = (req, res) => {
     const sameSite = cookieSameSite;
     res.clearCookie(sidCookieName, { sameSite, secure: isProd, path: '/' });
     res.clearCookie(cookieName,    { sameSite, secure: isProd, path: '/' });
-    if (req.session) {
-        return req.session.destroy(() => ResponseHandler.success(res, null, 'Logged out successfully!'));
-    }
     return ResponseHandler.success(res, null, 'Logged out successfully!');
 };
 
