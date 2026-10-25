@@ -31,22 +31,22 @@ export const TourQuickView = () => {
     return (
         <DialogPrimitive.Root open={!!tourId} onOpenChange={(open) => { if (!open) closeTour(); }}>
             <DialogPrimitive.Portal>
-                {/* The overlay is the scroll container, so the sheet can be taller than the screen */}
-                <DialogPrimitive.Overlay className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain bg-brand-blue/60 backdrop-blur-sm sm:flex sm:flex-col sm:items-center sm:p-6 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 duration-300 motion-reduce:animate-none">
+                {/* A fixed-size window with space above and below; only its content scrolls (full screen on phones) */}
+                <DialogPrimitive.Overlay className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-blue/60 backdrop-blur-sm sm:p-6 lg:p-10 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 duration-300 motion-reduce:animate-none">
                     <DialogPrimitive.Content
                         aria-describedby={undefined}
-                        className="relative w-full shrink-0 min-h-full sm:min-h-0 sm:my-auto sm:max-w-5xl bg-background sm:rounded-[2rem] shadow-2xl overflow-clip focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-10 sm:data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-10 sm:data-[state=closed]:zoom-out-95 duration-300 ease-out motion-reduce:animate-none"
+                        className="relative flex flex-col w-full h-dvh sm:h-full sm:max-h-[56rem] sm:max-w-5xl bg-background sm:rounded-[2rem] shadow-2xl overflow-hidden focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-10 sm:data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-10 sm:data-[state=closed]:zoom-out-95 duration-300 ease-out motion-reduce:animate-none"
                     >
-                        {/* Zero-height sticky row keeps the close button reachable while scrolling */}
-                        <div className="sticky top-0 z-30 h-0">
-                            <DialogPrimitive.Close
-                                className="absolute right-4 top-4 w-10 h-10 rounded-full bg-white/95 backdrop-blur-md text-brand-blue shadow-lg flex items-center justify-center hover:bg-white hover:scale-105 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
-                                aria-label="Close"
-                            >
-                                <X className="w-5 h-5" />
-                            </DialogPrimitive.Close>
+                        {/* Sits above the scrolling content, so it is always in reach */}
+                        <DialogPrimitive.Close
+                            className="absolute right-4 top-4 z-30 w-10 h-10 rounded-full bg-white/95 backdrop-blur-md text-brand-blue shadow-lg flex items-center justify-center hover:bg-white hover:scale-105 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                            aria-label="Close"
+                        >
+                            <X className="w-5 h-5" />
+                        </DialogPrimitive.Close>
+                        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                            {shown && <QuickViewBody key={shown.id} id={shown.id} preview={shown.preview} />}
                         </div>
-                        {shown && <QuickViewBody key={shown.id} id={shown.id} preview={shown.preview} />}
                     </DialogPrimitive.Content>
                 </DialogPrimitive.Overlay>
             </DialogPrimitive.Portal>
