@@ -17,7 +17,7 @@ const Booking = defineTable({
         coupon: { type: 'json', default: null },               // { code, discount }
         totalAmount: { type: 'number', required: true },
         // What the traveller chose and was charged in; every amount on the booking is in this currency
-        currency: { type: 'text', default: 'USD' },
+        currency: { type: 'text', default: 'INR' },
         // How the price was converted: the tour's own price per person, its currency and the rate used
         unitPrice: 'number',
         tourCurrency: 'text',

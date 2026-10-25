@@ -8,7 +8,7 @@ const Payment = defineTable({
         order: { type: 'ref', col: 'order_id' },
         user: { type: 'ref', required: true, col: 'user_id' },
         amount: { type: 'number', required: true },
-        currency: { type: 'text', default: 'USD' },
+        currency: { type: 'text', default: 'INR' },
         method: { type: 'text', enum: ['razorpay', 'stripe'], default: 'razorpay' },
         // Razorpay order (created before checkout) and payment (once the traveller has paid)
         gatewayOrderId: 'text',

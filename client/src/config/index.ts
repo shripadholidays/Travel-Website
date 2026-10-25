@@ -23,7 +23,7 @@ export const config = {
     },
 
     currency: {
-        default: (env.VITE_DEFAULT_CURRENCY || 'USD') as Currency,
+        default: (env.VITE_DEFAULT_CURRENCY || 'INR') as Currency,
         rates: {
             USD: 1,
             INR: Number(env.VITE_RATE_INR)  || 83.5,

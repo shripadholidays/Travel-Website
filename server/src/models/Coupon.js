@@ -7,7 +7,7 @@ const Coupon = defineTable({
         discountType: { type: 'text', enum: ['percent', 'flat'], required: true, label: 'Discount type' },
         discountValue: { type: 'number', required: true, min: 0, label: 'Discount' },
         // Flat discounts and the minimum order are in this currency (converted for other checkouts)
-        currency: { type: 'text', enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'], default: 'USD' },
+        currency: { type: 'text', enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'], default: 'INR' },
         minOrderAmount: { type: 'number', default: 0 },
         maxUses: { type: 'int', default: null },       // null = unlimited
         usedCount: { type: 'int', default: 0 },
