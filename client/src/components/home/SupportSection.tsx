@@ -19,7 +19,7 @@ const FALLBACK_FEATURES: SupportFeature[] = [
     { icon: "MessageCircle", title: "Ask Us Anything", description: "Travel queries, visa help or itinerary tweaks: send a message from any page." },
     { icon: "Clock", title: "Replies Within 24 Hours", description: "A real travel specialist answers every message, usually the same day." },
     { icon: "Route", title: "Trips Made to Measure", description: "Tell us what you love and we will shape an itinerary around it." },
-    { icon: "ShieldCheck", title: "Secure Booking", description: "Secure payments by Razorpay (cards, UPI, netbanking), and your booking details in your dashboard." },
+    { icon: "ShieldCheck", title: "Secure Booking", description: "Secure card, UPI and netbanking payments, and your booking details in your dashboard." },
 ];
 
 const FALLBACK_GREETING = "Hi! Tell us where you would like to go, or ask anything about a booking. A travel specialist will reply by email.";

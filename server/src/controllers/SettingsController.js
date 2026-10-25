@@ -1,6 +1,7 @@
 const { all, get } = require('../db');
 const { validationText } = require('../db/errors');
 const SiteSettings = require('../models/SiteSettings');
+const payments = require('../services/payments');
 const ResponseHandler = require('../utils/response-handler');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 const logger = require('../utils/logger');
@@ -89,7 +90,8 @@ exports.getHighlights = async (req, res) => {
 exports.getSettings = async (req, res) => {
     try {
         const settings = await getSettings();
-        return ResponseHandler.success(res, { settings });
+        // Which gateways have keys and which one checkout uses now (keys themselves never leave the server)
+        return ResponseHandler.success(res, { settings, paymentGateways: await payments.status() });
     } catch (err) {
         logger.error('Failed to fetch settings', { error: err.message });
         return ResponseHandler.error(res, 500, 'Failed to fetch settings');
@@ -104,7 +106,7 @@ const CONTENT_KEYS = [
 ];
 const SYSTEM_KEYS = [
     'companyName', 'contactEmail', 'contactPhone', 'address',
-    'socialLinks', 'footer', 'features', 'travelMarkup', 'currency',
+    'socialLinks', 'footer', 'features', 'travelMarkup', 'currency', 'payments',
 ];
 const UPDATABLE = [...SYSTEM_KEYS, ...CONTENT_KEYS];
 
@@ -146,6 +148,9 @@ exports.updateSettings = async (req, res) => {
         const denied = keys.filter((k) => !hasPermission(req.user, CONTENT_KEYS.includes(k) ? PERMISSIONS.CONTENT : PERMISSIONS.SETTINGS));
         if (denied.length) {
             return ResponseHandler.fail(res, 403, `Your role can't change: ${denied.join(', ')}. Ask an administrator.`);
+        }
+        if (req.body.payments !== undefined && !payments.CHOICES.includes(req.body.payments?.gateway)) {
+            return ResponseHandler.fail(res, 400, 'Pick Automatic, Razorpay or Stripe.');
         }
         if (req.body.currency) {
             const problem = checkCurrency(req.body.currency);

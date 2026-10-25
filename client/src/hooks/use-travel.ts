@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
-import type { RazorpayPaid } from '@/lib/razorpay';
+import type { PaymentResult } from '@/lib/checkout';
 import type {
     AdminTravelOrder, Airport, CreateTravelOrderPayload, CreateTravelOrderResult, FlightOffer, FlightSearchParams,
     HotelDetails, HotelOffer, HotelSearchParams, Place, TravelKind, TravelOrder, TravelOrderStatus,
@@ -95,7 +95,7 @@ export function useCreateTravelOrder() {
 export function useConfirmTravelOrder() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, paid }: { id: string; paid?: RazorpayPaid }) => api.post<{ order: TravelOrder }>(`/travel-orders/${id}/confirm`, paid ?? {}),
+        mutationFn: ({ id, paid }: { id: string; paid?: PaymentResult }) => api.post<{ order: TravelOrder }>(`/travel-orders/${id}/confirm`, paid ?? {}),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['travel-orders'] }),
     });
 }

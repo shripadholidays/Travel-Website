@@ -101,7 +101,7 @@ export const AdminPayments = () => {
                         { id: 'pending', label: 'Pending', count: s.pending?.count ?? 0 },
                         { id: 'failed', label: 'Failed', count: s.failed?.count ?? 0 },
                     ]} />
-                    <SearchField value={search} onChange={(v) => { setSearch(v); setParam('page', '1'); }} placeholder="Customer, or Razorpay order / payment ID…" className="sm:w-80" />
+                    <SearchField value={search} onChange={(v) => { setSearch(v); setParam('page', '1'); }} placeholder="Customer, or Razorpay / Stripe payment ID…" className="sm:w-80" />
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (

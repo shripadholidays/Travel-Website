@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import type { Booking } from '@/types';
-import type { RazorpayCheckout } from '@/lib/razorpay';
+import type { PaymentCheckout } from '@/lib/checkout';
 
 interface CreateBookingPayload {
     tour: string;
@@ -40,7 +40,7 @@ export function useCreateBooking() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: CreateBookingPayload) =>
-            api.post<{ booking: Booking; checkout?: RazorpayCheckout | null }>('/bookings', data),
+            api.post<{ booking: Booking; checkout?: PaymentCheckout | null }>('/bookings', data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bookings'] }),
     });
 }

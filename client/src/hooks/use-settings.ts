@@ -160,11 +160,13 @@ export interface SiteSettings {
     travelMarkup: { flightPct: number; hotelPct: number };
     /** Currencies travellers can pick, the base currency and rates (units per 1 USD) */
     currency?: CurrencySettings;
+    /** Which gateway takes payments: 'auto' = Razorpay when it has keys, otherwise Stripe */
+    payments?: { gateway: PaymentGatewayChoice };
 }
 
 export type TravelFeature = keyof SiteSettings['features'];
 
-export type PublicSettings = Omit<SiteSettings, '_id' | 'travelMarkup'>;
+export type PublicSettings = Omit<SiteSettings, '_id' | 'travelMarkup' | 'payments'>;
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 
@@ -177,10 +179,19 @@ export function usePublicSettings() {
     });
 }
 
+export type PaymentGatewayChoice = 'auto' | 'razorpay' | 'stripe';
+
+/** Which gateways have keys on the server, the admin's choice, and what checkout uses right now. */
+export interface PaymentGatewayStatus {
+    available: { razorpay: boolean; stripe: boolean };
+    choice: PaymentGatewayChoice;
+    active: 'razorpay' | 'stripe' | null;
+}
+
 export function useSiteSettings() {
     return useQuery({
         queryKey: ['admin', 'settings'],
-        queryFn: () => api.get<{ settings: SiteSettings }>('/admin/settings'),
+        queryFn: () => api.get<{ settings: SiteSettings; paymentGateways?: PaymentGatewayStatus }>('/admin/settings'),
     });
 }
 

@@ -21,8 +21,8 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useValidateCoupon, type ValidatedCoupon } from "@/hooks/use-coupons";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { RazorpayPayButton } from "@/components/payment/RazorpayPayButton";
-import type { RazorpayCheckout, RazorpayPaid } from "@/lib/razorpay";
+import { CheckoutPayment } from "@/components/payment/CheckoutPayment";
+import type { PaymentCheckout, PaymentResult } from "@/lib/checkout";
 import { TripAddons } from "@/components/travel/TripAddons";
 
 const steps = ['Traveller Details', 'Add-ons', 'Review & Pay', 'Success'];
@@ -74,7 +74,7 @@ export const BookingPage = () => {
     });
     const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
     const [specialRequests, setSpecialRequests] = useState("");
-    const [checkout, setCheckout] = useState<RazorpayCheckout | null>(null);
+    const [checkout, setCheckout] = useState<PaymentCheckout | null>(null);
     const [bookingId, setBookingId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [couponCode, setCouponCode] = useState("");
@@ -185,7 +185,7 @@ export const BookingPage = () => {
             setConfirmed(result.booking);
 
             if (result.checkout) {
-                // Razorpay opens straight away (see RazorpayPayButton autoOpen)
+                // The payment form for the gateway in use (Razorpay's window opens straight away)
                 setCheckout(result.checkout);
             } else if (result.booking.status === 'confirmed') {
                 setCurrentStep(3);
@@ -200,15 +200,15 @@ export const BookingPage = () => {
         }
     };
 
-    // Razorpay took the payment; the server verifies it with Razorpay and confirms the booking.
-    const handlePaymentSuccess = async (paid: RazorpayPaid) => {
+    // The gateway took the payment; the server verifies it with that gateway and confirms the booking.
+    const handlePaymentSuccess = async (paid: PaymentResult) => {
         setIsSubmitting(true);
         try {
             const res = await api.post<{ booking: Booking }>('/payments/confirm', { bookingId, ...paid });
             setConfirmed(res.booking);
             toast.success("Payment successful! Booking confirmed.");
         } catch {
-            // Razorpay's webhook confirms it as well, so a paid booking is never lost
+            // The gateway's webhook confirms it as well, so a paid booking is never lost
             toast.success("Payment received. Your confirmation is on its way by email.");
         } finally {
             setIsSubmitting(false);
@@ -447,11 +447,10 @@ export const BookingPage = () => {
                                 {checkout ? (
                                     <div>
                                         <h3 className="font-bold mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-brand-orange" /> Payment</h3>
-                                        <RazorpayPayButton
+                                        <CheckoutPayment
                                             checkout={checkout}
                                             onPaid={handlePaymentSuccess}
                                             isSubmitting={isSubmitting}
-                                            autoOpen
                                             label={`Pay ${formatMoney(checkout.amount / 100, checkout.currency)}`}
                                         />
                                     </div>

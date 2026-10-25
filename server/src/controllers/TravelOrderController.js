@@ -98,7 +98,8 @@ exports.createOrder = async (req, res) => {
             charge,
         });
 
-        if (!payments.gateway()) {
+        const gateway = await payments.active();
+        if (!gateway) {
             // No payment gateway configured (local dev): book straight away.
             await finalizeOrder(order);
             return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) }, 'Booking confirmed');
@@ -106,7 +107,7 @@ exports.createOrder = async (req, res) => {
 
         let checkout;
         try {
-            checkout = await payments.createCheckout({
+            checkout = await gateway.createCheckout({
                 amount: charge.total,
                 currency: charge.currency,
                 receipt: `${kind}_${order._id}`,
@@ -114,7 +115,7 @@ exports.createOrder = async (req, res) => {
                 description: kind === 'flight' ? 'Flight booking' : 'Hotel booking',
             });
         } catch (gatewayErr) {
-            logger.error('Razorpay order creation failed', { orderId: order._id, error: gatewayErr?.error?.description || gatewayErr.message });
+            logger.error(`${gateway.label} checkout could not start`, { orderId: order._id, error: gatewayErr?.error?.description || gatewayErr.message });
             order.status = 'failed';
             order.failureReason = 'Payment could not be started';
             await TravelOrder.save(order);
@@ -130,7 +131,7 @@ exports.createOrder = async (req, res) => {
             user: req.user._id,
             amount: charge.total,
             currency: charge.currency,
-            method: 'razorpay',
+            method: gateway.name,
             gatewayOrderId: checkout.orderId,
             status: 'pending',
         });
@@ -143,24 +144,22 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// POST /travel-orders/:id/confirm — the browser reports the Razorpay payment (webhook-independent).
-// Body: { razorpay_payment_id, razorpay_order_id, razorpay_signature }
+// POST /travel-orders/:id/confirm — the browser reports the payment (webhook-independent).
+// Razorpay sends { razorpay_payment_id, razorpay_order_id, razorpay_signature }; Stripe needs nothing.
 exports.confirmOrder = async (req, res) => {
     try {
         const order = await loadOwnOrder(req, res);
         if (!order) return undefined;
         if (order.status !== 'pending') return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) });
 
-        if (payments.gateway()) {
-            const payment = order.paymentId ? await Payment.findById(order.paymentId) : null;
-            const remote = await payments.settle(payment, {
-                paymentId: req.body?.razorpay_payment_id,
-                orderId: req.body?.razorpay_order_id,
-                signature: req.body?.razorpay_signature,
-            });
+        const payment = order.paymentId ? await Payment.findById(order.paymentId) : null;
+        if (payment) {
+            const remote = await payments.forPayment(payment).settle(payment, req.body || {});
             await paymentCaptured(payment, remote);
             return ResponseHandler.success(res, { order: TravelOrder.toPublic(await TravelOrder.findById(order._id)) });
         }
+        // An order is only pending without a payment when no gateway was set up at checkout
+        if (await payments.active()) return ResponseHandler.fail(res, 400, 'Payment not completed');
 
         await finalizeOrder(order);
         return ResponseHandler.success(res, { order: TravelOrder.toPublic(order) });

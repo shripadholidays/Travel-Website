@@ -73,7 +73,7 @@
         {
           "icon": "ShieldCheck",
           "title": "Secure Booking",
-          "description": "Secure payments by Razorpay (cards, UPI, netbanking), and your booking details in your dashboard."
+          "description": "Secure card, UPI and netbanking payments, and your booking details in your dashboard."
         }
       ],
       "chatMessages": [
@@ -328,7 +328,10 @@
         "order": 6
       }
     ],
-    "contentSections": []
+    "contentSections": [],
+    "payments": {
+      "gateway": "auto"
+    }
   },
   "items": {
     "footerExploreLinks": {

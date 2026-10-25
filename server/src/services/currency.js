@@ -2,8 +2,8 @@ const SiteSettings = require('../models/SiteSettings');
 const logger = require('../utils/logger');
 
 // Currencies the site can price tours in, show prices in, and charge cards in.
-// All of them use two decimal places, so Razorpay amounts are always the amount × 100.
-// Charging anything other than INR needs International Payments switched on in the Razorpay account.
+// All of them use two decimal places, so gateway amounts are always the amount × 100.
+// With Razorpay, charging anything other than INR needs International Payments switched on.
 const SUPPORTED = ['INR', 'USD', 'EUR', 'GBP', 'AED'];
 
 // Units of each currency per 1 US dollar. Admins can edit these (or fetch fresh ones) in Settings.

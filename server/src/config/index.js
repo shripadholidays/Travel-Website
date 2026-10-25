@@ -88,6 +88,13 @@ const config = {
         brandName:     e.RAZORPAY_BRAND_NAME      || 'Wandeazy',
     },
 
+    // Stripe (Developers → API keys / Webhooks). The publishable key reaches the browser through the API.
+    stripe: {
+        secretKey:      e.STRIPE_SECRET_KEY                                   || '',
+        publishableKey: e.STRIPE_PUBLISHABLE_KEY || e.VITE_STRIPE_PUBLISHABLE_KEY || '',
+        webhookSecret:  e.STRIPE_WEBHOOK_SECRET                               || '',
+    },
+
     pagination: {
         defaultLimit:        Number(e.PAGINATION_DEFAULT_LIMIT)         || 10,
         adminDefaultLimit:   Number(e.PAGINATION_ADMIN_DEFAULT_LIMIT)   || 20,

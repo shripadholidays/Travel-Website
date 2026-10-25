@@ -13,8 +13,8 @@ import { Eyebrow } from '@/components/travel/Eyebrow';
 import { SliceRow, AirlineBadge } from '@/components/travel/FlightCard';
 import { TravellerFields } from '@/components/travel/TravellerFields';
 import { AnimatedPrice } from '@/components/travel/motion';
-import { RazorpayPayButton } from '@/components/payment/RazorpayPayButton';
-import type { RazorpayCheckout, RazorpayPaid } from '@/lib/razorpay';
+import { CheckoutPayment } from '@/components/payment/CheckoutPayment';
+import type { PaymentCheckout, PaymentResult } from '@/lib/checkout';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useConfirmTravelOrder, useCreateTravelOrder, useFlightOffer, useHotelOffer } from '@/hooks/use-travel';
@@ -119,7 +119,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
     const [contact, setContact] = useState({ email: user?.email ?? '', phone: '' });
     const [price, setPrice] = useState<number | null>(null);
     const [newPrice, setNewPrice] = useState<number | null>(null);
-    const [checkout, setCheckout] = useState<RazorpayCheckout | null>(null);
+    const [checkout, setCheckout] = useState<PaymentCheckout | null>(null);
     const [order, setOrder] = useState<TravelOrder | null>(null);
 
     useEffect(() => {
@@ -158,7 +158,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
         }
     };
 
-    const onPaid = async (paid: RazorpayPaid) => {
+    const onPaid = async (paid: PaymentResult) => {
         if (!order) return;
         try {
             const result = await confirmOrder.mutateAsync({ id: order._id, paid });
@@ -269,11 +269,10 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
                                 {step === 2 && checkout && (
                                     <section className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 md:p-7" aria-label="Payment">
                                         <h2 className="text-2xl font-display font-bold text-brand-blue mb-5">Payment</h2>
-                                        <RazorpayPayButton
+                                        <CheckoutPayment
                                             checkout={checkout}
                                             onPaid={onPaid}
                                             isSubmitting={confirmOrder.isPending}
-                                            autoOpen
                                             label={`Pay ${formatMoney(checkout.amount / 100, checkout.currency)}`}
                                         />
                                     </section>
@@ -346,7 +345,7 @@ const TravelCheckout = ({ kind }: { kind: TravelKind }) => {
                                     Continue to payment
                                 </button>
                             )}
-                            <p className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="w-4 h-4 text-brand-orange" />Secure payment by Razorpay. Price re-checked before you pay.</p>
+                            <p className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="w-4 h-4 text-brand-orange" />Secure payment. Price re-checked before you pay.</p>
                         </aside>
                     )}
                 </div>

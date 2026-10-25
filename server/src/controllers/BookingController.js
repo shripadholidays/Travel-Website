@@ -69,13 +69,14 @@ exports.createBooking = async (req, res) => {
         });
 
         let checkout = null;
-        if (!payments.gateway() || pricing.totalAmount === 0) {
+        const gateway = pricing.totalAmount > 0 ? await payments.active() : null;
+        if (!gateway) {
             // No payment gateway (local dev) or nothing to pay: confirm straight away.
             await confirmBooking(booking);
         } else {
             try {
-                // A Razorpay order for exactly this amount; the browser pays it in Razorpay Checkout
-                checkout = await payments.createCheckout({
+                // An order for exactly this amount; the browser pays it in Razorpay Checkout or Stripe's form
+                checkout = await gateway.createCheckout({
                     amount: pricing.totalAmount,
                     currency,
                     receipt: `booking_${booking._id}`,
@@ -93,7 +94,7 @@ exports.createBooking = async (req, res) => {
                     user: req.user._id,
                     amount: pricing.totalAmount,
                     currency,
-                    method: 'razorpay',
+                    method: gateway.name,
                     gatewayOrderId: checkout.orderId,
                     status: 'pending'
                 });
@@ -102,7 +103,7 @@ exports.createBooking = async (req, res) => {
                 await Booking.save(booking);
             } catch (gatewayErr) {
                 // Don't tell the traveller they're booked when payment can't even start.
-                logger.error('Razorpay order creation failed', { error: gatewayErr?.error?.description || gatewayErr.message, bookingId: booking._id });
+                logger.error(`${gateway.label} checkout could not start`, { error: gatewayErr?.error?.description || gatewayErr.message, bookingId: booking._id });
                 booking.status = 'cancelled';
                 await Booking.save(booking);
                 return ResponseHandler.fail(res, 502, 'Payments are unavailable right now. Please try again shortly.');

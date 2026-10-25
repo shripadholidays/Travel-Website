@@ -62,6 +62,7 @@ function check(s) {
     if ((s.testimonials || []).some((t) => !(Number(t.rating) >= 1 && Number(t.rating) <= 5))) errors.testimonials = { message: 'Testimonial ratings go from 1 to 5.' };
     if ((s.supportSection?.chatMessages || []).some((m) => !['user', 'assistant'].includes(m.sender))) errors['supportSection.chatMessages'] = { message: 'Chat messages come from the user or the assistant.' };
     if ((s.contentSections || []).some((x) => !x.sectionId || !x.name)) errors.contentSections = { message: 'Every section needs an id and a name.' };
+    if (!['auto', 'razorpay', 'stripe'].includes(s.payments?.gateway)) errors['payments.gateway'] = { message: 'Pick Automatic, Razorpay or Stripe.' };
     if (s.offerBar?.countdownEnd && Number.isNaN(new Date(s.offerBar.countdownEnd).getTime())) errors['offerBar.countdownEnd'] = { message: 'The countdown end is not a valid date.' };
     if (Object.keys(errors).length) throw new ValidationError(errors);
 }

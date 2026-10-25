@@ -7,48 +7,49 @@ const { confirmBooking } = require('../services/booking-service');
 const ResponseHandler = require('../utils/response-handler');
 const logger = require('../utils/logger');
 
-// POST /payments/webhook — Razorpay events (set the URL and secret in Razorpay → Webhooks).
-// Subscribe to payment.captured, order.paid and payment.failed.
+// POST /payments/webhook — one URL for both gateways, told apart by their signature header.
+// Razorpay: events payment.captured, order.paid, payment.failed (header X-Razorpay-Signature).
+// Stripe:   events payment_intent.succeeded, payment_intent.payment_failed (header Stripe-Signature).
 exports.handleWebhook = async (req, res) => {
-    const signature = req.headers['x-razorpay-signature'];
     const raw = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
-    if (!payments.verifyWebhookSignature(raw, signature)) {
-        logger.warn('Razorpay webhook with a missing or wrong signature');
-        return res.status(400).json({ received: false });
-    }
+    const gateway = req.headers['stripe-signature'] ? payments.GATEWAYS.stripe
+        : req.headers['x-razorpay-signature'] ? payments.GATEWAYS.razorpay : null;
 
-    let event;
+    let event = null;
     try {
-        event = JSON.parse(raw.toString('utf8'));
+        event = gateway && gateway.parseWebhook(raw, req.headers);
     } catch {
+        event = null;
+    }
+    if (!event) {
+        logger.warn('Payment webhook with a missing or wrong signature');
         return res.status(400).json({ received: false });
     }
 
-    const remote = event.payload?.payment?.entity;
     try {
-        if (remote?.order_id && ['payment.captured', 'order.paid', 'payment.failed'].includes(event.event)) {
-            const payment = await Payment.findOne('gateway_order_id = ?', [remote.order_id]);
-            if (!payment) {
-                logger.warn('Webhook for an unknown Razorpay order', { orderId: remote.order_id });
-            } else if (event.event === 'payment.failed') {
-                await paymentFailed(payment, remote);
-            } else if (remote.status === 'captured' && remote.amount === payments.toMinor(payment.amount)) {
-                await paymentCaptured(payment, remote);
-                logger.info('Payment captured (webhook)', { paymentId: payment._id });
+        if (event.kind !== 'ignored') {
+            const payment = await Payment.findOne('gateway_order_id = ?', [event.orderId]);
+            if (!payment || payment.method !== gateway.name) {
+                logger.warn('Webhook for an unknown payment', { gateway: gateway.name, orderId: event.orderId });
+            } else if (event.kind === 'failed') {
+                await paymentFailed(payment, event.remote, event.reason);
+            } else if (event.amount === payments.toMinor(payment.amount) && String(event.currency).toUpperCase() === String(payment.currency).toUpperCase()) {
+                await paymentCaptured(payment, event.remote);
+                logger.info('Payment captured (webhook)', { gateway: gateway.name, paymentId: payment._id });
             } else {
-                logger.warn('Webhook payment not captured or amount mismatch', { paymentId: payment._id, status: remote.status });
+                logger.warn('Webhook amount does not match the payment', { gateway: gateway.name, paymentId: payment._id });
             }
         }
     } catch (err) {
-        // Razorpay retries on a non-2xx; log and accept so one bad record cannot block the queue
-        logger.error('Error processing Razorpay webhook', { error: err.message, event: event.event });
+        // Gateways retry on a non-2xx; log and accept so one bad record cannot block the queue
+        logger.error('Error processing payment webhook', { gateway: gateway.name, error: err.message });
     }
     return res.status(200).json({ received: true });
 };
 
-// POST /payments/confirm — the browser reports a Razorpay payment for the traveller's booking.
-// Body: { bookingId, razorpay_payment_id, razorpay_order_id, razorpay_signature }.
-// Only the booking's owner can call it, and only a payment Razorpay confirms as captured counts.
+// POST /payments/confirm — the browser reports the payment for the traveller's booking.
+// Razorpay sends { bookingId, razorpay_payment_id, razorpay_order_id, razorpay_signature }; Stripe just { bookingId }.
+// Only the booking's owner can call it, and only a payment the gateway confirms counts.
 exports.confirmPayment = async (req, res) => {
     try {
         const { bookingId } = req.body || {};
@@ -57,16 +58,14 @@ exports.confirmPayment = async (req, res) => {
         if (!booking) return ResponseHandler.fail(res, 404, 'Booking not found');
         if (booking.status !== 'pending') return ResponseHandler.success(res, { booking }, 'Booking already processed');
 
-        if (payments.gateway()) {
-            const payment = booking.paymentId ? await Payment.findById(booking.paymentId) : null;
-            const remote = await payments.settle(payment, {
-                paymentId: req.body.razorpay_payment_id,
-                orderId: req.body.razorpay_order_id,
-                signature: req.body.razorpay_signature,
-            });
+        const payment = booking.paymentId ? await Payment.findById(booking.paymentId) : null;
+        if (payment) {
+            const remote = await payments.forPayment(payment).settle(payment, req.body);
             await paymentCaptured(payment, remote);
             return ResponseHandler.success(res, { booking: await Booking.findById(booking._id) }, 'Payment confirmed successfully');
         }
+        // A booking is only pending without a payment when no gateway was set up at checkout
+        if (await payments.active()) return ResponseHandler.fail(res, 400, 'Payment not completed');
 
         await confirmBooking(booking);
         return ResponseHandler.success(res, { booking }, 'Payment confirmed successfully');

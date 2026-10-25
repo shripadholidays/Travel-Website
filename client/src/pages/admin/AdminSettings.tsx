@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingServicesCard } from "@/components/admin/BookingServicesCard";
 import { CurrencySettingsCard } from "@/components/admin/CurrencySettingsCard";
+import { PaymentGatewayCard } from "@/components/admin/PaymentGatewayCard";
 import { PageHeader } from "@/components/admin/AdminUI";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
@@ -99,9 +100,10 @@ export const AdminSettings = () => {
     return (
         <div className="space-y-6">
             {leaveGuard.dialog}
-            <PageHeader title="Settings" description="Company details shown across the site, footer options, and which booking services are switched on." />
+            <PageHeader title="Settings" description="How travellers pay, currencies, company details shown across the site, and which booking services are switched on." />
 
             <div className="grid gap-6">
+                <PaymentGatewayCard status={data?.paymentGateways} />
                 <CurrencySettingsCard value={settings?.currency} />
                 <BookingServicesCard settings={settings} />
 
