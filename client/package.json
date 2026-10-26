@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc -p tsconfig.app.json && vite build && vite-node scripts/prerender.ts",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prerender": "vite-node scripts/prerender.ts",
+    "seo:check": "vite-node scripts/seo-check.ts"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
@@ -25,6 +27,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
+    "vite-node": "^3.2.4",
     "vitest": "^3.2.4"
   },
   "dependencies": {

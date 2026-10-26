@@ -49,7 +49,8 @@ export const HotelDetailsPage = () => {
 
     return (
         <div className="bg-background min-h-screen pt-24 pb-20">
-            <PageTitle title={hotel.name} description={hotel.description} />
+            {/* Live supplier rates, not pages of our own: kept out of search */}
+            <PageTitle title={hotel.name} description={hotel.description} noIndex />
             <div className="max-w-7xl mx-auto px-4 lg:px-6">
                 <Link to={`/hotels?${backQs}`} className="inline-flex items-center gap-2 text-sm font-bold text-brand-blue hover:text-brand-orange mb-6">
                     <ArrowLeft className="w-4 h-4" /> All stays in {hotel.city}

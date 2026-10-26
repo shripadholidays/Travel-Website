@@ -17,6 +17,7 @@ import { TourBookingPanel } from "@/components/tour/TourBookingPanel";
 import { Container } from "@/components/ui/container";
 
 import { PageTitle } from "@/components/PageTitle";
+import { breadcrumbJsonLd, graph, tourDescription, tourJsonLd, tourPath, tourTitle } from "@/lib/seo";
 
 export const TourDetails = () => {
     const { id } = useParams();
@@ -45,8 +46,8 @@ export const TourDetails = () => {
     if (!tour) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4">
-                <PageTitle title="Tour Not Found" />
-                <h2 className="text-3xl font-display font-bold mb-4">Tour not found</h2>
+                <PageTitle title="Tour Not Found" noIndex />
+                <h1 className="text-3xl font-display font-bold mb-4">Tour not found</h1>
                 <p className="text-muted-foreground mb-8">The tour you are looking for does not exist or has been removed.</p>
                 <Link to="/tours"><Button>Browse all tours</Button></Link>
             </div>
@@ -58,38 +59,20 @@ export const TourDetails = () => {
     const rating = tour.reviews?.rating ?? 0;
     const reviewCount = tour.reviews?.basedOn ?? 0;
     const tags = tour.categories ?? [];
-    const description = tour.overview?.about ?? '';
 
     return (
         <div className="bg-background min-h-screen pb-24 lg:pb-0">
             <PageTitle
-                title={tour.title}
-                description={description?.slice(0, 160) || `Book ${tour.title} in ${tour.location} with Wandeazy.`}
+                title={tourTitle(tour)}
+                description={tourDescription(tour)}
                 image={image}
-                type="article"
-                jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'Product',
-                    name: tour.title,
-                    description: description?.slice(0, 200),
-                    image: image,
-                    category: tags[0] || 'Tour',
-                    offers: {
-                        '@type': 'Offer',
-                        price: tour.price,
-                        priceCurrency: tour.currency || 'USD',
-                        availability: 'https://schema.org/InStock',
-                    },
-                    ...(rating > 0 && reviewCount > 0
-                        ? {
-                            aggregateRating: {
-                                '@type': 'AggregateRating',
-                                ratingValue: rating,
-                                reviewCount: reviewCount,
-                            },
-                        }
-                        : {}),
-                }}
+                imageAlt={tour.title}
+                // Drafts and hidden tours are only seen by staff
+                noIndex={(tour.status ?? 'active') !== 'active'}
+                jsonLd={graph(
+                    tourJsonLd(tour),
+                    breadcrumbJsonLd([{ name: 'Tours', path: '/tours' }, { name: tour.title, path: tourPath(tour) }]),
+                )}
             />
             {tour.status && tour.status !== 'active' && (
                 <div className="sticky top-0 z-40 bg-amber-100 border-b border-amber-300 text-amber-900 text-sm" role="status">
@@ -101,7 +84,7 @@ export const TourDetails = () => {
             )}
             {/* Hero Gallery */}
             <div className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
-                <Image src={image} alt={tour.title} className="w-full h-full object-cover" />
+                <Image src={image} alt={tour.title} className="w-full h-full object-cover" priority />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                 <div className="absolute bottom-0 left-0 w-full p-8 md:p-12">

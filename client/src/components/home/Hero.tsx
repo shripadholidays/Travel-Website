@@ -69,6 +69,7 @@ export const Hero = () => {
                                 <Image
                                     src={slide.image}
                                     alt={slide.title}
+                                    priority={idx === 0}
                                     className={cn(
                                         "w-full h-full object-cover brightness-75 transition-all duration-500",
                                         isActive ? "grayscale-0" : "grayscale"
@@ -112,9 +113,9 @@ export const Hero = () => {
                                                 {slide.subtitle}
                                             </motion.span>
 
-                                            <h1 className="text-5xl sm:text-6xl md:text-8xl font-display font-bold text-white mb-6 leading-none">
+                                            <h2 className="text-5xl sm:text-6xl md:text-8xl font-display font-bold text-white mb-6 leading-none">
                                                 {slide.title}
-                                            </h1>
+                                            </h2>
 
                                             <p className="text-white/80 text-lg md:text-xl max-w-md mb-8 font-light">
                                                 Immerse yourself in the world's most breathtaking landscapes. Your journey begins here.

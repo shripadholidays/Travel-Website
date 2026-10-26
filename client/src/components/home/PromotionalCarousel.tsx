@@ -20,19 +20,19 @@ import "swiper/css/effect-fade";
 
 const FALLBACK: PromoSlide[] = [
     {
-        partner: "Singapore Tourism", title: "The Garden City Awaits",
+        partner: "Singapore", title: "The Garden City Awaits",
         subtitle: "Experience the magic of Sentosa and the Gardens by the Bay.",
         image: "https://images.unsplash.com/photo-1565967511849-76a60a516170?q=80&w=1600",
         accentColor: "text-emerald-400", searchQuery: "Singapore", discount: "", fromPrice: 1200,
     },
     {
-        partner: "Visit Dubai", title: "Golden Sands & Skyscrapers",
+        partner: "Dubai", title: "Golden Sands & Skyscrapers",
         subtitle: "Discover the future of luxury in the heart of the desert.",
         image: "https://images.unsplash.com/photo-1603521097795-3b798129197f?q=80&w=1600",
         accentColor: "text-amber-400", searchQuery: "Dubai", discount: "", fromPrice: 1500,
     },
     {
-        partner: "Switzerland Tourism", title: "Alpine Peaks & Valleys",
+        partner: "Switzerland", title: "Alpine Peaks & Valleys",
         subtitle: "Breathe in the freshest air atop the world's most famous mountains.",
         image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1600",
         accentColor: "text-blue-200", searchQuery: "Switzerland", discount: "", fromPrice: 1800,

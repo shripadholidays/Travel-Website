@@ -96,7 +96,7 @@ export const LoginPage = () => {
 
     return (
         <div className="min-h-screen grid lg:grid-cols-2">
-            <PageTitle title="Login" />
+            <PageTitle title="Login" noIndex />
             {/* Left: Image Section (Hidden on mobile) */}
             <div className="hidden lg:flex relative bg-black">
                 <Image

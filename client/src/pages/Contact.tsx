@@ -102,7 +102,7 @@ export const ContactPage = () => {
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
                 title="Contact Us"
-                description="Get in touch with Wandeazy or tell us about your dream trip and we'll craft the perfect itinerary."
+                description="Ask about a booking or plan a custom trip with Wandeazy. Send a message or email us and a travel specialist replies within 24 hours."
             />
             <Container>
                 <div className="text-center max-w-2xl mx-auto mb-12">

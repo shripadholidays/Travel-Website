@@ -125,11 +125,11 @@ export const FlightsPage = () => {
 
     return (
         <div className="bg-background min-h-screen">
-            <PageTitle title="Flights" description="Search and book flights across India and around the world, linked to your WandEazy trip." />
+            <PageTitle title="Flights" description="Search and book flights across India and around the world, linked to your Wandeazy trip." />
             <AccordionHero
                 panels={PANELS}
                 eyebrow="Flights · India & International"
-                description="Every airline in one search. Line your flights up with your WandEazy tour."
+                description="Every airline in one search. Line your flights up with your Wandeazy tour."
             />
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 -mt-28">

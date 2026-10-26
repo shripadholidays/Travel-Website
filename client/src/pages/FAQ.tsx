@@ -5,6 +5,7 @@ import { PageTitle } from "@/components/PageTitle";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { usePublicSettings } from "@/hooks/use-settings";
 import { FAQS } from "@/lib/faqs";
+import { faqJsonLd, graph } from "@/lib/seo";
 
 export const FAQPage = () => {
     const { data } = usePublicSettings();
@@ -17,17 +18,9 @@ export const FAQPage = () => {
     return (
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
-                title="FAQ"
-                description="Answers to the most common questions about booking, payments, cancellations, and more."
-                jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'FAQPage',
-                    mainEntity: items.map((item) => ({
-                        '@type': 'Question',
-                        name: item.question,
-                        acceptedAnswer: { '@type': 'Answer', text: item.answer },
-                    })),
-                }}
+                title="Frequently Asked Questions"
+                description="How to book a Wandeazy tour, free cancellation up to 24 hours before departure, accepted payments, what tour prices include, travel insurance and custom itineraries."
+                jsonLd={graph(faqJsonLd(items))}
             />
             <Container className="max-w-3xl">
                 <div className="text-center mb-12">

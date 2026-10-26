@@ -79,7 +79,7 @@ export const HotelsPage = () => {
 
     return (
         <div className="bg-background min-h-screen">
-            <PageTitle title="Hotels" description="Hand-picked hotels across India and the world, right next to your WandEazy tour." />
+            <PageTitle title="Hotels" description="Hand-picked hotels across India and the world, right next to your Wandeazy tour." />
             <AccordionHero
                 panels={PANELS}
                 eyebrow="Hotels · India & Worldwide"

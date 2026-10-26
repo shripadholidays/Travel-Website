@@ -1,14 +1,9 @@
 import { Link } from "react-router-dom";
-import * as LucideIcons from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { resolveIcon } from "@/lib/icons";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/PageTitle";
 import { usePublicSettings, useHighlights, liveStats, type AboutValue } from "@/hooks/use-settings";
-
-function resolveIcon(name: string): LucideIcon {
-    return (LucideIcons as unknown as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
-}
 
 const FALLBACK_VALUES: AboutValue[] = [
     { icon: "Globe2", title: "Global Reach", description: "Hand-picked experiences in destinations around the world." },
@@ -25,8 +20,8 @@ export const AboutPage = () => {
     const heroImage = about?.heroImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80";
     const heroHeadline = about?.heroHeadline || "We turn wanderlust into unforgettable journeys";
     const heroSubtext = about?.heroSubtext || "Wandeazy was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.";
-    const storyParagraph1 = about?.storyParagraph1 || "What started as a small group of travel obsessives sketching itineraries on napkins has grown into a platform trusted by travelers worldwide. We've walked the trails, tasted the food, and slept under the stars — so we know exactly what makes a trip worth taking.";
-    const storyParagraph2 = about?.storyParagraph2 || "Today, we partner with the best local operators on the planet to bring you experiences that are authentic, responsible, and unforgettable.";
+    const storyParagraph1 = about?.storyParagraph1 || "Wandeazy puts together tours to destinations around the world and lets you book them online in a few steps, with secure payment and free cancellation up to 24 hours before departure.";
+    const storyParagraph2 = about?.storyParagraph2 || "Every tour page shows the day-by-day itinerary and exactly what is and isn't included, so you know what you are booking. Want something different? Tell us and we'll plan a custom trip with you.";
     // Admin-written stats win; otherwise real numbers, never made-up ones
     const stats = (about?.stats?.length ?? 0) > 0 ? about!.stats : liveStats(highlights?.stats);
     const values = (about?.values?.length ?? 0) > 0 ? about!.values : FALLBACK_VALUES;
@@ -41,7 +36,7 @@ export const AboutPage = () => {
         <div className="bg-background min-h-screen">
             <PageTitle
                 title="About Us"
-                description="Learn about Wandeazy — our mission to craft unforgettable, hassle-free travel experiences around the world."
+                description="Who Wandeazy is, how we put together our tours and what you can expect when you book a trip with us."
             />
 
             {/* Hero */}

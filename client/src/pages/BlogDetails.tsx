@@ -5,6 +5,7 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
+import { articleDescription, articleJsonLd, articlePath, breadcrumbJsonLd, graph } from "@/lib/seo";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Calendar, Clock, Share2, Facebook, Twitter, Linkedin, Link2 } from "lucide-react";
 import { format } from "date-fns";
@@ -39,7 +40,7 @@ export const BlogDetails = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
                 <PageTitle title="Article Not Found" noIndex />
-                <h2 className="text-3xl font-display font-bold mb-4">Article not found</h2>
+                <h1 className="text-3xl font-display font-bold mb-4">Article not found</h1>
                 <p className="text-muted-foreground mb-8">This article may have been moved or removed.</p>
                 <Button variant="brand" asChild><Link to="/blog">Back to Magazine</Link></Button>
             </div>
@@ -65,28 +66,20 @@ export const BlogDetails = () => {
         <div className="bg-background min-h-screen pb-24">
             <PageTitle
                 title={blog.title}
-                description={blog.excerpt}
+                description={articleDescription(blog)}
                 image={blog.coverImage}
                 type="article"
-                jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'Article',
-                    headline: blog.title,
-                    description: blog.excerpt,
-                    image: blog.coverImage,
-                    datePublished: blog.publishedAt || blog.createdAt,
-                    author: { '@type': 'Person', name: authorName },
-                    publisher: {
-                        '@type': 'Organization',
-                        name: 'Wandeazy',
-                        logo: { '@type': 'ImageObject', url: 'https://wandeazy.com/favicon.svg' },
-                    },
-                }}
+                // Writers and editors preview unpublished articles; those stay out of search
+                noIndex={blog.status !== 'published'}
+                jsonLd={graph(
+                    articleJsonLd(blog),
+                    breadcrumbJsonLd([{ name: 'Travel Magazine', path: '/blog' }, { name: blog.title, path: articlePath(blog) }]),
+                )}
             />
 
             {/* Immersive hero */}
             <div className="relative h-[60vh] min-h-[440px] w-full overflow-hidden">
-                <Image src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" />
+                <Image src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" priority />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/40" />
 
                 <div className="absolute inset-0 flex flex-col">

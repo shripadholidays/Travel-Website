@@ -3,19 +3,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import * as LucideIcons from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { resolveIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/container";
 import { usePublicSettings, type PlanTripStep } from "@/hooks/use-settings";
 import { useEnabledFeatures } from '@/hooks/use-feature';
 import { stripTravelMentions } from '@/lib/feature-links';
-
-// Resolve icon name string → Lucide component
-function resolveIcon(name: string): LucideIcon {
-    const icon = (LucideIcons as unknown as Record<string, LucideIcon>)[name];
-    return icon || LucideIcons.HelpCircle;
-}
 
 const FALLBACK_STEPS: PlanTripStep[] = [
     { icon: "Map", title: "Pick Destination", description: "Browse tours and destinations" },

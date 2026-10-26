@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
+import { destinationPath, graph, itemListJsonLd } from "@/lib/seo";
 
 import { Container } from "@/components/ui/container";
 
@@ -36,8 +37,9 @@ export const DestinationsPage = () => {
     return (
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
-                title="Destinations"
-                description="Explore breathtaking destinations around the world, from iconic landmarks to hidden gems."
+                title="Travel Destinations Worldwide"
+                description="Explore Wandeazy travel destinations around the world, each with its highlights, best time to visit and the tours you can book there."
+                jsonLd={destinations.length > 0 ? graph(itemListJsonLd(destinations.map((d) => ({ name: d.name, path: destinationPath(d) })))) : undefined}
             />
             <Container>
                 <h1 className="text-4xl md:text-6xl font-display font-bold text-center mb-6">Explore the World</h1>

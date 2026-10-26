@@ -87,8 +87,8 @@
       "heroImage": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80",
       "heroHeadline": "We turn wanderlust into unforgettable journeys",
       "heroSubtext": "Wandeazy was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.",
-      "storyParagraph1": "What started as a small group of travel obsessives sketching itineraries on napkins has grown into a platform trusted by travelers worldwide. We've walked the trails, tasted the food, and slept under the stars — so we know exactly what makes a trip worth taking.",
-      "storyParagraph2": "Today, we partner with the best local operators on the planet to bring you experiences that are authentic, responsible, and unforgettable.",
+      "storyParagraph1": "Wandeazy puts together tours to destinations around the world and lets you book them online in a few steps, with secure payment and free cancellation up to 24 hours before departure.",
+      "storyParagraph2": "Every tour page shows the day-by-day itinerary and exactly what is and isn't included, so you know what you are booking. Want something different? Tell us and we'll plan a custom trip with you.",
       "ctaHeading": "Ready to start your journey?",
       "ctaSubtext": "Browse our curated tours or tell us about your dream trip — we'll handle the rest.",
       "ctaBtn1Label": "Explore Tours",
@@ -260,7 +260,7 @@
     ],
     "promoSlides": [
       {
-        "partner": "Singapore Tourism",
+        "partner": "Singapore",
         "title": "The Garden City Awaits",
         "subtitle": "Experience the magic of Sentosa and the Gardens by the Bay.",
         "image": "https://images.unsplash.com/photo-1565967511849-76a60a516170?q=80&w=1600",
@@ -270,7 +270,7 @@
         "searchQuery": "Singapore"
       },
       {
-        "partner": "Visit Dubai",
+        "partner": "Dubai",
         "title": "Golden Sands & Skyscrapers",
         "subtitle": "Discover the future of luxury in the heart of the desert.",
         "image": "https://images.unsplash.com/photo-1603521097795-3b798129197f?q=80&w=1600",
@@ -280,7 +280,7 @@
         "searchQuery": "Dubai"
       },
       {
-        "partner": "Switzerland Tourism",
+        "partner": "Switzerland",
         "title": "Alpine Peaks & Valleys",
         "subtitle": "Breathe in the freshest air atop the world's most famous mountains.",
         "image": "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1600",

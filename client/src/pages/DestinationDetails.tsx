@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
+import { breadcrumbJsonLd, destinationDescription, destinationJsonLd, destinationPath, graph } from "@/lib/seo";
 import type { Destination, Tour } from "@/types";
 
 import { Container } from "@/components/ui/container";
@@ -66,7 +67,7 @@ export const DestinationDetails = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
                 <PageTitle title="Destination Not Found" noIndex />
-                <h2 className="text-3xl font-display font-bold mb-4">Destination not found</h2>
+                <h1 className="text-3xl font-display font-bold mb-4">Destination not found</h1>
                 <p className="text-muted-foreground mb-8">This destination may have been moved or removed.</p>
                 <Button variant="brand" asChild><Link to="/destinations">Explore Destinations</Link></Button>
             </div>
@@ -82,25 +83,20 @@ export const DestinationDetails = () => {
     return (
         <div className="bg-background min-h-screen pb-24">
             <PageTitle
-                title={destination.name}
-                description={destination.description?.slice(0, 160)}
+                title={`${destination.name} Tours & Travel Guide`}
+                description={destinationDescription(destination)}
                 image={destination.coverImage}
-                jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'TouristDestination',
-                    name: destination.name,
-                    description: destination.description?.slice(0, 200),
-                    image: destination.coverImage,
-                    address: {
-                        '@type': 'PostalAddress',
-                        addressCountry: destination.country,
-                    },
-                }}
+                imageAlt={destination.name}
+                noIndex={destination.isActive === false}
+                jsonLd={graph(
+                    destinationJsonLd(destination),
+                    breadcrumbJsonLd([{ name: 'Destinations', path: '/destinations' }, { name: destination.name, path: destinationPath(destination) }]),
+                )}
             />
 
             {/* Hero */}
             <div className="relative h-[70vh] min-h-[440px] md:h-[78vh] md:min-h-[560px] w-full overflow-hidden">
-                <Image src={destination.coverImage} alt={destination.name} className="w-full h-full object-cover" />
+                <Image src={destination.coverImage} alt={destination.name} className="w-full h-full object-cover" priority />
                 {/* Smooth dark scrim — darkens top (navbar) and bottom (text), clears the middle */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />

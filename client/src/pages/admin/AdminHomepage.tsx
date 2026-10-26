@@ -21,13 +21,10 @@ import {
     type HeroSlide, type PromoSlide, type Testimonial, type PlanTripStep,
     type SupportFeature, type ChatMessage, type NavLink, type FooterLink,
 } from '@/hooks/use-settings';
+import { ICON_NAMES } from "@/lib/icons";
 
 // ── Icon choices for steps and features ─────────────────────────────────────
-const ICON_OPTIONS = [
-    'Map', 'Calendar', 'Settings', 'CheckCircle2', 'Zap', 'Headphones',
-    'MessageCircle', 'ShieldCheck', 'Globe2', 'Heart', 'Users', 'Star',
-    'Camera', 'Compass', 'Plane', 'Hotel', 'Coffee', 'Award',
-];
+const ICON_OPTIONS = ICON_NAMES;
 
 // ── Colour presets for hero slides ───────────────────────────────────────────
 const COLOR_OPTIONS = [
@@ -354,7 +351,7 @@ export const AdminHomepage = () => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Partner Name</Label>
-                                                <Input value={slide.partner} onChange={e => onChange({ ...slide, partner: e.target.value })} placeholder="Singapore Tourism" />
+                                                <Input value={slide.partner} onChange={e => onChange({ ...slide, partner: e.target.value })} placeholder="Singapore" />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Discount Badge</Label>

@@ -311,8 +311,11 @@ export const SearchPage = () => {
     return (
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
-                title={query ? `Tours matching “${query}”` : 'All Tours'}
-                description="Find and book your next adventure from our curated tours."
+                title={query ? `Tours matching “${query}”` : 'All Tours & Holiday Packages'}
+                description="Compare every Wandeazy tour by destination, price, duration, travel style and traveller rating, then book online."
+                // Filters and sorting all canonicalise to /tours; typed searches stay out of the index
+                path="/tours"
+                noIndex={!!query}
             />
             <Container>
                 {/* Search Header */}

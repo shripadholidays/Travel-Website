@@ -3,17 +3,12 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Container } from "@/components/ui/container";
-import * as LucideIcons from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { resolveIcon } from "@/lib/icons";
 import { Send, Headphones, ShieldCheck, Loader2, Mail } from "lucide-react";
 import { usePublicSettings, type SupportFeature } from "@/hooks/use-settings";
 import { useCreateInquiry, type InquiryTopic } from "@/hooks/use-contact";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-
-function resolveIcon(name: string): LucideIcon {
-    return (LucideIcons as unknown as Record<string, LucideIcon>)[name] || LucideIcons.HelpCircle;
-}
 
 const FALLBACK_FEATURES: SupportFeature[] = [
     { icon: "MessageCircle", title: "Ask Us Anything", description: "Travel queries, visa help or itinerary tweaks: send a message from any page." },

@@ -3,7 +3,7 @@ const { validationText } = require('../db/errors');
 const SiteSettings = require('../models/SiteSettings');
 const payments = require('../services/payments');
 const ResponseHandler = require('../utils/response-handler');
-const { hasPermission, PERMISSIONS } = require('../config/permissions');
+const { hasPermission, PERMISSIONS, STAFF_ROLES } = require('../config/permissions');
 const logger = require('../utils/logger');
 const { clearTravelConfigCache } = require('../services/travel-config');
 const { getCurrencyConfig, clearCurrencyCache, fetchLatestRates, SUPPORTED } = require('../services/currency');
@@ -45,7 +45,7 @@ exports.getPublicSettings = async (req, res) => {
 exports.getHighlights = async (req, res) => {
     try {
         // Reviews by our own staff are not testimonials
-        const byTravellers = "r.user_id NOT IN (SELECT id FROM users WHERE role IN ('admin', 'moderator'))";
+        const byTravellers = `r.user_id NOT IN (SELECT id FROM users WHERE role IN (${STAFF_ROLES.map((x) => `'${x}'`).join(', ')}))`;
         const [tours, bookingTotals, reviewTotals, reviews] = await Promise.all([
             all("SELECT location FROM tours WHERE status = 'active'"),
             get("SELECT SUM(number_of_travelers) AS travellers FROM bookings WHERE status IN ('confirmed', 'completed')"),

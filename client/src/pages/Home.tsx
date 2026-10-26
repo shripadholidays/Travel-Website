@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { FaqSection } from "@/components/home/FaqSection";
 import { RecentlyViewedTours } from "@/components/home/RecentlyViewedTours";
 import { PageTitle } from "@/components/PageTitle";
+import { graph, websiteJsonLd } from "@/lib/seo";
 import { FeatureGate } from "@/components/FeatureGate";
 import { TravelSearchTabs } from "@/components/home/TravelSearchTabs";
 
@@ -16,20 +17,11 @@ export const Home = () => {
     return (
         <div className="bg-background min-h-screen">
             <PageTitle
-                title="Premium Travel & Tour Booking"
-                description="Plan your dream trip with Wandeazy. Browse curated tours and breathtaking destinations worldwide, compare deals, and book unforgettable travel experiences with ease."
-                jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'WebSite',
-                    name: 'Wandeazy',
-                    url: 'https://wandeazy.com',
-                    potentialAction: {
-                        '@type': 'SearchAction',
-                        target: 'https://wandeazy.com/tours?q={search_term_string}',
-                        'query-input': 'required name=search_term_string',
-                    },
-                }}
+                title="Curated Tours & Holiday Packages"
+                description="Browse curated tours and holiday packages to destinations worldwide with Wandeazy. Compare day-by-day itineraries and inclusions, then book online securely."
+                jsonLd={graph(websiteJsonLd())}
             />
+            <h1 className="sr-only">Wandeazy: curated tours and holiday packages worldwide</h1>
             <Hero />
             <FeatureGate any>
                 <TravelSearchTabs />

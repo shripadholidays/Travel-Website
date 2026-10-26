@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/PageTitle";
+import { collectionPath, graph, itemListJsonLd } from "@/lib/seo";
 
 import { Container } from "@/components/ui/container";
 
@@ -23,8 +24,9 @@ export const CollectionsPage = () => {
     return (
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
-                title="Collections"
-                description="Hand-picked travel collections for every type of traveler — luxury, adventure, relaxation and more."
+                title="Tour Collections by Travel Style"
+                description="Hand-picked Wandeazy tour collections grouped by travel style, such as beach getaways, adventure and trekking, culture, luxury and honeymoons."
+                jsonLd={collections.length > 0 ? graph(itemListJsonLd(collections.map((c) => ({ name: c.name, path: collectionPath(c) })))) : undefined}
             />
             <Container>
                 <h1 className="text-4xl md:text-6xl font-display font-bold text-center mb-6">Our Collections</h1>

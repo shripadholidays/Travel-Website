@@ -4,6 +4,7 @@ import { Calendar, User, ArrowRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
+import { articlePath, graph, itemListJsonLd } from "@/lib/seo";
 import { format } from "date-fns";
 
 import { Link } from "react-router-dom";
@@ -25,8 +26,9 @@ export const BlogPage = () => {
     return (
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
-                title="Travel Magazine"
-                description="Stories, tips, and guides to inspire your next adventure from the Wandeazy travel magazine."
+                title="Travel Magazine: Guides & Tips"
+                description="Travel guides, packing lists, budget tips and food ideas from the Wandeazy travel magazine, written to help you plan your next trip."
+                jsonLd={blogs.length > 0 ? graph(itemListJsonLd(blogs.map((b) => ({ name: b.title, path: articlePath(b) })))) : undefined}
             />
             <Container>
                 <h1 className="text-4xl md:text-6xl font-display font-bold text-center mb-6">Travel Magazine</h1>

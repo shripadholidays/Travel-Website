@@ -133,14 +133,15 @@ describe('API on the libSQL database', () => {
             expect((await request(app).post(`/api/v1/tours/${tour._id}/reviews`).set('Cookie', cookieFor(admin)).send({ rating: 9, content: 'x' })).status).toBe(400);
             await request(app).post(`/api/v1/tours/${tour._id}/reviews`).set('Cookie', cookieFor(admin)).send({ rating: 2, content: 'Meh' }).expect(200);
 
-            expect((await TravelDestination.findById(tour._id)).reviews).toMatchObject({ rating: 3, basedOn: 2 });
+            // The admin's review is listed but is not a traveller rating
+            expect((await TravelDestination.findById(tour._id)).reviews).toMatchObject({ rating: 4, basedOn: 1 });
             const list = await request(app).get(`/api/v1/tours/${tour._id}/reviews`);
             expect(list.body.data.pagination.total).toBe(2);
 
             const all = await request(app).get('/api/v1/admin/reviews?search=lovely').set('Cookie', cookieFor(admin));
             expect(all.body.data.reviews).toHaveLength(1);
             await request(app).delete(`/api/v1/admin/reviews/${first.body.data.review._id}`).set('Cookie', cookieFor(admin)).expect(200);
-            expect((await TravelDestination.findById(tour._id)).reviews).toMatchObject({ rating: 2, basedOn: 1 });
+            expect((await TravelDestination.findById(tour._id)).reviews).toMatchObject({ rating: 0, basedOn: 0 });
         });
 
         it('adds, lists and removes wishlist tours', async () => {

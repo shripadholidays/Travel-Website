@@ -6,6 +6,7 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
+import { breadcrumbJsonLd, collectionJsonLd, collectionPath, graph, summarize } from "@/lib/seo";
 import { Container } from "@/components/ui/container";
 
 export const CollectionDetails = () => {
@@ -26,7 +27,7 @@ export const CollectionDetails = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
                 <PageTitle title="Collection Not Found" noIndex />
-                <h2 className="text-3xl font-display font-bold mb-4">Collection not found</h2>
+                <h1 className="text-3xl font-display font-bold mb-4">Collection not found</h1>
                 <p className="text-muted-foreground mb-8">This collection may have been moved or removed.</p>
                 <Button variant="brand" asChild><Link to="/collections">View all collections</Link></Button>
             </div>
@@ -36,14 +37,20 @@ export const CollectionDetails = () => {
     return (
         <div className="bg-background min-h-screen pb-24">
             <PageTitle
-                title={collection.name}
-                description={collection.description}
+                title={`${collection.name} Tours`}
+                description={summarize(collection.description || `${collection.name}: a hand-picked collection of Wandeazy tours.`)}
                 image={collection.coverImage}
+                imageAlt={collection.name}
+                noIndex={collection.isActive === false}
+                jsonLd={graph(
+                    collectionJsonLd(collection),
+                    breadcrumbJsonLd([{ name: 'Collections', path: '/collections' }, { name: collection.name, path: collectionPath(collection) }]),
+                )}
             />
 
             {/* Hero */}
             <div className="relative h-[50vh] min-h-[340px] w-full overflow-hidden">
-                <Image src={collection.coverImage} alt={collection.name} className="w-full h-full object-cover" />
+                <Image src={collection.coverImage} alt={collection.name} className="w-full h-full object-cover" priority />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/30" />
 
                 <div className="absolute top-0 left-0 w-full pt-28 z-20">

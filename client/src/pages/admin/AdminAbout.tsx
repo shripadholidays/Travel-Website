@@ -13,11 +13,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ImagePicker } from '@/components/ui/ImagePicker';
 import { ListEditor } from '@/components/ui/ListEditor';
 import { useSiteSettings, useUpdateSiteSettings, type AboutStat, type AboutValue } from '@/hooks/use-settings';
+import { ICON_NAMES } from "@/lib/icons";
 
-const ICON_OPTIONS = [
-    'Globe2', 'ShieldCheck', 'Heart', 'Users', 'Star', 'Award', 'Zap',
-    'Map', 'Camera', 'Compass', 'Plane', 'Coffee', 'Headphones', 'MessageCircle',
-];
+const ICON_OPTIONS = ICON_NAMES;
 
 function SaveBtn({ onClick, loading, disabled }: { onClick: () => void; loading: boolean; disabled?: boolean }) {
     return (

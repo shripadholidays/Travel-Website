@@ -87,7 +87,7 @@ export const RegisterPage = () => {
 
     return (
         <div className="min-h-screen grid lg:grid-cols-2">
-            <PageTitle title="Create Account" />
+            <PageTitle title="Create Account" noIndex />
             {/* Left: Image Section (Hidden on mobile) */}
             <div className="hidden lg:flex relative bg-black">
                 <Image

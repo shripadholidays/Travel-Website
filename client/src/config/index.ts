@@ -17,8 +17,13 @@ export const config = {
     },
 
     app: {
-        name:      read('APP_NAME')     || 'WandEazy',
-        logoText:  read('LOGO_TEXT')    || 'WandEazy',
+        name:      read('APP_NAME')     || 'Wandeazy',
+        logoText:  read('LOGO_TEXT')    || 'Wandeazy',
+    },
+
+    /** Public address of the site, used for canonical links, the sitemap and structured data (no trailing slash) */
+    site: {
+        url:       (read('SITE_URL')    || 'https://wandeazy.com').replace(/\/+$/, ''),
     },
 
     auth: {

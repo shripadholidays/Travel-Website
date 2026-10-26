@@ -34,7 +34,7 @@ export const ForgotPasswordPage = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-            <PageTitle title="Forgot Password" />
+            <PageTitle title="Forgot Password" noIndex />
             <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
