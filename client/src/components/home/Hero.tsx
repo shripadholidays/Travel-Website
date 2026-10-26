@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Image } from "@/components/ui/image";
@@ -35,25 +35,86 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     },
 ];
 
+// The slide that starts open; its photo is fetched first
+const INITIAL_SLIDE = 1;
+const AUTOPLAY_MS = 6000;
+const AUTOPLAY_AFTER_TOUCH_MS = 10000;
+
+function useIsMobile() {
+    const query = "(max-width: 767px)"; // Tailwind's md breakpoint
+    const [mobile, setMobile] = useState(() => typeof window !== "undefined" && window.matchMedia(query).matches);
+    useEffect(() => {
+        const list = window.matchMedia(query);
+        const update = () => setMobile(list.matches);
+        update();
+        list.addEventListener("change", update);
+        return () => list.removeEventListener("change", update);
+    }, []);
+    return mobile;
+}
+
 export const Hero = () => {
     const { data } = usePublicSettings();
     const slides = (data?.settings?.heroSlides?.length ?? 0) > 0
         ? data!.settings!.heroSlides
         : FALLBACK_SLIDES;
 
-    const [activeIdx, setActiveIdx] = useState(1);
+    const [activeIdx, setActiveIdx] = useState(INITIAL_SLIDE);
+    const isMobile = useIsMobile();
+    const reduceMotion = useReducedMotion();
+    // Set when the visitor swipes or taps, so the slideshow doesn't move under their finger
+    const [touchedAt, setTouchedAt] = useState(0);
+    const swipeStart = useRef<{ x: number; y: number } | null>(null);
+    const count = slides.length;
+
+    const show = (idx: number) => {
+        setActiveIdx(((idx % count) + count) % count);
+        setTouchedAt(Date.now());
+    };
+
+    // Phones show one slide at a time, so they move on by themselves (desktop opens slides on hover)
+    useEffect(() => {
+        if (!isMobile || reduceMotion || count < 2) return;
+        const delay = Math.max(AUTOPLAY_MS, touchedAt + AUTOPLAY_AFTER_TOUCH_MS - Date.now());
+        const id = window.setTimeout(() => setActiveIdx((i) => (i + 1) % count), delay);
+        return () => window.clearTimeout(id);
+    }, [isMobile, reduceMotion, count, activeIdx, touchedAt]);
+
+    // Fetch the next slide's photo early so a swipe doesn't land on an empty frame
+    useEffect(() => {
+        if (!isMobile || count < 2) return;
+        const next = slides[(activeIdx + 1) % count]?.image;
+        if (next) new window.Image().src = next;
+    }, [isMobile, activeIdx, count, slides]);
 
     return (
-        <div className="relative h-screen w-full overflow-hidden bg-black flex flex-col">
+        // svh: phone browsers' toolbars would otherwise cover the button and dots at the bottom
+        // (browsers without svh ignore the style and keep h-screen)
+        <div className="relative h-screen w-full overflow-hidden bg-black flex flex-col" style={{ height: "100svh" }}>
             {/* Accordion Container */}
-            <div className="flex-1 flex w-full">
+            <div
+                className="flex-1 flex w-full touch-pan-y"
+                onTouchStart={(e) => {
+                    const t = e.touches[0];
+                    swipeStart.current = { x: t.clientX, y: t.clientY };
+                }}
+                onTouchEnd={(e) => {
+                    const start = swipeStart.current;
+                    swipeStart.current = null;
+                    if (!start || !isMobile) return;
+                    const t = e.changedTouches[0];
+                    const dx = t.clientX - start.x;
+                    // A sideways swipe, not a scroll
+                    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(t.clientY - start.y)) show(activeIdx + (dx < 0 ? 1 : -1));
+                }}
+            >
                 {slides.map((slide, idx) => {
                     const isActive = idx === activeIdx;
                     return (
                         <motion.div
                             key={idx}
                             layout
-                            onClick={() => setActiveIdx(idx)}
+                            onClick={() => (isMobile ? setTouchedAt(Date.now()) : setActiveIdx(idx))}
                             onHoverStart={() => setActiveIdx(idx)}
                             className={cn(
                                 "relative h-full border-r border-white/10 cursor-pointer overflow-hidden transition-all duration-700 ease-in-out",
@@ -63,13 +124,15 @@ export const Hero = () => {
                             {/* Background Image */}
                             <motion.div
                                 className="absolute inset-0 w-full h-full"
-                                animate={{ scale: isActive ? 1.1 : 1 }}
-                                transition={{ duration: 0.7 }}
+                                initial={false}
+                                // On phones the incoming photo fades in rather than cutting
+                                animate={{ scale: isActive ? 1.1 : 1, opacity: isMobile && !isActive ? 0 : 1 }}
+                                transition={{ duration: 0.7, opacity: { duration: 0.4 } }}
                             >
                                 <Image
                                     src={slide.image}
                                     alt={slide.title}
-                                    priority={idx === 0}
+                                    priority={idx === INITIAL_SLIDE}
                                     className={cn(
                                         "w-full h-full object-cover brightness-75 transition-all duration-500",
                                         isActive ? "grayscale-0" : "grayscale"
@@ -85,7 +148,7 @@ export const Hero = () => {
                             )} />
 
                             {/* Content */}
-                            <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                            <div className="absolute inset-0 p-6 pb-14 md:p-8 flex flex-col justify-end">
                                 {/* Vertical Label for Inactive */}
                                 {!isActive && (
                                     <div className="absolute inset-0 flex items-center justify-center">
@@ -137,15 +200,18 @@ export const Hero = () => {
             </div>
 
             {/* Mobile dots */}
-            <div className="md:hidden absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+            <div className="md:hidden absolute bottom-1 left-0 right-0 flex justify-center z-20">
                 {slides.map((_, idx) => (
+                    // A finger-sized button around a small dot
                     <button
                         key={idx}
-                        onClick={() => setActiveIdx(idx)}
+                        onClick={() => show(idx)}
                         aria-label={`Show slide ${idx + 1}`}
                         aria-current={idx === activeIdx}
-                        className={cn("w-2 h-2 rounded-full transition-colors", idx === activeIdx ? "bg-white" : "bg-white/30")}
-                    />
+                        className="w-9 h-9 flex items-center justify-center"
+                    >
+                        <span className={cn("h-2 rounded-full transition-all duration-300", idx === activeIdx ? "w-6 bg-white" : "w-2 bg-white/40")} />
+                    </button>
                 ))}
             </div>
         </div>
