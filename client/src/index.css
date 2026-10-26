@@ -66,6 +66,42 @@
     background: #94a3b8;
 }
 
+/* Scroll areas inside rounded windows (tour quick view): a slim brand-orange thumb,
+   inset from the rounded corners so it never cuts them */
+.scrollbar-brand {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(249 115 22 / 0.45) transparent;
+}
+.scrollbar-brand::-webkit-scrollbar {
+    width: 12px;
+}
+.scrollbar-brand::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 1.25rem;
+}
+.scrollbar-brand::-webkit-scrollbar-thumb {
+    background: rgb(249 115 22 / 0.4);
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: 9999px;
+}
+.scrollbar-brand::-webkit-scrollbar-thumb:hover,
+.scrollbar-brand::-webkit-scrollbar-thumb:active {
+    background-color: rgb(249 115 22 / 0.75);
+}
+
+/* Tour quick view: the hero photo settles into place as the window opens */
+@keyframes qv-hero {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
+}
+.animate-qv-hero {
+    animation: qv-hero 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+    .animate-qv-hero { animation: none; }
+}
+
 /* Typography Overrides */
 h1, h2, h3, h4, h5, h6 {
   @apply font-display tracking-tight;
