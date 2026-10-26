@@ -164,7 +164,7 @@
       },
       {
         "label": "Plan a Custom Trip",
-        "path": "/contact?topic=trip"
+        "path": "/build-trip"
       }
     ],
     "footerCompanyLinks": [

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Heart, Minus, Plus, Share2, ShieldCheck, Users } from "lucide-react";
+import { Calendar as CalendarIcon, Heart, Minus, Plus, Route, Share2, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -159,6 +159,13 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </Link>
             </Button>
+
+            <Link
+                to={`/build-trip?from=${tour._id}`}
+                className="flex items-center justify-center gap-1.5 rounded-2xl py-2.5 text-sm font-semibold text-brand-orange hover:bg-brand-orange/10 transition-colors"
+            >
+                <Route className="w-4 h-4" aria-hidden /> Customise this trip
+            </Link>
 
             <div className="space-y-2 pt-1">
                 <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">

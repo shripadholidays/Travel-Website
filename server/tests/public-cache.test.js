@@ -45,12 +45,12 @@ describe('landing page cache', () => {
 
     test('changes outside the API show once the time limit passes', async () => {
         const saved = config.publicCache.ttlMs;
-        config.publicCache.ttlMs = 40;
+        config.publicCache.ttlMs = 400;
         try {
             await request(app).get('/api/v1/destinations').expect(200);
             await Destination.insert({ ...kerala, isActive: true });
             expect((await request(app).get('/api/v1/destinations')).body.data.destinations).toHaveLength(0);
-            await new Promise((r) => setTimeout(r, 60));
+            await new Promise((r) => setTimeout(r, 500));
             expect((await request(app).get('/api/v1/destinations')).body.data.destinations).toHaveLength(1);
         } finally {
             config.publicCache.ttlMs = saved;

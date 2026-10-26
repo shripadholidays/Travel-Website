@@ -20,6 +20,8 @@ const authRoutes = require('./routes/auth-route');
 const tourRoutes = require('./routes/tour-route');
 const userRoutes = require('./routes/user-route');
 const inquiryRoutes = require('./routes/inquiry-route');
+const customTripRoutes = require('./routes/custom-trip-route');
+const { getBuilder: getTripBuilder } = require('./controllers/CustomTripController');
 const subscribeRoutes = require('./routes/subscribe-route');
 const bookingRoutes = require('./routes/booking-route');
 const paymentRoutes = require('./routes/payment-route');
@@ -94,6 +96,9 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), {
 }));
 
 app.use(express.urlencoded({ extended: true }));
+// A built trip (with its day plans) and the trip builder's price list are bigger than other requests
+app.post('/api/v1/custom-trips', express.json({ limit: '64kb' }));
+app.put('/api/v1/admin/trip-builder', express.json({ limit: '512kb' }));
 app.use(express.json({ limit: config.app.bodyLimit }));
 app.use(cookieParser());
 app.use(helmet());
@@ -124,7 +129,7 @@ app.get('/health', async (req, res) => {
 app.use('/api/v1', clearOnChange);
 app.get([
     '/api/v1/settings', '/api/v1/settings/highlights', '/api/v1/tours/recommended',
-    '/api/v1/destinations', '/api/v1/collections',
+    '/api/v1/destinations', '/api/v1/collections', '/api/v1/trip-builder',
 ], publicCache);
 
 // Changes to anything the prerendered pages show (content, reviews, settings) rebuild the site
@@ -137,6 +142,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tours', tourRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/inquiries', inquiryRoutes);
+app.get('/api/v1/trip-builder', getTripBuilder);
+app.use('/api/v1/custom-trips', customTripRoutes);
 app.use('/api/v1/subscribe', subscribeRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
 app.use('/api/v1/payments', paymentRoutes);

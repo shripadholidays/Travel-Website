@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
     Map, Heart, Settings, LogOut, ArrowRight, X, Shield, Lock, HelpCircle, Plane, BedDouble,
-    PenTool, MailWarning, LayoutDashboard, Loader2, FileText,
+    PenTool, MailWarning, LayoutDashboard, Loader2, FileText, Route,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import { useCancelTravelOrder, useMyTravelOrders } from "@/hooks/use-travel";
 import { useMyBlogPosts, useDeleteBlogPost } from "@/hooks/use-blog";
 import { useWriteEligibility } from "@/hooks/use-write-eligibility";
 import { TravelOrderCard } from "@/components/travel/TravelOrderCard";
+import { MyCustomTrips } from "@/components/trip-builder/MyCustomTrips";
 import type { TravelOrder } from "@/types/travel";
 import { useAuth } from "@/context/AuthContext";
 import { useTourModal } from "@/hooks/use-tour-modal";
@@ -60,6 +61,7 @@ export const Dashboard = () => {
 
     const tabs = [
         { id: 'bookings', label: 'My Bookings', icon: Map },
+        { id: 'trips', label: 'Trips I Built', icon: Route },
         ...(travelFeatures.flights ? [{ id: 'flights', label: 'Flights', icon: Plane }] : []),
         ...(travelFeatures.hotels ? [{ id: 'hotels', label: 'Hotels', icon: BedDouble }] : []),
         { id: 'wishlist', label: 'Wishlist', icon: Heart },
@@ -359,6 +361,16 @@ export const Dashboard = () => {
                                         </p>
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        {currentTab === 'trips' && (
+                            <div>
+                                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                                    <h2 className="text-2xl font-bold font-display text-brand-blue">Trips I Built</h2>
+                                    <Button variant="outline" size="sm" asChild><Link to="/build-trip"><Route className="w-4 h-4 mr-1.5" /> Build a new trip</Link></Button>
+                                </div>
+                                <MyCustomTrips />
                             </div>
                         )}
 

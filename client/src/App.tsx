@@ -29,6 +29,8 @@ const ContactPage = lazy(() => import('@/pages/Contact').then((m) => ({ default:
 const PrivacyPage = lazy(() => import('@/pages/Privacy').then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('@/pages/Terms').then((m) => ({ default: m.TermsPage })));
 const FAQPage = lazy(() => import('@/pages/FAQ').then((m) => ({ default: m.FAQPage })));
+const TripBuilderPage = lazy(() => import('@/pages/TripBuilder').then((m) => ({ default: m.TripBuilderPage })));
+const AdminCustomTrips = lazy(() => import('@/pages/admin/AdminCustomTrips').then((m) => ({ default: m.AdminCustomTrips })));
 const TourDetails = lazy(() => import('@/pages/TourDetails').then((m) => ({ default: m.TourDetails })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 const BookingPage = lazy(() => import('@/pages/BookingPage').then((m) => ({ default: m.BookingPage })));
@@ -113,6 +115,7 @@ const router = createBrowserRouter([
                     { path: "blog", element: <BlogPage /> },
                     { path: "about", element: <AboutPage /> },
                     { path: "contact", element: <ContactPage /> },
+                    { path: "build-trip", element: <TripBuilderPage /> },
                     { path: "privacy", element: <PrivacyPage /> },
                     { path: "terms", element: <TermsPage /> },
                     { path: "faq", element: <FAQPage /> },
@@ -163,6 +166,7 @@ const router = createBrowserRouter([
 
                             // Operations
                             { path: "bookings", element: <AdminBookings /> },
+                            { path: "custom-trips", element: <AdminCustomTrips /> },
                             { path: "payments", element: <AdminPayments /> },
                             { path: "travel-orders", element: <AdminTravelOrders /> },
                             { path: "reviews", element: <AdminReviews /> },

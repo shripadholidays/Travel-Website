@@ -3,12 +3,13 @@
 // (over a thousand) into the main bundle that every visitor downloads.
 import {
     Award, Calendar, Camera, CheckCircle2, Clock, Coffee, Compass, Globe2, Headphones, Heart, HelpCircle,
-    Hotel, Map, MessageCircle, Plane, Route, Settings, ShieldCheck, Star, Users, Zap, type LucideIcon,
+    Hotel, Map, MessageCircle, Plane, Route, Settings, ShieldCheck, Star, Users, Zap, Car, Utensils, Mountain, Sparkles,
+    type LucideIcon,
 } from 'lucide-react';
 
 const ICONS: Record<string, LucideIcon> = {
     Award, Calendar, Camera, CheckCircle2, Clock, Coffee, Compass, Globe2, Headphones, Heart,
-    Hotel, Map, MessageCircle, Plane, Route, Settings, ShieldCheck, Star, Users, Zap,
+    Hotel, Map, MessageCircle, Plane, Route, Settings, ShieldCheck, Star, Users, Zap, Car, Utensils, Mountain, Sparkles,
 };
 
 /** Names offered in the admin icon pickers */

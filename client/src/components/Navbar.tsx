@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, ChevronDown, PenLine, LayoutDashboard, Heart, LogOut, ShieldCheck, Settings, FileText } from 'lucide-react';
+import { Menu, X, ChevronDown, PenLine, LayoutDashboard, Heart, LogOut, ShieldCheck, Settings, FileText, Route } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from '@/components/ui/Logo';
@@ -133,6 +133,7 @@ export const Navbar = () => {
 
     const accountLinks = [
         { to: '/dashboard', label: 'My trips', icon: LayoutDashboard },
+        { to: '/dashboard?tab=trips', label: 'Trips I built', icon: Route },
         { to: '/dashboard?tab=wishlist', label: 'Wishlist', icon: Heart },
         { to: '/dashboard?tab=articles', label: 'My articles', icon: FileText },
         { to: '/dashboard?tab=settings', label: 'Settings', icon: Settings },
@@ -199,6 +200,20 @@ export const Navbar = () => {
                             "hidden lg:flex items-center gap-1.5 xl:gap-2",
                             isOverlay && "[&_button]:[text-shadow:0_1px_2px_rgba(0,0,0,0.35)]"
                         )}>
+                            {/* Trip builder: always on offer, whatever links the admin sets */}
+                            <Button
+                                asChild
+                                size="sm"
+                                className={cn(
+                                    "h-9 rounded-full px-3 xl:px-4 gap-1.5 text-sm font-semibold border shadow-none transition-colors",
+                                    isOverlay
+                                        ? "bg-white/15 text-white border-white/40 hover:bg-white/25"
+                                        : "bg-brand-orange/10 text-brand-orange border-brand-orange/20 hover:bg-brand-orange/15",
+                                )}
+                            >
+                                <Link to="/build-trip"><Route className="w-4 h-4" /> Build a trip</Link>
+                            </Button>
+
                             {/* Currency */}
                             <Select value={currency} onValueChange={(v) => setCurrency(v as Currency)}>
                                 <SelectTrigger aria-label="Currency" className={cn("w-auto gap-1 bg-transparent border-none h-9 rounded-full text-xs font-bold focus:ring-0 px-3", textColor, hoverBg)}>
@@ -348,6 +363,13 @@ export const Navbar = () => {
                                         </Link>
                                     );
                                 })}
+
+                                <Link
+                                    to="/build-trip"
+                                    className="mt-1 flex items-center gap-3 p-3.5 rounded-2xl bg-brand-orange/10 text-brand-orange font-bold"
+                                >
+                                    <Route className="w-5 h-5" /> Build your own trip
+                                </Link>
 
                                 <div className="border-t border-slate-100 my-2" />
 

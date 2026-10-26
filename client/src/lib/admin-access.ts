@@ -52,6 +52,7 @@ const PATH_PERMISSIONS: [string, Permission[]][] = [
     ["/admin/faq", ["content.manage"]],
     ["/admin/content", ["content.manage"]],
     ["/admin/bookings", ["bookings.manage"]],
+    ["/admin/custom-trips", ["bookings.manage", "catalog.manage"]],
     ["/admin/travel-orders", ["bookings.manage"]],
     ["/admin/payments", ["finance.view"]],
     ["/admin/coupons", ["marketing.manage"]],

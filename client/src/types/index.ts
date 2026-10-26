@@ -233,7 +233,7 @@ export interface DashboardStats {
     totalRevenue?: number;
     /** The base currency revenue is reported in */
     revenueCurrency?: string;
-    attention: { pendingArticles?: number; newInquiries?: number; pendingBookings?: number; draftTours?: number };
+    attention: { pendingArticles?: number; newInquiries?: number; pendingBookings?: number; draftTours?: number; newCustomTrips?: number };
     catalogHealth?: { noGallery: number; noItinerary: number; expiringSoon: number };
     recentBookings?: Booking[];
     bookingsByStatus?: { _id: string; count: number }[];

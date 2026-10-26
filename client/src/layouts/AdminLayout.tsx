@@ -4,7 +4,7 @@ import {
     LayoutDashboard, Map, Calendar, Users, Settings, LogOut,
     FileText, Globe, Menu, X, ExternalLink,
     Home, Layers, MessageSquare, Mail, Star,
-    CreditCard, HelpCircle, Info, Tag, Plane, History } from 'lucide-react';
+    CreditCard, HelpCircle, Info, Tag, Plane, History, Route } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { PageTitle } from '@/components/PageTitle';
@@ -54,6 +54,7 @@ const NAV: NavGroup[] = [
         group: 'Sales',
         items: [
             { label: 'Bookings', path: '/admin/bookings', icon: Calendar, badge: 'pendingBookings' },
+            { label: 'Custom Trips', path: '/admin/custom-trips', icon: Route, badge: 'newCustomTrips' },
             { label: 'Flight & Hotel Orders', path: '/admin/travel-orders', icon: Plane },
             { label: 'Payments', path: '/admin/payments', icon: CreditCard },
             { label: 'Coupons', path: '/admin/coupons', icon: Tag },

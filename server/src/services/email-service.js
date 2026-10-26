@@ -154,4 +154,35 @@ const sendArticleReviewEmail = async (to, { title, approved, note, url }) => {
     });
 };
 
-module.exports = { sendArticleReviewEmail, sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail, sendAdminAlert };
+// The traveller's own trip from the trip builder: "we got it", or the team's final price
+const sendCustomTripEmail = async (trip, { kind, url }) => {
+    const { formatMoney } = require('./currency');
+    const est = trip.estimate || {};
+    const route = (trip.stops || []).map((s) => `${escapeHtml(s.name)} (${s.nights}N)`).join(' → ');
+    const quoted = kind === 'quoted';
+    return sendEmail({
+        from: `"${fromName}" <${fromAddress}>`,
+        to: trip.email,
+        subject: quoted ? `Your price for ${trip.title}` : `We received your trip: ${trip.title}`,
+        html: emailLayout(`
+            <div style="padding: 32px; background: #fff;">
+                <h2 style="color: ${brandColor}; margin-top: 0;">Hi ${escapeHtml(trip.fullName)}!</h2>
+                <p>${quoted ? 'Our team has priced your trip.' : 'Thanks for planning your trip with us. A travel specialist will check it and send you a final price within 24 hours.'}</p>
+                <div style="background: #F8FAFC; padding: 16px; border-radius: 8px; margin: 16px 0;">
+                    <p><strong>${escapeHtml(trip.title)}</strong></p>
+                    <p>${route}</p>
+                    <p>${est.nights || 0} nights · ${trip.adults} adult${trip.adults === 1 ? '' : 's'}${trip.children ? ` · ${trip.children} child${trip.children === 1 ? '' : 'ren'}` : ''}${est.hotelLabel ? ` · ${escapeHtml(est.hotelLabel)} hotels` : ''}</p>
+                    ${quoted
+                        ? `<p style="font-size: 18px;"><strong>Final price: ${escapeHtml(formatMoney(trip.quote, est.currency || 'INR'))}</strong></p>`
+                        : `<p><strong>Estimated price:</strong> ${escapeHtml(formatMoney(est.low, est.currency || 'INR'))} – ${escapeHtml(formatMoney(est.high, est.currency || 'INR'))}</p>`}
+                </div>
+                ${quoted && trip.quoteNote ? `<p style="white-space: pre-wrap;">${escapeHtml(trip.quoteNote)}</p>` : ''}
+                ${url ? `<p style="text-align: center; margin: 32px 0;">
+                    <a href="${url}" style="display: inline-block; background: ${accentColor}; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: bold;">See your trip</a>
+                </p>` : ''}
+                <p style="color: #64748B; font-size: 14px;">Just reply to this email if you'd like to change anything.</p>
+            </div>`),
+    });
+};
+
+module.exports = { sendArticleReviewEmail, sendEmail, sendBookingConfirmation, sendInquiryAcknowledgment, sendPasswordResetEmail, sendVerificationEmail, sendAdminAlert, sendCustomTripEmail };

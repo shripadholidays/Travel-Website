@@ -10,6 +10,7 @@ const BlogPost = require('../models/BlogPost');
 const ActivityLog = require('../models/ActivityLog');
 const { recomputeTourRating } = require('../services/rating-service');
 const UserInquiry = require('../models/UserInquiry');
+const CustomTrip = require('../models/CustomTrip');
 const NewsletterSubscriber = require('../models/NewsletterSubscriber');
 const Payment = require('../models/Payment');
 const ResponseHandler = require('../utils/response-handler');
@@ -53,6 +54,7 @@ exports.getDashboardStats = async (req, res) => {
         }
         if (pendingArticles !== null) data.attention.pendingArticles = pendingArticles;
         if (newInquiries !== null) data.attention.newInquiries = newInquiries;
+        if (can(P.BOOKINGS)) data.attention.newCustomTrips = await CustomTrip.count("status = 'new'");
         if (totalReviews !== null) data.totalReviews = totalReviews;
         if (totalUsers !== null) data.totalUsers = totalUsers;
         if (can(P.FINANCE)) {

@@ -223,7 +223,7 @@ export const DestinationDetails = () => {
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                     <Button variant="brand" asChild><Link to="/tours">Browse All Tours</Link></Button>
-                                    <Button variant="outline" asChild><Link to={askLink}>Plan a Custom Trip</Link></Button>
+                                    <Button variant="outline" asChild><Link to="/build-trip">Build a Custom Trip</Link></Button>
                                 </div>
                             </div>
                         )}

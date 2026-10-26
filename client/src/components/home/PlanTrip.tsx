@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { resolveIcon } from "@/lib/icons";
@@ -101,7 +101,7 @@ export const PlanTrip = () => {
                             <Link to="/tours">Start planning <ArrowRight className="w-4 h-4 ml-2" /></Link>
                         </Button>
                         <Button variant="glass" size="lg" asChild>
-                            <Link to="/contact?topic=trip"><MessageCircle className="w-4 h-4 mr-2" /> Plan a custom trip with us</Link>
+                            <Link to="/build-trip"><Route className="w-4 h-4 mr-2" /> Build your own trip</Link>
                         </Button>
                     </div>
                 </div>

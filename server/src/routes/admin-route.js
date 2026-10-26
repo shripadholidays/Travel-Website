@@ -17,6 +17,7 @@ const { getSettings, updateSettings, toggleSection, refreshRates } = require('..
 const { getAllCollections, createCollection, updateCollection, deleteCollection } = require('../controllers/CollectionController');
 const { listCoupons, createCoupon, updateCoupon, deleteCoupon } = require('../controllers/CouponController');
 const { adminList: listTravelOrders, adminUpdate: updateTravelOrder } = require('../controllers/TravelOrderController');
+const CustomTrips = require('../controllers/CustomTripController');
 
 const router = express.Router();
 
@@ -50,6 +51,12 @@ router.get('/settings', can(P.SETTINGS, P.CONTENT, P.MARKETING), getSettings);
 router.put('/settings', can(P.SETTINGS, P.CONTENT), activity('site settings', (req) => ({ label: Object.keys(req.body || {}).join(', ') })), updateSettings);
 router.post('/settings/currency/refresh', can(P.SETTINGS), activity('exchange rates', () => ({ action: 'update', label: 'latest market rates' })), refreshRates);
 router.patch('/settings/sections/:sectionId', can(P.CONTENT), activity('homepage section', (req) => ({ label: req.params.sectionId, detail: req.body?.isVisible ? 'shown' : 'hidden' })), toggleSection);
+
+// Trips travellers built themselves, and the builder's price list
+router.get('/custom-trips', can(P.BOOKINGS), CustomTrips.adminList);
+router.patch('/custom-trips/:id', can(P.BOOKINGS), activity('custom trip', (req) => ({ detail: [req.body?.status && `status: ${req.body.status}`, req.body?.quote !== undefined && `price: ${req.body.quote}`].filter(Boolean).join(', ') || undefined })), CustomTrips.adminUpdate);
+router.get('/trip-builder', can(P.CATALOG), CustomTrips.adminGetBuilder);
+router.put('/trip-builder', can(P.CATALOG), activity('trip builder', () => ({ label: 'Trip builder prices' })), CustomTrips.adminSaveBuilder);
 
 // Inquiries
 router.get('/inquiries', can(P.COMMUNITY), getInquiries);

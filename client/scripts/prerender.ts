@@ -331,6 +331,21 @@ async function main() {
     });
 
     pages.push({
+        path: '/build-trip',
+        title: 'Build Your Own Trip',
+        description: 'Pick your places, nights, hotels and extras, plan each day, and see a price range straight away. Our team confirms your final price within 24 hours.',
+        body: `<h1>Build your own trip</h1>${para('Drag in the places you want, set the nights, plan your days. The price range updates as you go.')}`
+            + list([
+                'Choose places across India and abroad, in any order',
+                'Set how many nights you stay in each place',
+                'Plan each day with ideas from our travel team, or your own',
+                'Pick Economy, Standard, Deluxe or Luxury hotels',
+                'Add extras like a private cab, meals or flights',
+                'Send it free: we email you a final price within 24 hours',
+            ]),
+    });
+
+    pages.push({
         path: '/faq',
         title: 'Frequently Asked Questions',
         description: 'How to book a Wandeazy tour, free cancellation up to 24 hours before departure, accepted payments, what tour prices include, travel insurance and custom itineraries.',

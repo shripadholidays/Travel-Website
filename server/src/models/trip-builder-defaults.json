@@ -1,0 +1,1816 @@
+{
+  "currency": "INR",
+  "childShare": 0.5,
+  "maxStops": 8,
+  "maxNights": 30,
+  "places": [
+    {
+      "id": "shimla",
+      "name": "Shimla",
+      "region": "Himachal Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Mall Road evening",
+          "note": "Check-in. Mall Road evening. Christ Church."
+        },
+        {
+          "title": "Shimla Sightseeing",
+          "note": "Jakhu Temple, Kufri, Chail Palace, Himalayan Nature Park."
+        },
+        {
+          "title": "Optional Kalka-Shimla Toy Train (UNESCO)",
+          "note": "Optional Kalka-Shimla Toy Train (UNESCO). Check-in Shimla."
+        },
+        {
+          "title": "Shimla",
+          "note": "Jakhu, Kufri, Chail, Nature Park."
+        }
+      ]
+    },
+    {
+      "id": "manali",
+      "name": "Manali",
+      "region": "Himachal Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Kullu Shawl factories, Bijli Mahadev Temple",
+          "note": "Kullu Shawl factories, Bijli Mahadev Temple. Arrive Manali."
+        },
+        {
+          "title": "Manali Sightseeing",
+          "note": "Hadimba Temple, Manu Temple, Vashisht Springs, Tibetan Monastery, Old Manali."
+        },
+        {
+          "title": "Solang, Rohtang & Sissu",
+          "note": "Solang Valley adventures. Atal Tunnel to Sissu — pristine waterfalls, Lahaul Valley."
+        },
+        {
+          "title": "Manali",
+          "note": "Hadimba, Manu Temple, Vashisht, Old Manali."
+        },
+        {
+          "title": "Solang & Sissu",
+          "note": "Solang Valley, Atal Tunnel, Lahaul Valley."
+        }
+      ]
+    },
+    {
+      "id": "chandigarh",
+      "name": "Chandigarh",
+      "region": "Punjab",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Rock Garden, Sukhna Lake, Rose Garden",
+          "note": "Rock Garden, Sukhna Lake, Rose Garden."
+        },
+        {
+          "title": "Chandigarh Sightseeing",
+          "note": "Capitol Complex, Le Corbusier Centre, Pinjore Gardens, Government Museum."
+        }
+      ]
+    },
+    {
+      "id": "dharamshala",
+      "name": "Dharamshala & McLeod Ganj",
+      "region": "Himachal Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3600,
+      "nightlyTo": 4800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "McLeod Ganj evening",
+          "note": "McLeod Ganj evening."
+        },
+        {
+          "title": "Dharamshala",
+          "note": "Dalai Lama temple, Tibet Museum, Bhagsu Falls."
+        },
+        {
+          "title": "Triund Trek",
+          "note": "Trek to Triund (2827m) — panoramic Dhauladhar views. Most beloved short trek in Himachal."
+        },
+        {
+          "title": "Anandpur Sahib en route",
+          "note": "Anandpur Sahib en route — birthplace of the Khalsa."
+        }
+      ]
+    },
+    {
+      "id": "dalhousie",
+      "name": "Dalhousie & Khajjiar",
+      "region": "Himachal Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3600,
+      "nightlyTo": 4800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Chamunda Devi Temple",
+          "note": "Chamunda Devi Temple. Dalhousie evening."
+        },
+        {
+          "title": "Khajjiar & Kalatop",
+          "note": "Mini Switzerland Khajjiar, Kalatop Wildlife Sanctuary trek — deodar forests."
+        }
+      ]
+    },
+    {
+      "id": "amritsar",
+      "name": "Amritsar",
+      "region": "Punjab",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 3600,
+      "nightlyTo": 4800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Golden Temple evening",
+          "note": "Golden Temple evening."
+        },
+        {
+          "title": "Amritsar",
+          "note": "Golden Temple morning. Jallianwala Bagh. Wagah Border."
+        },
+        {
+          "title": "Amritsar Local",
+          "note": "Durgiana Temple, Gobindgarh Fort (multimedia Punjab history show). Try kulcha, lassi, makki di roti."
+        }
+      ]
+    },
+    {
+      "id": "spiti",
+      "name": "Spiti Valley",
+      "region": "Himachal Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 4500,
+      "nightlyTo": 5900,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Acclimatise",
+          "note": "Acclimatise. Check-in."
+        },
+        {
+          "title": "Chitkul",
+          "note": "Chitkul — last inhabited village before Tibet border. Chitkul is the end of the world road. Baspa River."
+        },
+        {
+          "title": "Mountain road via Nako Lake",
+          "note": "Mountain road via Nako Lake. Arrive Kaza."
+        },
+        {
+          "title": "Kaza Sightseeing",
+          "note": "Key Monastery, Kibber, Chicham Bridge, Komic village (world's highest motorable village 4587m)."
+        },
+        {
+          "title": "Dhankar & Pin Valley",
+          "note": "Dhankar Monastery (perched on cliff 4000m). Pin Valley National Park — snow leopard habitat. Mud village — ancient fort."
+        },
+        {
+          "title": "Chandratal Lake",
+          "note": "Moon Lake, overnight camp."
+        },
+        {
+          "title": "Atal Tunnel or Rohtang",
+          "note": "Atal Tunnel or Rohtang. Bhuntar Airport."
+        }
+      ]
+    },
+    {
+      "id": "leh",
+      "name": "Leh & Ladakh",
+      "region": "Ladakh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 5200,
+      "nightlyTo": 6700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Full rest day",
+          "note": "Full rest day."
+        },
+        {
+          "title": "Leh City",
+          "note": "Leh Palace, Shanti Stupa, Namgyal Tsemo."
+        },
+        {
+          "title": "Monasteries",
+          "note": "Spituk, Alchi (1000-year-old murals), Likir — rarely visited, deeply spiritual."
+        },
+        {
+          "title": "Pangong Lake",
+          "note": "Chang La, Pangong colours. Overnight camps."
+        },
+        {
+          "title": "Tso Moriri",
+          "note": "Remote Tso Moriri Lake — higher and more isolated than Pangong, very few tourists. Overnight Korzok."
+        },
+        {
+          "title": "Nubra Valley",
+          "note": "Khardung La, Diskit, Hunder, Panamik hot springs."
+        }
+      ]
+    },
+    {
+      "id": "srinagar",
+      "name": "Srinagar",
+      "region": "Kashmir",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Dal Lake Shikara",
+          "note": "Dal Lake Shikara. Houseboat. Wazwan dinner."
+        },
+        {
+          "title": "Srinagar",
+          "note": "Mughal Gardens, Hazratbal, old city, spice market."
+        },
+        {
+          "title": "Patnitop & Srinagar",
+          "note": "Patnitop hill station (2024m) — meadows, pine forests, beautiful. Continue Srinagar."
+        }
+      ]
+    },
+    {
+      "id": "gulmarg",
+      "name": "Gulmarg",
+      "region": "Kashmir",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Gulmarg",
+          "note": "Gondola, snow, meadow walk."
+        }
+      ]
+    },
+    {
+      "id": "pahalgam",
+      "name": "Pahalgam",
+      "region": "Kashmir",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Pahalgam",
+          "note": "Betaab Valley, Aru Village, Lidder River."
+        }
+      ]
+    },
+    {
+      "id": "katra",
+      "name": "Katra (Vaishno Devi)",
+      "region": "Jammu",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Vaishno Devi",
+          "note": "Katra, trek/helicopter, darshan, return."
+        }
+      ]
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
+      "nightlyFrom": 2700,
+      "nightlyTo": 3600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "India Gate, Connaught Place",
+          "note": "India Gate, Connaught Place."
+        },
+        {
+          "title": "Old Delhi",
+          "note": "Chandni Chowk, Red Fort, Jama Masjid, rickshaw ride."
+        },
+        {
+          "title": "New Delhi",
+          "note": "Humayun's Tomb, Qutub Minar, Lotus Temple, Akshardham."
+        }
+      ]
+    },
+    {
+      "id": "agra",
+      "name": "Agra",
+      "region": "Uttar Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
+      "nightlyFrom": 2700,
+      "nightlyTo": 3600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Agra",
+          "note": "Taj Mahal sunrise, Agra Fort, marble craft."
+        }
+      ]
+    },
+    {
+      "id": "mathura",
+      "name": "Mathura & Vrindavan",
+      "region": "Uttar Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
+      "nightlyFrom": 2700,
+      "nightlyTo": 3600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Mathura & Vrindavan",
+          "note": "Janmabhoomi, Dwarkadhish, Banke Bihari, Prem Mandir at night."
+        },
+        {
+          "title": "Braj Mandal",
+          "note": "Govardhan Hill, Radha Kund, Barsana (Lathmar Holi famous), Nandgaon — rarely visited sacred sites."
+        }
+      ]
+    },
+    {
+      "id": "rishikesh",
+      "name": "Rishikesh",
+      "region": "Uttarakhand",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=1200&q=80",
+      "nightlyFrom": 3100,
+      "nightlyTo": 4100,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Rishikesh Spiritual",
+          "note": "Beatles Ashram, Parmarth yoga, Triveni Ghat Aarti."
+        },
+        {
+          "title": "Rishikesh Adventure",
+          "note": "Ganga rafting, bungee, Neer Garh Waterfall trek — hidden gem."
+        }
+      ]
+    },
+    {
+      "id": "haridwar",
+      "name": "Haridwar",
+      "region": "Uttarakhand",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=1200&q=80",
+      "nightlyFrom": 3100,
+      "nightlyTo": 4100,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Har Ki Pauri Ganga Aarti",
+          "note": "Har Ki Pauri Ganga Aarti."
+        },
+        {
+          "title": "Haridwar Temples",
+          "note": "Mansa Devi, Chandi Devi, Maya Devi, Sapt Rishi Ashram."
+        }
+      ]
+    },
+    {
+      "id": "nainital",
+      "name": "Nainital",
+      "region": "Uttarakhand",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 5100,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Naini Lake, Naina Devi Temple, Mall Road",
+          "note": "Naini Lake, Naina Devi Temple, Mall Road."
+        },
+        {
+          "title": "Nainital",
+          "note": "Snow View, Bhimtal, Sattal, Eco Caves."
+        },
+        {
+          "title": "Nainital & Almora",
+          "note": "Snow View, Bhimtal. Drive to Almora. Kasar Devi, Chitai Temple."
+        }
+      ]
+    },
+    {
+      "id": "almora",
+      "name": "Almora & Ranikhet",
+      "region": "Uttarakhand",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Almora",
+          "note": "Kasar Devi, Chitai Temple, Bright End Corner sunset."
+        },
+        {
+          "title": "Ranikhet",
+          "note": "Jhula Devi, Chaubatia, golf course, Upat viewpoint."
+        }
+      ]
+    },
+    {
+      "id": "corbett",
+      "name": "Jim Corbett",
+      "region": "Uttarakhand",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=1200&q=80",
+      "nightlyFrom": 4000,
+      "nightlyTo": 5100,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Jim Corbett Safaris",
+          "note": "Early morning jeep safari — core zone, best tiger sightings. Evening safari different zone."
+        },
+        {
+          "title": "Jim Corbett Full Day",
+          "note": "Morning canter safari in Dhikala grasslands. Afternoon zone safari. 650+ bird species."
+        }
+      ]
+    },
+    {
+      "id": "jaipur",
+      "name": "Jaipur",
+      "region": "Rajasthan",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
+      "nightlyFrom": 3000,
+      "nightlyTo": 4000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Johari Bazaar evening",
+          "note": "Johari Bazaar evening."
+        },
+        {
+          "title": "Jaipur",
+          "note": "Amber Fort, City Palace, Hawa Mahal, Jantar Mantar."
+        },
+        {
+          "title": "Around Jaipur",
+          "note": "Nahargarh Fort sunset, Jaigarh Fort, Galtaji Monkey Temple, Sanganer block printing."
+        },
+        {
+          "title": "Johari Bazaar",
+          "note": "Johari Bazaar."
+        },
+        {
+          "title": "Jaipur Forts",
+          "note": "Amber, Nahargarh, Jaigarh."
+        },
+        {
+          "title": "Jaipur City",
+          "note": "City Palace, Hawa Mahal, Jantar Mantar, Galtaji."
+        },
+        {
+          "title": "Ajmer & Pushkar",
+          "note": "Dargah Sharif, Brahma Temple, Pushkar Lake."
+        },
+        {
+          "title": "Salasar Balaji",
+          "note": "Temple darshan overnight."
+        }
+      ]
+    },
+    {
+      "id": "pushkar",
+      "name": "Pushkar & Ajmer",
+      "region": "Rajasthan",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
+      "nightlyFrom": 3100,
+      "nightlyTo": 4000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Ajmer",
+          "note": "Dargah Sharif, Ana Sagar, Adhai Din Ka Jhopra."
+        },
+        {
+          "title": "Pushkar",
+          "note": "Brahma Temple, lake ghats, Savitri Temple, bazaar, Naga Pahar viewpoint."
+        }
+      ]
+    },
+    {
+      "id": "jodhpur",
+      "name": "Jodhpur",
+      "region": "Rajasthan",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200&q=80",
+      "nightlyFrom": 3800,
+      "nightlyTo": 4900,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Old city walk, Clock Tower, spice market",
+          "note": "Old city walk, Clock Tower, spice market."
+        },
+        {
+          "title": "Jodhpur",
+          "note": "Mehrangarh, Jaswant Thada, Umaid Bhawan."
+        }
+      ]
+    },
+    {
+      "id": "jaisalmer",
+      "name": "Jaisalmer",
+      "region": "Rajasthan",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200&q=80",
+      "nightlyFrom": 3800,
+      "nightlyTo": 4900,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Osian temples",
+          "note": "Osian temples. Golden City arrival."
+        },
+        {
+          "title": "Fort & Dunes",
+          "note": "Fort, Havelis, camel safari, overnight camp, stargazing."
+        }
+      ]
+    },
+    {
+      "id": "udaipur",
+      "name": "Udaipur",
+      "region": "Rajasthan",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1200&q=80",
+      "nightlyFrom": 3200,
+      "nightlyTo": 4600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Lake Pichola boat ride, rooftop dinner",
+          "note": "Lake Pichola boat ride, rooftop dinner."
+        },
+        {
+          "title": "Udaipur",
+          "note": "City Palace, Jagdish Temple, Saheliyon Ki Bari, Bagore Ki Haveli."
+        },
+        {
+          "title": "Around Udaipur",
+          "note": "Ranakpur Jain Temple (1444 unique pillars), Kumbhalgarh Fort (wall longer than Great Wall — UNESCO), Nathdwara Shrinathji."
+        },
+        {
+          "title": "Lake Pichola, dinner",
+          "note": "Lake Pichola, dinner."
+        },
+        {
+          "title": "Ranakpur",
+          "note": "Ranakpur Jain Temple — 1444 unique pillars."
+        },
+        {
+          "title": "Nathdwara & Eklingi",
+          "note": "Shrinathji, Eklingi Mahadev."
+        },
+        {
+          "title": "Charbhuja & Kumbhalgarh",
+          "note": "Four-armed Vishnu. UNESCO fort."
+        },
+        {
+          "title": "Chittorgarh",
+          "note": "Greatest Rajput fort. Vijay Stambha. Meera Temple."
+        }
+      ]
+    },
+    {
+      "id": "mountabu",
+      "name": "Mount Abu",
+      "region": "Rajasthan",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1200&q=80",
+      "nightlyFrom": 3600,
+      "nightlyTo": 4600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Nakki Lake, Sunset Point, market",
+          "note": "Nakki Lake, Sunset Point, market."
+        },
+        {
+          "title": "Mount Abu",
+          "note": "Dilwara Temples, Guru Shikhar, Achalgarh Fort, wildlife walk."
+        }
+      ]
+    },
+    {
+      "id": "kutch",
+      "name": "Kutch & Rann",
+      "region": "Gujarat",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 3600,
+      "nightlyTo": 5000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Prag Mahal, Aaina Mahal, Hamirsar Lake",
+          "note": "Prag Mahal, Aaina Mahal, Hamirsar Lake."
+        },
+        {
+          "title": "Rann & Dholavira",
+          "note": "Kalo Dungar, Dholavira UNESCO, White Rann sunset."
+        },
+        {
+          "title": "Wild Ass Sanctuary",
+          "note": "Little Rann — Indian Wild Ass Sanctuary, flamingos, migratory birds. Rare wildlife experience."
+        },
+        {
+          "title": "Mandvi Beach",
+          "note": "Bhujodi weavers, Nirona artists. Mandvi Beach — 400-year-old wooden shipbuilding still active. Vijay Vilas Palace."
+        }
+      ]
+    },
+    {
+      "id": "dwarka",
+      "name": "Dwarka",
+      "region": "Gujarat",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 3200,
+      "nightlyTo": 4300,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Dwarkadhish Temple, Gomti Ghat aarti",
+          "note": "Dwarkadhish Temple, Gomti Ghat aarti."
+        },
+        {
+          "title": "Dwarka Temples",
+          "note": "Rukmini Temple, Nageshwar Jyotirlinga, Gopi Talav sacred lake."
+        },
+        {
+          "title": "Bet Dwarka",
+          "note": "Ferry to island, Krishna's residence, coral temples."
+        }
+      ]
+    },
+    {
+      "id": "somnath",
+      "name": "Somnath",
+      "region": "Gujarat",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 3200,
+      "nightlyTo": 4300,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Somnath Temple",
+          "note": "Somnath Temple. Sound & Light show."
+        },
+        {
+          "title": "Dev & Gir",
+          "note": "Dev Surya Temple. Gir National Park — last Asiatic lions (jeep safari)."
+        }
+      ]
+    },
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "region": "Maharashtra",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1200&q=80",
+      "nightlyFrom": 2700,
+      "nightlyTo": 3600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Marine Drive, Gateway, Chowpatty",
+          "note": "Marine Drive, Gateway, Chowpatty."
+        },
+        {
+          "title": "Mumbai South",
+          "note": "Elephanta Caves, Colaba, Taj Hotel photo."
+        },
+        {
+          "title": "Mumbai Heritage",
+          "note": "CST UNESCO, Crawford Market, Dharavi tour, Dhobi Ghat."
+        },
+        {
+          "title": "Film City & Kanheri",
+          "note": "Film City Studios (Bollywood). Sanjay Gandhi National Park — leopards and ancient Buddhist caves inside Mumbai!"
+        }
+      ]
+    },
+    {
+      "id": "lonavala",
+      "name": "Lonavala",
+      "region": "Maharashtra",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1200&q=80",
+      "nightlyFrom": 2700,
+      "nightlyTo": 3600,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Bhushi Dam, Tiger Point, chikki",
+          "note": "Bhushi Dam, Tiger Point, chikki."
+        },
+        {
+          "title": "Khandala & Caves",
+          "note": "Rajmachi Fort trek, Karla Bhaja Caves, Lohagad Fort."
+        }
+      ]
+    },
+    {
+      "id": "mahabaleshwar",
+      "name": "Mahabaleshwar",
+      "region": "Maharashtra",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3900,
+      "nightlyTo": 5200,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Arthur's Seat",
+          "note": "Arthur's Seat. Market. Check-in."
+        },
+        {
+          "title": "Main Sightseeing",
+          "note": "Venna Lake, Wilson Point sunrise, Echo Point, Kate's Point, Mapro Garden."
+        },
+        {
+          "title": "Pratapgarh Fort",
+          "note": "Pratapgarh Fort (Shivaji defeated Afzal Khan — 1659). Panchganga Temple. Lingmala Falls."
+        }
+      ]
+    },
+    {
+      "id": "shirdi",
+      "name": "Shirdi & Nashik",
+      "region": "Maharashtra",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 2900,
+      "nightlyTo": 3800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Godavari ghats, Panchavati, Kalaram Temple",
+          "note": "Godavari ghats, Panchavati, Kalaram Temple."
+        },
+        {
+          "title": "Trimbakeshwar",
+          "note": "Jyotirlinga, Brahmagiri Hill, Godavari source."
+        },
+        {
+          "title": "Shirdi",
+          "note": "Morning aarti, Samadhi Mandir, Dwarkamai, Chavadi."
+        },
+        {
+          "title": "Shani Shingnapur & Aurangabad",
+          "note": "Shani temple. Drive Aurangabad. Bibi Ka Maqbara."
+        },
+        {
+          "title": "Ajanta Caves",
+          "note": "Full day — Buddhist art."
+        },
+        {
+          "title": "Ellora Caves",
+          "note": "Full day — Kailasa Temple."
+        },
+        {
+          "title": "Bhimashankar & Departure",
+          "note": "Jyotirlinga. Pune Airport."
+        }
+      ]
+    },
+    {
+      "id": "goa",
+      "name": "Goa",
+      "region": "Goa",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 2900,
+      "nightlyTo": 3800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "North Goa",
+          "note": "Calangute, Baga, Anjuna, Vagator. Fort Aguada, Chapora. Water sports."
+        },
+        {
+          "title": "South Goa",
+          "note": "Basilica, Se Cathedral, Miramar, Panaji."
+        },
+        {
+          "title": "Offbeat Goa",
+          "note": "Divar Island (village life, no tourists). Fontainhas Latin Quarter. Spice plantation lunch."
+        }
+      ]
+    },
+    {
+      "id": "kochi",
+      "name": "Kochi",
+      "region": "Kerala",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Fort Kochi walk, fishing nets, Jew Town",
+          "note": "Fort Kochi walk, fishing nets, Jew Town."
+        },
+        {
+          "title": "Fort Kochi walk",
+          "note": "Fort Kochi walk."
+        }
+      ]
+    },
+    {
+      "id": "munnar",
+      "name": "Munnar",
+      "region": "Kerala",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Munnar",
+          "note": "Tea gardens, national park, Tea Museum."
+        },
+        {
+          "title": "Munnar Offbeat",
+          "note": "Top Station (highest in Kerala). Lockhart Gap. Nyayamakad Waterfalls — hidden gem."
+        }
+      ]
+    },
+    {
+      "id": "thekkady",
+      "name": "Thekkady",
+      "region": "Kerala",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Thekkady",
+          "note": "Periyar Lake, spice garden, Kathakali."
+        }
+      ]
+    },
+    {
+      "id": "alleppey",
+      "name": "Alleppey (Houseboat)",
+      "region": "Kerala",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Alleppey Houseboat",
+          "note": "Overnight luxury houseboat."
+        }
+      ]
+    },
+    {
+      "id": "kovalam",
+      "name": "Kovalam & Varkala",
+      "region": "Kerala",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Kovalam",
+          "note": "Beach, Ayurvedic massage."
+        },
+        {
+          "title": "Kovalam + Kanyakumari",
+          "note": "Beach then three-sea confluence."
+        }
+      ]
+    },
+    {
+      "id": "madurai",
+      "name": "Madurai",
+      "region": "Tamil Nadu",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 2900,
+      "nightlyTo": 3800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Madurai",
+          "note": "Meenakshi Amman Temple — 14 towers, 33,000 sculptures. Evening ceremony."
+        }
+      ]
+    },
+    {
+      "id": "rameswaram",
+      "name": "Rameswaram",
+      "region": "Tamil Nadu",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 2900,
+      "nightlyTo": 3800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Temple, 22 wells, Agnitheertham",
+          "note": "Temple, 22 wells, Agnitheertham."
+        },
+        {
+          "title": "Rameswaram",
+          "note": "Pamban Bridge, Dhanushkodi, Gandamadana Parvatham."
+        }
+      ]
+    },
+    {
+      "id": "kanyakumari",
+      "name": "Kanyakumari",
+      "region": "Tamil Nadu",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "nightlyFrom": 2900,
+      "nightlyTo": 3800,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "En route Tiruchendur Murugan Temple (on sea…",
+          "note": "En route Tiruchendur Murugan Temple (on sea cliffs)."
+        },
+        {
+          "title": "Kanyakumari",
+          "note": "Sunrise, Vivekananda Rock, temple."
+        }
+      ]
+    },
+    {
+      "id": "varanasi",
+      "name": "Varanasi",
+      "region": "Uttar Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Evening Dashashwamedh Ghat Aarti",
+          "note": "Evening Dashashwamedh Ghat Aarti. Boat ride with floating diyas."
+        },
+        {
+          "title": "Varanasi",
+          "note": "Sunrise boat ride. Kashi Vishwanath. Old city lanes."
+        },
+        {
+          "title": "Varanasi Offbeat",
+          "note": "Assi Ghat yoga morning. BHU campus (Vishwanath Temple inside). Ramnagar Fort (across the river). Tulsi Manas Temple."
+        },
+        {
+          "title": "Sarnath & Prayagraj",
+          "note": "Sarnath Buddhist site. Triveni Sangam boat ride."
+        }
+      ]
+    },
+    {
+      "id": "ayodhya",
+      "name": "Ayodhya & Prayagraj",
+      "region": "Uttar Pradesh",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Ayodhya",
+          "note": "Ram Mandir, Hanuman Garhi, Kanak Bhawan, Saryu aarti."
+        }
+      ]
+    },
+    {
+      "id": "andaman",
+      "name": "Port Blair & Havelock",
+      "region": "Andaman Islands",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80",
+      "nightlyFrom": 4900,
+      "nightlyTo": 6300,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Cellular Jail, Light & Sound show",
+          "note": "Cellular Jail, Light & Sound show."
+        },
+        {
+          "title": "Port Blair",
+          "note": "Corbyn's Cove, Ross Island, North Bay glass-bottom boat."
+        },
+        {
+          "title": "Baratang Island",
+          "note": "Baratang — limestone caves through mangrove creek (boat safari through dense jungle), mud volcanoes. Totally offbeat and extraordinary."
+        },
+        {
+          "title": "Havelock Island",
+          "note": "Ferry to Havelock. Radhanagar Beach sunset."
+        },
+        {
+          "title": "Havelock Snorkelling",
+          "note": "Elephanta Beach coral snorkelling, scuba diving option."
+        },
+        {
+          "title": "Neil Island",
+          "note": "Natural Bridge, three beaches, beach walks."
+        }
+      ]
+    },
+    {
+      "id": "shillong",
+      "name": "Shillong & Cherrapunji",
+      "region": "Meghalaya",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 4500,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Shillong",
+          "note": "Ward's Lake, Don Bosco Museum, Umiam Lake, Elephant Falls."
+        },
+        {
+          "title": "Cherrapunji",
+          "note": "Nohkalikai Falls, Seven Sisters Falls, Living root bridges trek."
+        },
+        {
+          "title": "Mawlynnong & Dawki",
+          "note": "Cleanest village Asia, glass-clear river."
+        }
+      ]
+    },
+    {
+      "id": "kaziranga",
+      "name": "Kaziranga",
+      "region": "Assam",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 4500,
+      "nightlyTo": 5700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Kamakhya Temple, Brahmaputra cruise",
+          "note": "Kamakhya Temple, Brahmaputra cruise."
+        },
+        {
+          "title": "Kaziranga",
+          "note": "Jeep safari — rhinos, elephants."
+        },
+        {
+          "title": "Kaziranga Morning",
+          "note": "Elephant safari sunrise. Drive Shillong."
+        }
+      ]
+    },
+    {
+      "id": "darjeeling",
+      "name": "Darjeeling",
+      "region": "West Bengal",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3800,
+      "nightlyTo": 5000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Toy train option",
+          "note": "Toy train option. Mall Road."
+        },
+        {
+          "title": "Tiger Hill",
+          "note": "Sunrise, Kanchenjunga, Batasia Loop, Zoo, Tea Estate."
+        },
+        {
+          "title": "Darjeeling Offbeat",
+          "note": "Sandakphu trek option or Mirik Lake (1495m — orange orchards, Himalayan views). Ghoom Monastery (oldest in Darjeeling)."
+        }
+      ]
+    },
+    {
+      "id": "gangtok",
+      "name": "Gangtok",
+      "region": "Sikkim",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
+      "nightlyFrom": 3800,
+      "nightlyTo": 5000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Rumtek Monastery, MG Marg evening",
+          "note": "Rumtek Monastery, MG Marg evening."
+        },
+        {
+          "title": "Tsomgo & Baba Mandir",
+          "note": "High-altitude lake, sacred mandir."
+        }
+      ]
+    },
+    {
+      "id": "ooty",
+      "name": "Ooty",
+      "region": "Tamil Nadu",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 3100,
+      "nightlyTo": 4000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Lake, Botanical Garden, Tea Museum",
+          "note": "Lake, Botanical Garden, Tea Museum."
+        },
+        {
+          "title": "Ooty",
+          "note": "Doddabetta, Rose Garden, Toda village, toy train."
+        }
+      ]
+    },
+    {
+      "id": "coorg",
+      "name": "Coorg",
+      "region": "Karnataka",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 3100,
+      "nightlyTo": 4000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Mudumalai & Coorg",
+          "note": "Mudumalai Tiger Reserve morning. Drive to Coorg coffee estate."
+        },
+        {
+          "title": "Coorg",
+          "note": "Abbey Falls, Nagarhole safari, coffee plantation tour."
+        },
+        {
+          "title": "Coorg Offbeat",
+          "note": "Iruppu Falls (sacred waterfall), Brahmagiri Hills trek, Talacauvery (Cauvery source — sacred). Local village."
+        }
+      ]
+    },
+    {
+      "id": "mysore",
+      "name": "Mysore",
+      "region": "Karnataka",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
+      "nightlyFrom": 3100,
+      "nightlyTo": 4000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Mysore",
+          "note": "Mysore Palace (Sunday lights), Chamundeshwari Temple."
+        }
+      ]
+    },
+    {
+      "id": "hampi",
+      "name": "Hampi & Badami",
+      "region": "Karnataka",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Virupaksha Temple",
+          "note": "Virupaksha Temple. Hemakuta sunset."
+        },
+        {
+          "title": "Hampi",
+          "note": "Vittala Temple, Stone Chariot, Royal Enclosure, bicycle ride."
+        },
+        {
+          "title": "Hampi Offbeat",
+          "note": "Anegundi (across river — older than Hampi, Kishkindha from Ramayana). Coracle boat ride. Matanga Hill sunrise."
+        },
+        {
+          "title": "Badami & Aihole",
+          "note": "Badami caves. Aihole — cradle of Indian temple architecture, 125 temples, 600 AD."
+        }
+      ]
+    },
+    {
+      "id": "gokarna",
+      "name": "Gokarna",
+      "region": "Karnataka",
+      "country": "India",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
+      "nightlyFrom": 3400,
+      "nightlyTo": 4400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Gokarna",
+          "note": "Mahabaleshwar Temple. Om Beach. Beach hopping by boat."
+        }
+      ]
+    },
+    {
+      "id": "bali",
+      "name": "Bali",
+      "region": "Bali",
+      "country": "Indonesia",
+      "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80",
+      "nightlyFrom": 9900,
+      "nightlyTo": 12900,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Pool villa, welcome dinner",
+          "note": "Pool villa, welcome dinner."
+        },
+        {
+          "title": "Ubud",
+          "note": "Tegalalang terraces, Monkey Forest, Kecak dance."
+        },
+        {
+          "title": "Volcano & Temples",
+          "note": "Mount Batur sunrise, Tirta Empul, Tanah Lot."
+        },
+        {
+          "title": "Nusa Penida",
+          "note": "Full day boat tour — Kelingking Beach (T-Rex cliff), Angel's Billabong, Broken Beach, Crystal Bay snorkelling."
+        },
+        {
+          "title": "Jatiluwih & Lovina",
+          "note": "Jatiluwih rice terraces (UNESCO — more dramatic than Tegalalang). Lovina dolphin watching at sunrise — wild spinner dolphins."
+        },
+        {
+          "title": "Spa & Seminyak",
+          "note": "Couples spa. Beach club sunset. Farewell dinner."
+        }
+      ]
+    },
+    {
+      "id": "bangkok",
+      "name": "Bangkok & Pattaya",
+      "region": "Thailand",
+      "country": "Thailand",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 7700,
+      "nightlyTo": 10200,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Bangkok Arrival",
+          "note": "Check-in. Khao San Road evening."
+        },
+        {
+          "title": "Bangkok Temples",
+          "note": "Grand Palace, Wat Pho, Wat Arun, river cruise."
+        },
+        {
+          "title": "Bangkok Offbeat",
+          "note": "Floating Market (Amphawa or Damnoen Saduak). Jim Thompson House. Chinatown (Yaowarat) street food tour at night."
+        }
+      ]
+    },
+    {
+      "id": "phuket",
+      "name": "Phuket & Krabi",
+      "region": "Thailand",
+      "country": "Thailand",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 7700,
+      "nightlyTo": 10200,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Phuket",
+          "note": "Flight. Patong Beach, Thai massage."
+        },
+        {
+          "title": "Phi Phi Islands",
+          "note": "Maya Bay, snorkelling, lagoons."
+        }
+      ]
+    },
+    {
+      "id": "srilanka",
+      "name": "Sri Lanka",
+      "region": "Sri Lanka",
+      "country": "Sri Lanka",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 7000,
+      "nightlyTo": 9000,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Temple of Tooth, cultural show",
+          "note": "Temple of Tooth, cultural show."
+        },
+        {
+          "title": "Sigiriya & Dambulla",
+          "note": "Pidurangala, Dambulla Caves, Hiriwadunna village."
+        },
+        {
+          "title": "Sigiriya Rock",
+          "note": "UNESCO rock fortress."
+        },
+        {
+          "title": "Minneriya Safari",
+          "note": "Minneriya National Park — The Gathering (July-Oct, 400+ elephants). Or Udawalawe (year-round elephants)."
+        },
+        {
+          "title": "Nuwara Eliya",
+          "note": "Tea country, Little England, tea tasting."
+        },
+        {
+          "title": "Galle & Beach",
+          "note": "Galle Fort, Unawatuna Beach sunset."
+        }
+      ]
+    },
+    {
+      "id": "kathmandu",
+      "name": "Kathmandu",
+      "region": "Nepal",
+      "country": "Nepal",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 5200,
+      "nightlyTo": 6700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Pashupatinath, Boudhanath",
+          "note": "Pashupatinath, Boudhanath."
+        },
+        {
+          "title": "Kathmandu Valley",
+          "note": "Swayambhunath, Patan, Bhaktapur."
+        },
+        {
+          "title": "Nagarkot Sunrise",
+          "note": "Drive to Nagarkot (2195m) — 360° Himalayan sunrise including Everest on clear days. Changu Narayan Temple (UNESCO, 1700 years old)."
+        }
+      ]
+    },
+    {
+      "id": "pokhara",
+      "name": "Pokhara",
+      "region": "Nepal",
+      "country": "Nepal",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 5200,
+      "nightlyTo": 6700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Pokhara",
+          "note": "Phewa Lake, Peace Pagoda, Lakeside."
+        },
+        {
+          "title": "Sarangkot & Pokhara",
+          "note": "4am sunrise. Paragliding. Davis Falls. Gupteshwor Cave."
+        },
+        {
+          "title": "Chitwan",
+          "note": "Rhino, tiger, crocodile safaris. Tharu village walk."
+        }
+      ]
+    },
+    {
+      "id": "bhutan",
+      "name": "Thimphu & Paro",
+      "region": "Bhutan",
+      "country": "Bhutan",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 11800,
+      "nightlyTo": 15200,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Folk Museum, Takin Preserve",
+          "note": "Folk Museum, Takin Preserve."
+        },
+        {
+          "title": "Thimphu",
+          "note": "Buddha Dordenma, Trashi Chhoe Dzong, National Chorten."
+        },
+        {
+          "title": "Dochula & Punakha",
+          "note": "108 chortens pass, Punakha Dzong."
+        },
+        {
+          "title": "Punakha Valley",
+          "note": "Chimi Lhakhang, Khamsum Yulley Namgyal Chorten (hilltop trek with valley views)."
+        },
+        {
+          "title": "Bumthang",
+          "note": "Bumthang — Bhutan's cultural heartland. Jakar Dzong. Jambay Lhakhang (7th century temple). Kurje Lhakhang."
+        },
+        {
+          "title": "Tiger's Nest & Departure",
+          "note": "Morning Tiger's Nest trek. Paro Airport."
+        }
+      ]
+    },
+    {
+      "id": "singapore",
+      "name": "Singapore",
+      "region": "Singapore",
+      "country": "Singapore",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 8500,
+      "nightlyTo": 11200,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Marina Bay evening, Supertrees",
+          "note": "Marina Bay evening, Supertrees."
+        },
+        {
+          "title": "Iconic Singapore",
+          "note": "MBS observation, Gardens by Bay, Merlion, river walk."
+        },
+        {
+          "title": "Sentosa",
+          "note": "Universal Studios or beach day."
+        },
+        {
+          "title": "Culture",
+          "note": "Chinatown, Little India, Arab Street, hawker food."
+        },
+        {
+          "title": "Day Trip Batam/Johor",
+          "note": "Short ferry to Batam Indonesia or drive to Johor Bahru Malaysia — shopping and local food."
+        }
+      ]
+    },
+    {
+      "id": "kualalumpur",
+      "name": "Kuala Lumpur",
+      "region": "Malaysia",
+      "country": "Malaysia",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 5900,
+      "nightlyTo": 7700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 2,
+      "activities": [
+        {
+          "title": "Petronas Towers night view",
+          "note": "Petronas Towers night view."
+        },
+        {
+          "title": "KL",
+          "note": "Batu Caves, Bird Park, Merdeka Square."
+        }
+      ]
+    },
+    {
+      "id": "langkawi",
+      "name": "Langkawi",
+      "region": "Malaysia",
+      "country": "Malaysia",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 5900,
+      "nightlyTo": 7700,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Langkawi",
+          "note": "Cable car, Sky Bridge, mangroves, duty-free."
+        }
+      ]
+    },
+    {
+      "id": "dubai",
+      "name": "Dubai",
+      "region": "UAE",
+      "country": "UAE",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 9500,
+      "nightlyTo": 12400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 3,
+      "activities": [
+        {
+          "title": "Dubai Frame, Gold Souk, Spice Souk",
+          "note": "Dubai Frame, Gold Souk, Spice Souk."
+        },
+        {
+          "title": "Dubai Modern",
+          "note": "Burj Khalifa, Dubai Mall, Fountain, Creek cruise."
+        },
+        {
+          "title": "Dubai Heritage",
+          "note": "Al Fahidi Historical Neighbourhood (old Dubai). Dubai Museum. Abra (water taxi) across the Creek. Al Seef heritage waterfront. Museum of the Future."
+        },
+        {
+          "title": "Desert Safari",
+          "note": "Palm Jumeirah, Burj Al Arab photo. Desert dune bashing, camel, BBQ, stars."
+        }
+      ]
+    },
+    {
+      "id": "abudhabi",
+      "name": "Abu Dhabi",
+      "region": "UAE",
+      "country": "UAE",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "nightlyFrom": 9500,
+      "nightlyTo": 12400,
+      "minNights": 1,
+      "maxNights": 7,
+      "suggestedNights": 1,
+      "activities": [
+        {
+          "title": "Abu Dhabi",
+          "note": "Sheikh Zayed Grand Mosque. Louvre Abu Dhabi. Ferrari World (optional)."
+        }
+      ]
+    }
+  ],
+  "hotelClasses": [
+    {
+      "key": "economy",
+      "label": "Economy",
+      "extraFrom": 0,
+      "extraTo": 0
+    },
+    {
+      "key": "standard",
+      "label": "Standard",
+      "extraFrom": 500,
+      "extraTo": 800
+    },
+    {
+      "key": "deluxe",
+      "label": "Deluxe",
+      "extraFrom": 1200,
+      "extraTo": 2000
+    },
+    {
+      "key": "luxury",
+      "label": "Luxury",
+      "extraFrom": 2500,
+      "extraTo": 5000
+    }
+  ],
+  "extras": [
+    {
+      "id": "cab",
+      "label": "Private cab for the whole trip",
+      "description": "Your own car and driver for transfers and sightseeing.",
+      "icon": "Car",
+      "priceFrom": 2500,
+      "priceTo": 4000,
+      "per": "day"
+    },
+    {
+      "id": "flights",
+      "label": "Return flights",
+      "description": "Economy flights from your city and back.",
+      "icon": "Plane",
+      "priceFrom": 5000,
+      "priceTo": 14000,
+      "per": "person"
+    },
+    {
+      "id": "meals",
+      "label": "Breakfast and dinner every day",
+      "description": "Meals at your hotel, so you only plan lunch.",
+      "icon": "Utensils",
+      "priceFrom": 600,
+      "priceTo": 1400,
+      "per": "person-night"
+    },
+    {
+      "id": "guide",
+      "label": "Local guide",
+      "description": "An English or Hindi speaking guide on sightseeing days.",
+      "icon": "Users",
+      "priceFrom": 1200,
+      "priceTo": 2500,
+      "per": "day"
+    },
+    {
+      "id": "adventure",
+      "label": "Adventure activities",
+      "description": "Paragliding, rafting, snow sports or scuba, where the places offer them.",
+      "icon": "Mountain",
+      "priceFrom": 1500,
+      "priceTo": 4500,
+      "per": "person"
+    },
+    {
+      "id": "honeymoon",
+      "label": "Honeymoon touches",
+      "description": "Flower bed decoration, a cake and a candle-light dinner.",
+      "icon": "Heart",
+      "priceFrom": 2500,
+      "priceTo": 6000,
+      "per": "trip"
+    },
+    {
+      "id": "insurance",
+      "label": "Travel insurance",
+      "description": "Cover for medical emergencies, delays and lost bags.",
+      "icon": "ShieldCheck",
+      "priceFrom": 400,
+      "priceTo": 1200,
+      "per": "person"
+    },
+    {
+      "id": "photographer",
+      "label": "Photographer for a day",
+      "description": "A local photographer for a half-day shoot.",
+      "icon": "Camera",
+      "priceFrom": 4000,
+      "priceTo": 9000,
+      "per": "trip"
+    }
+  ]
+}

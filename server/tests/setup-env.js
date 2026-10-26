@@ -8,6 +8,7 @@ process.env.RAZORPAY_KEY_SECRET = '';
 process.env.RAZORPAY_WEBHOOK_SECRET = '';
 process.env.RATE_LIMIT_API_MAX = '100000';
 process.env.RATE_LIMIT_SEARCH_MAX = '100000';
+process.env.RATE_LIMIT_STRICT_MAX = '100000';
 process.env.FLIGHT_PROVIDER = 'mock';
 process.env.HOTEL_PROVIDER = 'mock';
 process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'error';

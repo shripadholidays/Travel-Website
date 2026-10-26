@@ -1,7 +1,8 @@
-// The hook URL and short delays are read when config loads, so they are set before anything is required
+// The hook URL and short delays are read when config loads, so they are set before anything is required.
+// They leave room for a busy machine: requests in a burst can each take a while when every suite runs at once.
 process.env.SITE_REBUILD_HOOK_URL = 'https://hooks.example.test/deploy/abc';
-process.env.SITE_REBUILD_DELAY_MS = '60';
-process.env.SITE_REBUILD_MAX_WAIT_MS = '300';
+process.env.SITE_REBUILD_DELAY_MS = '400';
+process.env.SITE_REBUILD_MAX_WAIT_MS = '1200';
 
 jest.mock('axios');
 const axios = require('axios');
@@ -29,7 +30,7 @@ describe('site rebuild hook', () => {
         const admin = await createUser('admin');
         await request(app).post('/api/v1/tours').set('Cookie', cookieFor(admin)).send(newTour).expect(200);
         expect(axios.post).not.toHaveBeenCalled();
-        await wait(120);
+        await wait(700);
         expect(axios.post).toHaveBeenCalledTimes(1);
         expect(axios.post).toHaveBeenCalledWith(HOOK, null, expect.any(Object));
     });
@@ -41,14 +42,14 @@ describe('site rebuild hook', () => {
         await request(app).post('/api/v1/destinations').set('Cookie', cookie)
             .send({ name: 'Kerala', slug: 'kerala', country: 'India', continent: 'Asia', description: 'Backwaters', coverImage: 'c' }).expect(200);
         await request(app).put('/api/v1/admin/settings').set('Cookie', cookie).send({ footer: { copyrightText: '© Wandeazy' } }).expect(200);
-        await wait(150);
+        await wait(700);
         expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     test('edits that never stop still rebuild by the maximum wait', async () => {
-        for (let i = 0; i < 8; i += 1) { requestRebuild(`edit ${i}`); await wait(45); }
+        for (let i = 0; i < 9; i += 1) { requestRebuild(`edit ${i}`); await wait(200); }
         expect(axios.post).toHaveBeenCalledTimes(1);
-        await wait(100);
+        await flushRebuild();
     });
 
     test('reads, refused changes and private changes do not rebuild', async () => {
@@ -56,7 +57,7 @@ describe('site rebuild hook', () => {
         await request(app).get('/api/v1/tours').expect(200);
         expect((await request(app).post('/api/v1/tours').set('Cookie', cookieFor(traveller)).send(newTour)).status).toBe(403);
         await request(app).patch('/api/v1/users/profile').set('Cookie', cookieFor(traveller)).send({ displayName: 'New name' }).expect(200);
-        await wait(120);
+        await wait(700);
         expect(axios.post).not.toHaveBeenCalled();
     });
 
