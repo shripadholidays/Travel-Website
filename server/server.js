@@ -4,6 +4,7 @@ const db = require('./src/db');
 const { migrate } = require('./src/db/migrate');
 const logger = require('./src/utils/logger');
 const app = require('./src/app');
+const { flushRebuild } = require('./src/services/site-rebuild');
 
 const { port: PORT } = config.app;
 
@@ -26,7 +27,7 @@ let server;
 
 const gracefulShutdown = (signal) => {
     logger.info(`${signal} received. Starting graceful shutdown...`);
-    const finish = () => db.close().finally(() => {
+    const finish = () => flushRebuild().finally(() => db.close()).finally(() => {
         logger.info('Database connection closed');
         process.exit(0);
     });

@@ -5,7 +5,7 @@
 | `client: npm run build` (`tsc -p tsconfig.app.json` → `vite build` → prerender) | pass; 41 pages prerendered from the local API (Turso data); main chunk 677.7 KB / 216.4 KB gzip (was 1,325 KB / 385.5 KB) |
 | `client: npm run seo:check` | pass: 41 pages, 41 indexable, 41 in sitemap, no problems. Fault injection (duplicate title, wrong canonical, broken link) correctly failed with 3 problems |
 | `client: npx vitest run` | 6 files, 32 tests pass (10 new + 1 more in `src/lib/seo.test.ts`) |
-| `server: npm test` | 15 suites, 137 tests pass (new `tests/seo-ratings.test.js`; `api-coverage.test.js` updated for the staff-review rule) |
+| `server: npm test` | 16 suites, 144 tests pass (new `tests/site-rebuild.test.js`) (new `tests/seo-ratings.test.js`; `api-coverage.test.js` updated for the staff-review rule) |
 | Prerender idempotency | second run on the same `dist` gives byte-identical output |
 | `SITE_URL=https://staging.example.test` prerender | canonical, sitemap and robots use the override |
 

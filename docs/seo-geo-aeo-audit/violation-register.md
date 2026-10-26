@@ -87,7 +87,7 @@ what the first two rounds missed:
 | V-28 | S3 | Tour title template and prerender would crash on a tour with no duration or location | FIXED: `tourTitle()` with guards + unit test |
 | V-30 | S4 | `npm run build` ran `tsc` against a root tsconfig with `files: []`, so it type-checked nothing | FIXED: `tsc -p tsconfig.app.json` (now also checks `scripts/`) |
 | V-31 | S4 | Titles repeated the brand ("About Wandeazy \| Wandeazy") | FIXED |
-| V-32 | S3 | New tours or articles published after a build are not prerendered or in the sitemap until the next build (the app shell still serves them, and Google can render them) | ACCEPTED? Rebuild on content change (e.g. a Vercel deploy hook) |
+| V-32 | S3 | New tours or articles published after a build are not prerendered or in the sitemap until the next build (the app shell still serves them, and Google can render them) | FIXED IN CODE (needs hook URL): the API calls `SITE_REBUILD_HOOK_URL` after any successful change to tours, articles, destinations, collections, reviews or settings, grouped (2 min quiet, 15 min max). `server/tests/site-rebuild.test.js`, 7 tests |
 | V-33 | S3 | Docker builds usually can't reach the API, so they prerender static pages only | ACCEPTED? Pass `PRERENDER_API_URL`; set `PRERENDER_REQUIRE_API=true` to fail the build instead |
 | V-34 | S5 | Flights/Hotels flags went from on to off in the shared Turso database during the audit (not caused by the audit: tests use in-memory databases) | INFO: prerender follows the live setting |
 
@@ -99,5 +99,5 @@ unit tests.
 
 Discovered 34 (S1 1 · S2 6 · S3 15 · S4 8 · S5 4, counting V-29 found in Round 2).
 Fixed and verified: 25. Open for the owner: 3 (V-04 and V-19, fixed in code, live data pending; V-26).
-Need explicit acceptance: 3 (V-21, V-32, V-33). Info only: 3 (V-24, V-25, V-34).
+Need explicit acceptance: 2 (V-21, V-33). V-32 needs only the hook URL set. Info only: 3 (V-24, V-25, V-34).
 Regressions introduced and fixed: 1 (V-29). Reopened: 0.

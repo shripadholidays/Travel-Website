@@ -12,6 +12,7 @@ const { ping } = require('./db');
 const logger = require('./utils/logger');
 const mockAuth = require('./middlewares/mock-auth');
 const { apiLimiter, authLimiter } = require('./middlewares/rate-limit');
+const rebuildSite = require('./middlewares/rebuild-site');
 
 // Routes
 const authRoutes = require('./routes/auth-route');
@@ -117,6 +118,12 @@ app.get('/health', async (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+
+// Changes to anything the prerendered pages show (content, reviews, settings) rebuild the site
+app.use([
+    '/api/v1/tours', '/api/v1/blog', '/api/v1/destinations', '/api/v1/collections',
+    '/api/v1/admin/settings', '/api/v1/admin/reviews', '/api/v1/admin/collections',
+], rebuildSite);
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tours', tourRoutes);

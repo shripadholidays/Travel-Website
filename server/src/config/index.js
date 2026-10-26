@@ -121,6 +121,14 @@ const config = {
         maxUploadMb:       Number(e.MAX_UPLOAD_MB) || 10,
     },
 
+    // Deploy hook of the frontend host (Vercel → Settings → Git → Deploy Hooks). Called after public content
+    // changes so prerendered pages and the sitemap stay current. Blank = never called.
+    siteRebuild: {
+        hookUrl:   e.SITE_REBUILD_HOOK_URL                || '',
+        delayMs:   Number(e.SITE_REBUILD_DELAY_MS)        || 120_000,
+        maxWaitMs: Number(e.SITE_REBUILD_MAX_WAIT_MS)     || 15 * 60_000,
+    },
+
     mock: {
         userId:      e.MOCK_USER_ID           || 'mock-user-id',
         email:       e.MOCK_USER_EMAIL        || 'test@wandeazy.com',

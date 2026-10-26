@@ -12,7 +12,10 @@
    boards. Keep them only if those partnerships are real. In Admin → About, "trusted by travelers
    worldwide" and "the best local operators on the planet" are unsupported. The new default wording is
    in `server/src/models/site-settings-defaults.json`.
-4. **Decide on the three accepted limitations** in violation-register.md (V-21, V-32, V-33).
+4. **Decide on the two remaining limitations** in violation-register.md (V-21, V-33).
+5. **Turn on automatic rebuilds (V-32).** Vercel → Project → Settings → Git → Deploy Hooks → create one for the
+   production branch, then set `SITE_REBUILD_HOOK_URL=<that URL>` on the API host and restart it. The API log
+   then shows "Site rebuild requested" about 2 minutes after an edit, and a new deploy appears in Vercel.
 
 ## Unverified (no access from this machine)
 
@@ -27,4 +30,5 @@
 | Indexing, coverage, sitemap acceptance | No Search Console / Bing Webmaster access | Submit `/sitemap.xml`; inspect a tour URL |
 | Core Web Vitals field data (LCP/INP/CLS, p75) | No live traffic data; only bundle sizes measured | PageSpeed Insights on the deployed home and tour pages |
 | CDN / WAF blocking of crawlers (incl. GPTBot, ClaudeBot, PerplexityBot, Google-Extended) | Hosting edge not accessible | robots.txt allows all; check the host's bot protection settings |
+| Deploy hook on the real host | No Vercel access; tested against a mocked hook | Publish a draft tour, check the API log and Vercel deployments |
 | AI answer visibility, rankings | External, not controllable by code | Post-release monitoring only |

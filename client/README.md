@@ -34,7 +34,8 @@ Welcome to the Wandeazy frontend codebase. This project is a modern, cinematic, 
     The build also prerenders every public page, `sitemap.xml` and `robots.txt` from the API
     (`scripts/prerender.ts`). Set `SITE_URL` to the site's public address (default `https://wandeazy.com`),
     and make sure `API_URL` (or `PRERENDER_API_URL`) is reachable during the build. If it isn't, only the
-    static pages are prerendered. Rebuild after publishing new tours or articles so they reach the sitemap.
+    static pages are prerendered. To rebuild automatically when content changes, set `SITE_REBUILD_HOOK_URL` on the API to the host's deploy hook
+    (see `server/.env.example`); otherwise rebuild after publishing new tours or articles.
     Check the result with `npm run seo:check`.
 
 ## 📂 Project Structure
