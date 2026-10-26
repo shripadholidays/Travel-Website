@@ -4,8 +4,7 @@ import { addDays, format } from "date-fns";
 import { bookingReference, cancellationWindow } from "@/lib/bookings";
 import { toast } from "sonner";
 import {
-    ArrowLeft, CalendarDays, CalendarPlus, Check, MapPin, MessageCircle, Printer, Users, X, Mail, Phone,
-} from "lucide-react";
+    ArrowLeft, CalendarDays, CalendarPlus, Check, MapPin, MessageCircle, Printer, Users, X, Mail, Phone, BedDouble } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { ConfirmDialog } from "@/components/ui/alert-dialog";
@@ -14,6 +13,7 @@ import { PageTitle } from "@/components/PageTitle";
 import { useBooking, useCancelBooking } from "@/hooks/use-bookings";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { describePackageChoice } from "@/lib/package-options";
 import type { Booking, Tour } from "@/types";
 
 const STATUS_STYLES: Record<Booking["status"], string> = {
@@ -82,8 +82,13 @@ export const BookingReceipt = () => {
     const ref = bookingReference(booking._id);
     const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: booking.currency || "USD" }).format(n);
     const start = new Date(booking.travelDate);
-    const end = tour?.duration?.days ? addDays(start, tour.duration.days - 1) : null;
-    const tourLine = tour ? tour.price * booking.numberOfTravelers : null;
+    // The length booked, when the tour came in several
+    const tripDays = booking.packageChoice?.days ?? tour?.duration?.days;
+    const end = tripDays ? addDays(start, tripDays - 1) : null;
+    // What was charged per person, in the booking's currency (older bookings fall back to the tour's price)
+    const unit = booking.unitPrice ?? tour?.price ?? null;
+    const tourLine = unit !== null ? unit * booking.numberOfTravelers : null;
+    const packageLine = describePackageChoice(booking.packageChoice);
     const subtotal = booking.subtotalAmount ?? booking.totalAmount;
     const { open: canCancel, deadline } = cancellationWindow(booking);
     const isOwner = typeof booking.user === "object" ? booking.user._id === user?._id : booking.user === user?._id;
@@ -141,6 +146,9 @@ export const BookingReceipt = () => {
                                 <span className="flex items-center gap-2"><Users className="w-4 h-4 text-brand-orange" />
                                     {booking.numberOfTravelers} {booking.numberOfTravelers === 1 ? "traveller" : "travellers"}
                                 </span>
+                                {packageLine && (
+                                    <span className="flex items-center gap-2"><BedDouble className="w-4 h-4 text-brand-orange" /> {packageLine}</span>
+                                )}
                             </div>
                         </div>
                     </header>
@@ -164,8 +172,8 @@ export const BookingReceipt = () => {
                         <section className="md:col-span-3">
                             <h2 className="font-bold text-brand-blue mb-4">Price breakdown</h2>
                             <dl className="space-y-2.5 text-sm">
-                                {tourLine !== null && tour && (
-                                    <Line label={`${money(tour.price)} × ${booking.numberOfTravelers} ${booking.numberOfTravelers === 1 ? "traveller" : "travellers"}`} value={money(tourLine)} />
+                                {tourLine !== null && unit !== null && (
+                                    <Line label={`${money(unit)} × ${booking.numberOfTravelers} ${booking.numberOfTravelers === 1 ? "traveller" : "travellers"}`} value={money(tourLine)} />
                                 )}
                                 {booking.addons?.map((a) => <Line key={a.name} label={a.name} value={money(a.price)} />)}
                                 {booking.coupon?.code && (

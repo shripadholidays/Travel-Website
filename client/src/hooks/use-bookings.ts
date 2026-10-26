@@ -18,6 +18,8 @@ interface CreateBookingPayload {
     // Add-ons and coupons are priced by the server
     addons?: { name: string }[];
     couponCode?: string;
+    /** Trip length and hotel class; the server prices them */
+    choice?: { duration?: number; hotelClass?: string };
     specialRequests?: string;
 }
 

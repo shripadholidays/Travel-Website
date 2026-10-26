@@ -5,6 +5,7 @@ import { Image } from "@/components/ui/image";
 import { MapPin, Clock, Star } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useCurrency } from "@/context/CurrencyContext";
+import { withChoice } from "@/lib/package-options";
 import { TourMap } from "@/components/TourMap";
 import { ReviewSection } from "@/components/ReviewSection";
 import { useEffect } from "react";
@@ -26,7 +27,7 @@ export const TourDetails = () => {
 
     const { addTour: addToRecentlyViewed } = useRecentlyViewed();
     const tour = data?.tour;
-    const booking = useTourBooking(tour?._id);
+    const booking = useTourBooking(tour);
     const actions = useTourActions(tour);
 
     // Track this tour as recently viewed once loaded
@@ -55,7 +56,10 @@ export const TourDetails = () => {
     }
 
     const image = tour.imageURL || tour.images?.[0] || '';
-    const durationLabel = `${tour.duration.days}D/${tour.duration.nights}N`;
+    // Length, day plan and price follow the trip length and hotel class picked in the booking panel
+    const shown = withChoice(tour, booking.choice);
+    const hasChoices = !!tour.packageOptions;
+    const durationLabel = `${shown.duration.days}D/${shown.duration.nights}N`;
     const rating = tour.reviews?.rating ?? 0;
     const reviewCount = tour.reviews?.basedOn ?? 0;
     const tags = tour.categories ?? [];
@@ -111,8 +115,8 @@ export const TourDetails = () => {
             {/* Sticky mobile booking bar — hidden on large screens which have the sidebar */}
             <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl px-4 py-3 flex items-center gap-3">
                 <div className="flex-1">
-                    <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wide">From</p>
-                    <p className="text-xl font-bold font-display text-brand-blue">{formatPrice(tour.price, tour.currency)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
+                    <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wide">{hasChoices ? "Your package" : "From"}</p>
+                    <p className="text-xl font-bold font-display text-brand-blue tabular-nums">{formatPrice(shown.price, tour.currency)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
                 </div>
                 <Button asChild className="h-12 px-7 text-base font-bold bg-brand-orange hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20 rounded-2xl text-white flex-shrink-0">
                     <Link to="/book" state={booking.bookState}>
@@ -124,11 +128,11 @@ export const TourDetails = () => {
             <Container className="py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-12">
-                    <TourQuickFacts tour={tour} className="-mt-2" />
+                    <TourQuickFacts tour={shown} className="-mt-2" />
                     <TourOverview tour={tour} />
                     <TourGallery tour={tour} />
                     <TourInclusions tour={tour} />
-                    <TourItinerary tour={tour} />
+                    <TourItinerary tour={shown} />
 
                     {/* Map */}
                     <section>

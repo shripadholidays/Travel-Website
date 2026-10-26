@@ -11,6 +11,7 @@ const logger = require('../utils/logger');
 const config = require('../config');
 const { hasPermission, PERMISSIONS } = require('../config/permissions');
 const { getCurrencyConfig, convert, isSupported, normalizeCode } = require('../services/currency');
+const { normalizePackageOptions } = require('../services/package-options');
 
 // Catalog staff can list and preview tours that are not live yet
 const canSeeAll = (user) => hasPermission(user, PERMISSIONS.CATALOG);
@@ -241,6 +242,8 @@ function normalizeTour(input = {}, { partial = false, baseCurrency = 'INR' } = {
         const max = Number(data.maxGroupSize);
         data.maxGroupSize = data.maxGroupSize !== null && data.maxGroupSize !== '' && Number.isFinite(max) && max >= 1 ? Math.round(max) : null;
     }
+    if ('packageOptions' in data) data.packageOptions = normalizePackageOptions(data.packageOptions, { location: data.location });
+    if (typeof data.bestTime === 'string') data.bestTime = data.bestTime.trim();
     if (data.coordinates) {
         const num = (v) => (v === '' || v === null || v === undefined || Number.isNaN(Number(v)) ? null : Number(v));
         data.coordinates = { lat: num(data.coordinates.lat), lng: num(data.coordinates.lng) };

@@ -59,7 +59,7 @@ const sendBookingConfirmation = async (booking, userEmail) => {
                 <div style="background: #F8FAFC; padding: 16px; border-radius: 8px; margin: 16px 0;">
                     <p><strong>Booking ID:</strong> ${booking._id}</p>
                     <p><strong>Travel Date:</strong> ${new Date(booking.travelDate).toLocaleDateString()}</p>
-                    <p><strong>Travelers:</strong> ${booking.numberOfTravelers}</p>
+                    <p><strong>Travelers:</strong> ${booking.numberOfTravelers}</p>${booking.packageChoice ? `<p><strong>Package:</strong> ${escapeHtml([booking.packageChoice.duration, booking.packageChoice.hotelLabel && `${booking.packageChoice.hotelLabel}${booking.packageChoice.hotel ? ` (${booking.packageChoice.hotel})` : ''}`].filter(Boolean).join(' · '))}</p>` : ''}
                     <p><strong>Total:</strong> ${escapeHtml(require('./currency').formatMoney(booking.totalAmount, booking.currency))}</p>
                 </div>
                 <p>We'll send you more details as your travel date approaches.</p>

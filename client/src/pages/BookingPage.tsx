@@ -6,14 +6,16 @@ import { Label } from "@/components/ui/label";
 import { Image } from "@/components/ui/image";
 import { Spinner } from "@/components/ui/spinner";
 import { PageTitle } from "@/components/PageTitle";
-import { CheckCircle2, ChevronRight, Loader2, AlertCircle, MapPin, Calendar, Users, Lock, ShieldCheck, Tag, X, Minus, Plus } from "lucide-react";
+import { CheckCircle2, ChevronRight, Loader2, AlertCircle, MapPin, Calendar, Users, Lock, ShieldCheck, Tag, X, Minus, Plus, Clock, BedDouble } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { api } from "@/services/api";
-import type { Booking } from "@/types";
+import type { Booking, PackageChoice } from "@/types";
+import { defaultChoice, pickedHotel, pickedLength, withChoice } from "@/lib/package-options";
+import { TourOptionsPicker } from "@/components/tour/TourOptionsPicker";
 import { useTour } from "@/hooks/use-tours";
 import { useCreateBooking } from "@/hooks/use-bookings";
 import { useAuth } from "@/context/AuthContext";
@@ -56,7 +58,7 @@ export const BookingPage = () => {
     const money = (amount: number) => formatMoney(amount, currency);
     const createBooking = useCreateBooking();
 
-    const { tourId, date, guests } = (location.state as { tourId?: string; date?: string; guests?: number }) || {};
+    const { tourId, date, guests, choice: chosenOnTour } = (location.state as { tourId?: string; date?: string; guests?: number; choice?: PackageChoice }) || {};
 
     const { data: tourData, isLoading: tourLoading } = useTour(tourId || '');
 
@@ -64,6 +66,9 @@ export const BookingPage = () => {
     const [travelDate, setTravelDate] = useState<Date | undefined>(date ? parseISO(date) : undefined);
     const [isDateOpen, setIsDateOpen] = useState(false);
     const [guestCount, setGuestCount] = useState(Math.max(1, guests || 1));
+    // Trip length and hotel class, carried over from the tour page and changeable here
+    const [pickedChoice, setChoice] = useState<PackageChoice | null>(chosenOnTour ?? null);
+    const choice = pickedChoice ?? defaultChoice(tourData?.tour);
     const [confirmed, setConfirmed] = useState<Booking | null>(null);
     const [firstName = "", ...restOfName] = (user?.displayName || "").trim().split(/\s+/);
     const [contactInfo, setContactInfo] = useState<ContactInfo>({
@@ -89,7 +94,7 @@ export const BookingPage = () => {
     }, [user]);
 
     // A coupon's discount depends on the subtotal, so re-check it when guests or add-ons change.
-    const unitInPay = inPay(tourData?.tour?.price ?? 0, tourData?.tour?.currency);
+    const unitInPay = inPay(tourData?.tour ? withChoice(tourData.tour, choice).price : 0, tourData?.tour?.currency);
     const liveSubtotal = Math.round((unitInPay * guestCount + selectedAddons.reduce((sum, a) => sum + inPay(a.price), 0)) * 100) / 100;
     useEffect(() => {
         if (!appliedCoupon) return;
@@ -175,6 +180,7 @@ export const BookingPage = () => {
                 numberOfTravelers: numberOfGuests,
                 contactInfo,
                 addons: selectedAddons.map(a => ({ name: a.name })),
+                choice: tour.packageOptions ? choice : undefined,
                 couponCode: appliedCoupon?.code,
                 // Charged in the currency the traveller is viewing
                 currency,
@@ -308,6 +314,12 @@ export const BookingPage = () => {
                                         </div>
                                     </div>
                                 </div>
+
+                                {tour.packageOptions && (
+                                    <div className="mb-10">
+                                        <TourOptionsPicker tour={tour} choice={choice} onChange={setChoice} compact />
+                                    </div>
+                                )}
 
                                 <h2 className="text-2xl font-bold font-display mb-1 text-brand-blue">Traveller Details</h2>
                                 <p className="text-sm text-muted-foreground mb-6">Who should we send the booking confirmation to?</p>
@@ -566,6 +578,18 @@ export const BookingPage = () => {
                                         <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4 text-brand-orange" /> Guests</span>
                                         <span className="font-medium">{numberOfGuests} {numberOfGuests === 1 ? 'guest' : 'guests'}</span>
                                     </div>
+                                    {pickedLength(tour, choice) && (
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4 text-brand-orange" /> Length</span>
+                                            <span className="font-medium text-right">{pickedLength(tour, choice)!.label}</span>
+                                        </div>
+                                    )}
+                                    {pickedHotel(tour, choice) && (
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="flex items-center gap-2 text-muted-foreground"><BedDouble className="w-4 h-4 text-brand-orange" /> Hotel</span>
+                                            <span className="font-medium text-right">{pickedHotel(tour, choice)!.label}</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="border-t border-slate-100" />

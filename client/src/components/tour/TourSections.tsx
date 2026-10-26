@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, Moon, Star, Tag, XCircle } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, Moon, Star, Tag, XCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import type { Tour } from "@/types";
@@ -47,6 +47,12 @@ export const TourOverview = ({ tour, compact }: { tour: Tour; compact?: boolean 
         <section>
             <SectionHeading compact={compact}>Overview</SectionHeading>
             <p className={cn("text-muted-foreground leading-relaxed", compact ? "text-base" : "text-lg")}>{description}</p>
+            {tour.bestTime && (
+                <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-secondary/60 px-3 py-1.5 text-sm text-muted-foreground">
+                    <CalendarDays className="w-4 h-4 text-brand-orange" aria-hidden="true" />
+                    <span>Best time to visit: <span className="font-semibold text-foreground">{tour.bestTime}</span></span>
+                </p>
+            )}
         </section>
     );
 };

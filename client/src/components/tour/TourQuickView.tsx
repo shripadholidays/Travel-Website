@@ -13,6 +13,7 @@ import { TourGallery, tourPhotos } from "@/components/tour/TourGallery";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useTour } from "@/hooks/use-tours";
 import { useTourActions, useTourBooking } from "@/hooks/use-tour-actions";
+import { withChoice } from "@/lib/package-options";
 import { useTourModal } from "@/hooks/use-tour-modal";
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 import { cn } from "@/lib/utils";
@@ -116,7 +117,9 @@ const QuickViewBody = ({ id, preview, scrollRef }: { id: string; preview?: Tour;
     const full = data?.tour;
     // Card data paints the hero straight away; the sections fill in once the tour loads.
     const tour = full ?? preview;
-    const booking = useTourBooking(tour?._id);
+    const booking = useTourBooking(full ?? preview);
+    // The trip length and hotel class picked change the price, length and day plan shown
+    const shown = tour ? withChoice(tour, booking.choice) : tour;
     const actions = useTourActions(tour);
     const { formatPrice } = useCurrency();
     const { addTour } = useRecentlyViewed();
@@ -243,13 +246,13 @@ const QuickViewBody = ({ id, preview, scrollRef }: { id: string; preview?: Tour;
 
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-8 lg:gap-10 p-5 sm:p-8">
                 <div className="space-y-12 min-w-0">
-                    <TourQuickFacts tour={tour} />
+                    <TourQuickFacts tour={shown ?? tour} />
                     {full ? (
                         <>
                             {keys.includes("overview") && <div data-qv-section="overview"><TourOverview tour={full} compact /></div>}
                             {keys.includes("photos") && <div data-qv-section="photos"><TourGallery tour={full} compact /></div>}
                             {keys.includes("included") && <div data-qv-section="included"><TourInclusions tour={full} compact /></div>}
-                            {keys.includes("itinerary") && <div data-qv-section="itinerary"><TourItinerary tour={full} compact /></div>}
+                            {keys.includes("itinerary") && <div data-qv-section="itinerary"><TourItinerary tour={withChoice(full, booking.choice)} compact /></div>}
                             <div data-qv-section="reviews"><ReviewSection tourId={full._id} /></div>
                         </>
                     ) : (
@@ -273,8 +276,8 @@ const QuickViewBody = ({ id, preview, scrollRef }: { id: string; preview?: Tour;
             {/* Mobile: price + Book Now stay in reach while reading */}
             <div className="lg:hidden sticky bottom-0 z-20 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 flex items-center gap-3">
                 <div className="flex-1">
-                    <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wide">From</p>
-                    <p className="text-xl font-bold font-display text-brand-blue">{formatPrice(tour.price, tour.currency)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
+                    <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wide">{tour.packageOptions ? "Your package" : "From"}</p>
+                    <p className="text-xl font-bold font-display text-brand-blue tabular-nums">{formatPrice((shown ?? tour).price, tour.currency)}<span className="text-xs font-medium text-muted-foreground ml-1">/ person</span></p>
                 </div>
                 <Button asChild className="h-12 px-7 text-base font-bold bg-brand-orange hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20 rounded-2xl text-white flex-shrink-0">
                     <Link to="/book" state={booking.bookState}>Book Now</Link>

@@ -16,6 +16,7 @@ import { EmptyState, PageHeader, SearchField, StatusPill, StatusTabs, TableFoote
 import { useAdminBookings, useUpdateBookingStatus, toQuery, type BookingStatus } from "@/hooks/use-admin";
 import { useDebounced } from "@/hooks/use-debounced";
 import { api } from "@/services/api";
+import { describePackageChoice } from "@/lib/package-options";
 import type { Booking, Pagination, Tour } from "@/types";
 
 const STATUS: Record<BookingStatus, { label: string; tone: Tone }> = {
@@ -87,11 +88,11 @@ export const AdminBookings = () => {
                 if (p >= res.pagination.pages) break;
             }
             if (all.length === 0) { toast.error("No bookings to export."); return; }
-            const headers = ["Reference", "Booked on", "Traveller", "Email", "Phone", "Tour", "Travel date", "Travellers", "Add-ons", "Coupon", "Currency", "Total", "Refunded", "Status"];
+            const headers = ["Reference", "Booked on", "Traveller", "Email", "Phone", "Tour", "Travel date", "Travellers", "Package", "Add-ons", "Coupon", "Currency", "Total", "Refunded", "Status"];
             const rows = all.map((b) => [
                 ref(b), format(new Date(b.createdAt), "yyyy-MM-dd"),
                 `${b.contactInfo.firstName} ${b.contactInfo.lastName}`, b.contactInfo.email, b.contactInfo.phone,
-                tourOf(b)?.title ?? "", format(new Date(b.travelDate), "yyyy-MM-dd"), b.numberOfTravelers,
+                tourOf(b)?.title ?? "", format(new Date(b.travelDate), "yyyy-MM-dd"), b.numberOfTravelers, describePackageChoice(b.packageChoice),
                 (b.addons ?? []).map((a) => a.name).join("; "), b.coupon?.code ?? "", b.currency || "USD", b.totalAmount, b.refundedAmount ?? "", STATUS[b.status].label,
             ].map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
             const url = URL.createObjectURL(new Blob([[headers.join(","), ...rows].join("\n")], { type: "text/csv;charset=utf-8;" }));
@@ -169,7 +170,7 @@ export const AdminBookings = () => {
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 <p className="line-clamp-1">{tourOf(b)?.title ?? "Tour removed"}</p>
-                                                <p className="text-xs text-muted-foreground">{b.numberOfTravelers} traveller{b.numberOfTravelers === 1 ? "" : "s"}</p>
+                                                <p className="text-xs text-muted-foreground">{b.numberOfTravelers} traveller{b.numberOfTravelers === 1 ? "" : "s"}{b.packageChoice && ` · ${describePackageChoice(b.packageChoice)}`}</p>
                                             </TableCell>
                                             <TableCell className="hidden sm:table-cell whitespace-nowrap">{format(new Date(b.travelDate), "d MMM yyyy")}</TableCell>
                                             <TableCell className="text-right tabular-nums font-semibold whitespace-nowrap">
@@ -223,6 +224,7 @@ export const AdminBookings = () => {
                                         <span className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {format(new Date(detail.travelDate), "EEE d MMM yyyy")}</span>
                                         <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {detail.numberOfTravelers} traveller{detail.numberOfTravelers === 1 ? "" : "s"}</span>
                                     </div>
+                                    {detail.packageChoice && <p className="mt-2 font-medium text-brand-blue">{describePackageChoice(detail.packageChoice)}</p>}
                                 </div>
                                 <div>
                                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Lead traveller</p>

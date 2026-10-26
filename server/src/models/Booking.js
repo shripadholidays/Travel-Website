@@ -12,6 +12,8 @@ const Booking = defineTable({
         'contactInfo.email': { type: 'text', required: true, label: 'Email' },
         'contactInfo.phone': { type: 'text', required: true, label: 'Phone' },
         addons: { type: 'json', default: [] },                 // [{ name, price }]
+        // The trip length and hotel class picked, when the tour offers them: { duration, days, nights, hotelClass, hotelLabel, hotel }
+        packageChoice: { type: 'json', default: null },
         // Before any coupon; totalAmount is what the traveller pays
         subtotalAmount: 'number',
         coupon: { type: 'json', default: null },               // { code, discount }

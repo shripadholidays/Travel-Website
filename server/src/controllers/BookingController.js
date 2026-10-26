@@ -20,7 +20,7 @@ exports.createBooking = async (req, res) => {
     try {
         const {
             tour: tourField, tourId: tourIdField, travelDate, numberOfTravelers,
-            contactInfo, addons, specialRequests, couponCode, currency: requestedCurrency
+            contactInfo, addons, specialRequests, couponCode, currency: requestedCurrency, choice
         } = req.body;
 
         // Accept either `tour` or `tourId` from the client.
@@ -40,7 +40,7 @@ exports.createBooking = async (req, res) => {
         }
 
         // Prices, add-ons and coupons are all worked out here, never trusted from the client.
-        const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode, currency: requestedCurrency });
+        const pricing = await priceBooking({ tour, numberOfTravelers, addons, couponCode, currency: requestedCurrency, choice });
         const { currency } = pricing;
 
         const booking = await Booking.insert({
@@ -55,6 +55,7 @@ exports.createBooking = async (req, res) => {
                 phone: contactInfo?.phone,
             },
             addons: pricing.addons,
+            packageChoice: pricing.packageChoice,
             subtotalAmount: pricing.subtotalAmount,
             coupon: pricing.coupon || null,
             totalAmount: pricing.totalAmount,

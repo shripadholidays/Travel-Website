@@ -11,6 +11,8 @@ import type { TourActions, TourBooking } from "@/hooks/use-tour-actions";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { Tour } from "@/types";
+import { withChoice } from "@/lib/package-options";
+import { TourOptionsPicker } from "@/components/tour/TourOptionsPicker";
 
 /** Price, date, guests and Book Now — the sidebar of the details page and the modal. */
 export const TourBookingPanel = ({ tour, booking, actions, compact, className }: {
@@ -23,15 +25,17 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
     const { formatPrice } = useCurrency();
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const dateTriggerRef = useRef<HTMLButtonElement>(null);
-    const { date, setDate, guests, setGuests, bookState } = booking;
-    const totalPrice = tour.price * guests;
+    const { date, setDate, guests, setGuests, choice, setChoice, bookState } = booking;
+    // The price of the trip length and hotel class picked (the tour's own price when it has none)
+    const shown = withChoice(tour, choice);
+    const totalPrice = shown.price * guests;
 
     return (
         <div className={cn("bg-white border border-slate-100 rounded-[2rem] shadow-2xl shadow-brand-blue/5", compact ? "p-6 space-y-5" : "p-8 space-y-6", className)}>
             <div className={cn("flex items-center justify-between border-b border-slate-100", compact ? "pb-5" : "pb-6")}>
                 <div>
                     <span className="text-sm font-medium text-muted-foreground">Price per person</span>
-                    <div className="text-3xl font-bold font-display text-brand-blue">{formatPrice(tour.price, tour.currency)}</div>
+                    <div className="text-3xl font-bold font-display text-brand-blue tabular-nums">{formatPrice(shown.price, tour.currency)}</div>
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -58,6 +62,8 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
             </div>
 
             <div className={compact ? "space-y-5" : "space-y-6"}>
+                <TourOptionsPicker tour={tour} choice={choice} onChange={setChoice} compact={compact} />
+
                 {/* Date Selection */}
                 <div className="space-y-3">
                     <label className="text-sm font-bold flex items-center gap-2 text-brand-blue"><CalendarIcon className="w-4 h-4 text-brand-orange" /> Select Date</label>
@@ -122,7 +128,7 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
                 {/* Total Price Section */}
                 <div className="bg-brand-light/30 p-4 rounded-2xl border border-brand-light/60 space-y-2">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{formatPrice(tour.price, tour.currency)} × {guests} {guests === 1 ? 'guest' : 'guests'}</span>
+                        <span>{formatPrice(shown.price, tour.currency)} × {guests} {guests === 1 ? 'guest' : 'guests'}</span>
                         <span className="tabular-nums">{formatPrice(totalPrice, tour.currency)}</span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-brand-light/60">
@@ -167,7 +173,7 @@ export const TourBookingPanel = ({ tour, booking, actions, compact, className }:
             <TripAddons
                 location={tour.location}
                 date={bookState.date || undefined}
-                nights={tour.duration?.nights || 3}
+                nights={shown.duration?.nights || 3}
             />
         </div>
     );

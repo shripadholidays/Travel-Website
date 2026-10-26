@@ -26,6 +26,35 @@ export interface User {
     updatedAt: string;
 }
 
+/** One way a package can be booked: its length (with its own price and day plan) */
+export interface TripLength {
+    label: string;
+    days: number;
+    nights: number;
+    price: number;
+    itinerary: { day: number; activity: string; location: string }[];
+}
+
+/** A hotel class a package can be booked with, adding a fixed amount per person */
+export interface HotelClass {
+    key: string;
+    label: string;
+    hotel: string;
+    features: string;
+    extraPerPerson: number;
+}
+
+export interface PackageOptions {
+    durations: TripLength[];
+    hotelClasses: HotelClass[];
+}
+
+/** What the traveller picked on a tour with package options (index into durations, hotel class key) */
+export interface PackageChoice {
+    duration?: number;
+    hotelClass?: string;
+}
+
 export interface Tour {
     _id: string;
     title: string;
@@ -62,6 +91,10 @@ export interface Tour {
     isFeatured?: boolean;
     status?: 'active' | 'inactive' | 'draft';
     coordinates?: { lat: number | null; lng: number | null };
+    /** Trip lengths and hotel classes to pick from; price, duration and itinerary describe the cheapest */
+    packageOptions?: PackageOptions | null;
+    /** e.g. "March–June, Sep–Nov" */
+    bestTime?: string;
     /** Admin views only */
     updatedBy?: { _id: string; displayName: string } | string;
     createdAt: string;
@@ -81,6 +114,8 @@ export interface Booking {
         phone: string;
     };
     addons: { name: string; price: number }[];
+    /** The trip length and hotel class booked, when the tour offers them */
+    packageChoice?: { duration?: string; days?: number; nights?: number; hotelClass?: string; hotelLabel?: string; hotel?: string } | null;
     /** Before any coupon; totalAmount is what was charged */
     subtotalAmount?: number;
     coupon?: { code: string; discount: number };

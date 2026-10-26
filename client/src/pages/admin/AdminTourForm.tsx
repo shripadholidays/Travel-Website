@@ -33,7 +33,9 @@ const COMMON_INCLUSIONS = ['Hotel stays', 'Daily breakfast', 'Airport transfers'
 type Inclusion = { title: string; included: boolean };
 type ItineraryDay = { activity: string; location: string };
 type GalleryItem = { imageURL: string; altText: string };
-type Tab = 'details' | 'photos' | 'itinerary' | 'inclusions' | 'description';
+type LengthForm = { label: string; days: string; nights: string; price: string; itinerary: ItineraryDay[] };
+type HotelForm = { key: string; label: string; hotel: string; features: string; extra: string };
+type Tab = 'details' | 'photos' | 'itinerary' | 'packages' | 'inclusions' | 'description';
 
 interface FormState {
     title: string;
@@ -50,6 +52,10 @@ interface FormState {
     categories: string[];
     inclusions: Inclusion[];
     itinerary: ItineraryDay[];
+    // Optional: the trip lengths and hotel classes travellers pick from
+    lengths: LengthForm[];
+    hotels: HotelForm[];
+    bestTime: string;
     about: string;
     isFeatured: boolean;
     status: TourStatus;
@@ -61,7 +67,7 @@ const inAYear = () => new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 
 
 const EMPTY: FormState = {
     title: '', location: '', price: '', currency: '', days: '5', nights: '4', validity: inAYear(), maxGroupSize: '', emi: '',
-    imageURL: '', gallery: [], categories: [], inclusions: [], itinerary: [], about: '',
+    imageURL: '', gallery: [], categories: [], inclusions: [], itinerary: [], lengths: [], hotels: [], bestTime: '', about: '',
     isFeatured: false, status: 'draft', lat: '', lng: '',
 };
 
@@ -86,6 +92,12 @@ function fromTour(t: Tour): FormState {
         categories: t.categories ?? [],
         inclusions: (t.inclusions ?? []).map(({ title, included }) => ({ title, included })),
         itinerary: (t.itinerary ?? []).map(({ activity, location }) => ({ activity, location })),
+        lengths: (t.packageOptions?.durations ?? []).map((d) => ({
+            label: d.label, days: String(d.days), nights: String(d.nights), price: String(d.price),
+            itinerary: d.itinerary.map(({ activity, location }) => ({ activity, location })),
+        })),
+        hotels: (t.packageOptions?.hotelClasses ?? []).map((h) => ({ key: h.key, label: h.label, hotel: h.hotel, features: h.features, extra: String(h.extraPerPerson || '') })),
+        bestTime: t.bestTime ?? '',
         about: t.overview?.about ?? '',
         isFeatured: !!t.isFeatured,
         status: t.status ?? 'active',
@@ -115,6 +127,16 @@ function toPayload(f: FormState): Partial<Tour> {
         itinerary: f.itinerary
             .filter((d) => d.activity.trim() || d.location.trim())
             .map((d, i) => ({ day: i + 1, activity: d.activity.trim(), location: d.location.trim() })),
+        packageOptions: f.lengths.length || f.hotels.length ? {
+            durations: f.lengths.map((l) => ({
+                label: l.label.trim(), days: Number(l.days) || 1, nights: Number(l.nights) || 0, price: Number(l.price) || 0,
+                itinerary: l.itinerary
+                    .filter((d) => d.activity.trim() || d.location.trim())
+                    .map((d, i) => ({ day: i + 1, activity: d.activity.trim(), location: d.location.trim() })),
+            })),
+            hotelClasses: f.hotels.map((h) => ({ key: h.key, label: h.label.trim(), hotel: h.hotel.trim(), features: h.features.trim(), extraPerPerson: Number(h.extra) || 0 })),
+        } : null,
+        bestTime: f.bestTime.trim(),
         isFeatured: f.isFeatured,
         status: f.status,
         coordinates: { lat: f.lat === '' ? null : Number(f.lat), lng: f.lng === '' ? null : Number(f.lng) },
@@ -126,6 +148,7 @@ type Errors = Partial<Record<keyof FormState, string>>;
 const FIELD_TAB: Partial<Record<keyof FormState, Tab>> = {
     title: 'details', location: 'details', price: 'details', days: 'details', nights: 'details', validity: 'details',
     maxGroupSize: 'details', lat: 'details', lng: 'details', imageURL: 'photos', about: 'description',
+    lengths: 'packages', hotels: 'packages',
 };
 
 /** Always-needed fields, plus what a live tour needs before it can be published. */
@@ -144,8 +167,14 @@ function validate(f: FormState, publishing: boolean): Errors {
         if (f.lng === '' || Number.isNaN(lng) || lng < -180 || lng > 180) e.lng = 'Longitude is a number from -180 to 180.';
     }
     if (f.price !== '' && !(Number(f.price) >= 0)) e.price = 'Enter the price per person as a number.';
+    if (f.lengths.some((l) => !l.label.trim() || !(Number(l.days) >= 1))) e.lengths = 'Every trip length needs a name and a number of days.';
+    if (f.hotels.some((h) => !h.label.trim())) e.hotels = 'Every hotel class needs a name.';
     if (publishing) {
-        if (!(Number(f.price) >= 1)) e.price = 'A live tour needs a price per person.';
+        // With trip lengths, the price and day plan come from them
+        if (f.lengths.length) {
+            if (f.lengths.some((l) => !(Number(l.price) >= 1))) e.lengths = 'Every trip length needs a price per person.';
+            else if (f.lengths.some((l) => !l.itinerary.some((d) => d.activity.trim() || d.location.trim()))) e.lengths = 'Every trip length needs its day plan.';
+        } else if (!(Number(f.price) >= 1)) e.price = 'A live tour needs a price per person.';
         if (!f.imageURL) e.imageURL = 'A live tour needs a cover image.';
         if (f.about.trim().length < 40) e.about = 'Write at least a couple of sentences (40+ characters) for travellers.';
         if (!f.validity) e.validity = 'Pick the last date this tour can be booked for.';
@@ -203,14 +232,21 @@ export const AdminTourForm = () => {
     const dirty = JSON.stringify(payload) !== saved;
     const leaveGuard = useUnsavedChanges(dirty);
 
+    // With trip lengths, the tour's price, length and day plan come from them (cheapest one)
+    const hasLengths = form.lengths.length > 0;
+
     // What travellers look for, as a checklist next to the form
     const checklist = [
         { label: 'Title and location', done: !!form.title.trim() && !!form.location.trim(), tab: 'details' as Tab, required: true },
-        { label: 'Price per person', done: Number(form.price) >= 1, tab: 'details' as Tab, required: true },
+        hasLengths
+            ? { label: 'A price for every trip length', done: form.lengths.every((l) => Number(l.price) >= 1), tab: 'packages' as Tab, required: true }
+            : { label: 'Price per person', done: Number(form.price) >= 1, tab: 'details' as Tab, required: true },
         { label: 'Cover image', done: !!form.imageURL, tab: 'photos' as Tab, required: true },
         { label: 'Description (40+ characters)', done: form.about.trim().length >= 40, tab: 'description' as Tab, required: true },
         { label: 'At least 3 gallery photos', done: form.gallery.filter((g) => g.imageURL).length >= 3, tab: 'photos' as Tab, required: false },
-        { label: 'Day-by-day itinerary', done: form.itinerary.some((d) => d.activity.trim()), tab: 'itinerary' as Tab, required: false },
+        hasLengths
+            ? { label: 'A day plan for every trip length', done: form.lengths.every((l) => l.itinerary.some((d) => d.activity.trim())), tab: 'packages' as Tab, required: false }
+            : { label: 'Day-by-day itinerary', done: form.itinerary.some((d) => d.activity.trim()), tab: 'itinerary' as Tab, required: false },
         { label: "What's included", done: form.inclusions.some((i) => i.title.trim()), tab: 'inclusions' as Tab, required: false },
         { label: 'Trip styles', done: form.categories.length > 0, tab: 'details' as Tab, required: false },
     ];
@@ -374,7 +410,7 @@ export const AdminTourForm = () => {
                 <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)} className="min-w-0">
                     <TabsList className="flex w-full overflow-x-auto justify-start gap-1 h-auto bg-slate-100 p-1 rounded-xl mb-2 [scrollbar-width:none]">
                         {([
-                            ['details', 'Details'], ['photos', 'Photos'], ['itinerary', 'Itinerary'],
+                            ['details', 'Details'], ['photos', 'Photos'], ['itinerary', 'Itinerary'], ['packages', 'Lengths & hotels'],
                             ['inclusions', 'Inclusions'], ['description', 'Description'],
                         ] as [Tab, string][]).map(([value, label]) => (
                             <TabsTrigger key={value} value={value} className="rounded-lg text-sm px-3 py-1.5 gap-1.5 shrink-0">
@@ -418,6 +454,7 @@ export const AdminTourForm = () => {
                                         <Label htmlFor="price">Price per person {form.status === 'active' && '*'}</Label>
                                         <Input id="price" inputMode="decimal" className="tabular-nums" value={form.price} onChange={(e) => set('price', e.target.value.replace(/[^0-9.]/g, ''))} placeholder={(form.currency || base) === 'INR' ? '45000' : '1200'} aria-invalid={!!errors.price} />
                                         <FieldError message={errors.price} />
+                                        {hasLengths && <p className="text-xs text-muted-foreground">Set by the cheapest trip length in "Lengths &amp; hotels".</p>}
                                     </div>
                                     <div className="space-y-1.5">
                                         <Label htmlFor="days">Days *</Label>
@@ -454,6 +491,11 @@ export const AdminTourForm = () => {
                                         <Label htmlFor="emi">Card highlight</Label>
                                         <Input id="emi" value={form.emi} onChange={(e) => set('emi', e.target.value)} placeholder="Best seller" maxLength={30} />
                                         <p className="text-xs text-muted-foreground">Optional short label on the tour card. Never a price or discount.</p>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="bestTime">Best time to visit</Label>
+                                        <Input id="bestTime" value={form.bestTime} onChange={(e) => set('bestTime', e.target.value)} placeholder="October to March" maxLength={80} />
+                                        <p className="text-xs text-muted-foreground">Optional. Shown under the description.</p>
                                     </div>
                                 </div>
 
@@ -559,7 +601,11 @@ export const AdminTourForm = () => {
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div>
                                         <CardTitle>Day by day</CardTitle>
-                                        <CardDescription>Days are numbered in the order shown. Use the arrows to reorder.</CardDescription>
+                                        <CardDescription>
+                                            {hasLengths
+                                                ? 'This tour has trip lengths, so each one has its own day plan in "Lengths & hotels". This list is replaced by the cheapest one when you save.'
+                                                : 'Days are numbered in the order shown. Use the arrows to reorder.'}
+                                        </CardDescription>
                                     </div>
                                     {form.itinerary.length < (Number(form.days) || 0) && (
                                         <Button type="button" variant="outline" size="sm" onClick={fillItinerary}>
@@ -582,6 +628,119 @@ export const AdminTourForm = () => {
                                                 <Input aria-label={`Day ${i + 1} place`} value={day.location} onChange={(e) => onChange({ ...day, location: e.target.value })} placeholder="Where (e.g. Alleppey)" />
                                             </div>
                                             <Textarea aria-label={`Day ${i + 1} plan`} rows={2} value={day.activity} onChange={(e) => onChange({ ...day, activity: e.target.value })} placeholder="What happens (e.g. Board the houseboat, lunch on deck, village walk at dusk)" />
+                                        </div>
+                                    )}
+                                />
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    {/* TRIP LENGTHS AND HOTEL CLASSES */}
+                    <TabsContent value="packages" className="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Trip lengths</CardTitle>
+                                <CardDescription>
+                                    Optional. Add one for each length travellers can pick, with its own price per person and day plan.
+                                    The cheapest becomes the "from" price on cards.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <FieldError message={errors.lengths} />
+                                <ListEditor
+                                    items={form.lengths}
+                                    onChange={(l) => set('lengths', l)}
+                                    addLabel="Add a trip length"
+                                    maxItems={8}
+                                    createEmpty={() => ({ label: '', days: form.days, nights: form.nights, price: '', itinerary: [] })}
+                                    renderItem={(len, i, onChange) => (
+                                        <div className="space-y-3">
+                                            <div className="grid grid-cols-2 sm:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))] gap-3">
+                                                <div className="col-span-2 sm:col-span-1 space-y-1">
+                                                    <Label htmlFor={`len-label-${i}`} className="text-xs">Name</Label>
+                                                    <Input id={`len-label-${i}`} value={len.label} onChange={(e) => onChange({ ...len, label: e.target.value })} placeholder="5 Nights / 6 Days" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor={`len-days-${i}`} className="text-xs">Days</Label>
+                                                    <Input
+                                                        id={`len-days-${i}`} inputMode="numeric" className="tabular-nums" value={len.days}
+                                                        onChange={(e) => {
+                                                            const days = e.target.value.replace(/[^0-9]/g, '');
+                                                            onChange({ ...len, days, nights: days ? String(Math.max(0, Number(days) - 1)) : len.nights });
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor={`len-nights-${i}`} className="text-xs">Nights</Label>
+                                                    <Input id={`len-nights-${i}`} inputMode="numeric" className="tabular-nums" value={len.nights} onChange={(e) => onChange({ ...len, nights: e.target.value.replace(/[^0-9]/g, '') })} />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor={`len-price-${i}`} className="text-xs">Price / person</Label>
+                                                    <Input id={`len-price-${i}`} inputMode="decimal" className="tabular-nums" value={len.price} onChange={(e) => onChange({ ...len, price: e.target.value.replace(/[^0-9.]/g, '') })} />
+                                                </div>
+                                            </div>
+                                            <details className="rounded-xl border bg-slate-50/60 px-3 py-2" open={len.itinerary.length === 0}>
+                                                <summary className="cursor-pointer text-sm font-medium py-1">
+                                                    Day plan <span className="text-muted-foreground font-normal">({len.itinerary.length} {len.itinerary.length === 1 ? 'day' : 'days'})</span>
+                                                </summary>
+                                                <div className="pt-3">
+                                                    <ListEditor
+                                                        items={len.itinerary}
+                                                        onChange={(days) => onChange({ ...len, itinerary: days })}
+                                                        addLabel={`Add day ${len.itinerary.length + 1}`}
+                                                        maxItems={90}
+                                                        createEmpty={() => ({ activity: '', location: '' })}
+                                                        renderItem={(day, d, onDay) => (
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="inline-flex h-7 shrink-0 items-center rounded-full bg-brand-blue px-2.5 text-xs font-bold text-white">Day {d + 1}</span>
+                                                                    <Input aria-label={`Day ${d + 1} title`} value={day.location} onChange={(e) => onDay({ ...day, location: e.target.value })} placeholder="Arrival Shimla" />
+                                                                </div>
+                                                                <Textarea aria-label={`Day ${d + 1} plan`} rows={2} value={day.activity} onChange={(e) => onDay({ ...day, activity: e.target.value })} placeholder="What happens that day" />
+                                                            </div>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </details>
+                                        </div>
+                                    )}
+                                />
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Hotel classes</CardTitle>
+                                <CardDescription>
+                                    Optional. Travellers pick one, and its extra cost per person is added to the price. Use 0 for the class the price already includes.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <FieldError message={errors.hotels} />
+                                <ListEditor
+                                    items={form.hotels}
+                                    onChange={(h) => set('hotels', h)}
+                                    addLabel="Add a hotel class"
+                                    maxItems={8}
+                                    createEmpty={() => ({ key: '', label: '', hotel: '', features: '', extra: '' })}
+                                    renderItem={(h, i, onChange) => (
+                                        <div className="grid grid-cols-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] gap-3">
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`hotel-label-${i}`} className="text-xs">Class</Label>
+                                                <Input id={`hotel-label-${i}`} value={h.label} onChange={(e) => onChange({ ...h, label: e.target.value })} placeholder="Deluxe" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`hotel-name-${i}`} className="text-xs">Hotel</Label>
+                                                <Input id={`hotel-name-${i}`} value={h.hotel} onChange={(e) => onChange({ ...h, hotel: e.target.value })} placeholder="Span Resort & Spa" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`hotel-extra-${i}`} className="text-xs">Extra / person</Label>
+                                                <Input id={`hotel-extra-${i}`} inputMode="decimal" className="tabular-nums" value={h.extra} onChange={(e) => onChange({ ...h, extra: e.target.value.replace(/[^0-9.]/g, '') })} placeholder="0" />
+                                            </div>
+                                            <div className="space-y-1 col-span-2 sm:col-span-3">
+                                                <Label htmlFor={`hotel-features-${i}`} className="text-xs">What it offers</Label>
+                                                <Input id={`hotel-features-${i}`} value={h.features} onChange={(e) => onChange({ ...h, features: e.target.value })} placeholder="Valley views, pool, multi-cuisine restaurant" />
+                                            </div>
                                         </div>
                                     )}
                                 />

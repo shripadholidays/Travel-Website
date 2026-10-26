@@ -1,4 +1,5 @@
 const { defineTable } = require('../db/table');
+const { packageOptionsErrors, applyCheapestChoice } = require('../services/package-options');
 
 // Drafts may be saved half-finished; a live tour needs a price, a cover image and a description
 const isLive = (doc) => (doc.status ?? 'active') === 'active';
@@ -34,6 +35,9 @@ const TravelDestination = defineTable({
         'reviews.basedOn': { type: 'int', default: 0 },
         'reviews.individualReviews': { type: 'json', default: [], itemIds: true },
         maxGroupSize: { type: 'int', default: null, min: 1, label: 'Max group size' },
+        // Optional trip lengths and hotel classes the traveller picks from (see services/package-options)
+        packageOptions: { type: 'json', default: null },
+        bestTime: 'text',
         isFeatured: { type: 'bool', default: false },
         status: { type: 'text', enum: ['active', 'inactive', 'draft'], default: 'active', label: 'Status' },
         'coordinates.lat': { type: 'number', default: null, label: 'Latitude' },
@@ -46,11 +50,15 @@ const TravelDestination = defineTable({
         const errors = {};
         if ((doc.inclusions || []).some((x) => !x || !String(x.title || '').trim())) errors.inclusions = 'Every inclusion needs a title';
         if ((doc.itinerary || []).some((d) => !d || !String(d.activity || '').trim() || !String(d.location || '').trim())) errors.itinerary = 'Every itinerary day needs an activity and a place';
+        const optionsError = isLive(doc) ? packageOptionsErrors(doc.packageOptions) : null;
+        if (optionsError) errors.packageOptions = optionsError;
         if ((doc.overview?.gallery || []).some((g) => !g || !String(g.imageURL || '').trim())) errors['overview.gallery'] = 'Every gallery photo needs an image';
         return errors;
     },
     async beforeSave(doc) {
         if (SYMBOLS[doc.currency]) doc.currency = SYMBOLS[doc.currency];
+        // Price, duration and itinerary follow the cheapest trip length when the tour has choices
+        applyCheapestChoice(doc);
         // The USD price index always follows the price. Required here to avoid a load-order cycle with settings.
         const { getCurrencyConfig, convert } = require('../services/currency');
         const { rates } = await getCurrencyConfig();

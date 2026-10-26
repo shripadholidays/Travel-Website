@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from '@/hooks/use-wishlist';
 import { rememberReturnTo } from '@/lib/return-to';
-import type { Tour } from '@/types';
+import type { PackageChoice, Tour } from '@/types';
+import { defaultChoice } from '@/lib/package-options';
 
 /** Wishlist toggle + share for one tour (card, modal and details page). */
 export function useTourActions(tour?: Pick<Tour, '_id' | 'title'>) {
@@ -56,12 +57,15 @@ export function useTourActions(tour?: Pick<Tour, '_id' | 'title'>) {
     };
 }
 
-/** Date + guest selection, and the router state the /book page expects. */
-export function useTourBooking(tourId?: string) {
+/** Date, guests, trip length and hotel class, and the router state the /book page expects. */
+export function useTourBooking(tour?: Pick<Tour, '_id' | 'packageOptions'> | null) {
     const [date, setDate] = useState<Date>();
     const [guests, setGuests] = useState(2);
-    const bookState = { tourId, date: date ? format(date, 'yyyy-MM-dd') : '', guests };
-    return { date, setDate, guests, setGuests, bookState };
+    // Starts on the cheapest choice (the price shown on cards) until the traveller picks
+    const [picked, setChoice] = useState<PackageChoice | null>(null);
+    const choice = picked ?? defaultChoice(tour);
+    const bookState = { tourId: tour?._id, date: date ? format(date, 'yyyy-MM-dd') : '', guests, choice };
+    return { date, setDate, guests, setGuests, choice, setChoice, bookState };
 }
 
 export type TourBooking = ReturnType<typeof useTourBooking>;
