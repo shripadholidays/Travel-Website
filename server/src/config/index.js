@@ -121,6 +121,12 @@ const config = {
         maxUploadMb:       Number(e.MAX_UPLOAD_MB) || 10,
     },
 
+    // How long the landing page's public answers are remembered (0 turns it off). Changes made through
+    // the API clear it at once, so this only limits how stale outside changes can get.
+    publicCache: {
+        ttlMs: e.PUBLIC_CACHE_TTL_MS === undefined ? 5 * 60_000 : Number(e.PUBLIC_CACHE_TTL_MS),
+    },
+
     // Deploy hook of the frontend host (Vercel → Settings → Git → Deploy Hooks). Called after public content
     // changes so prerendered pages and the sitemap stay current. Blank = never called.
     siteRebuild: {

@@ -13,6 +13,7 @@ const logger = require('./utils/logger');
 const mockAuth = require('./middlewares/mock-auth');
 const { apiLimiter, authLimiter } = require('./middlewares/rate-limit');
 const rebuildSite = require('./middlewares/rebuild-site');
+const { publicCache, clearOnChange } = require('./middlewares/public-cache');
 
 // Routes
 const authRoutes = require('./routes/auth-route');
@@ -118,6 +119,13 @@ app.get('/health', async (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+
+// The landing page's public data is remembered for a few minutes; any change clears it
+app.use('/api/v1', clearOnChange);
+app.get([
+    '/api/v1/settings', '/api/v1/settings/highlights', '/api/v1/tours/recommended',
+    '/api/v1/destinations', '/api/v1/collections',
+], publicCache);
 
 // Changes to anything the prerendered pages show (content, reviews, settings) rebuild the site
 app.use([

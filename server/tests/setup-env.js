@@ -11,3 +11,5 @@ process.env.RATE_LIMIT_SEARCH_MAX = '100000';
 process.env.FLIGHT_PROVIDER = 'mock';
 process.env.HOTEL_PROVIDER = 'mock';
 process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'error';
+// Tests change data straight through the models, so the landing page cache is off unless a test turns it on
+process.env.PUBLIC_CACHE_TTL_MS = '0';
