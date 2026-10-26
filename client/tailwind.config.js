@@ -71,7 +71,12 @@ export default {
                 "float": {
                     "0%, 100%": { transform: "translateY(0)" },
                     "50%": { transform: "translateY(-10px)" },
-                }
+                },
+                // Fills a progress bar; its duration is set where it's used
+                "fill-x": {
+                    from: { transform: "scaleX(0)" },
+                    to: { transform: "scaleX(1)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
