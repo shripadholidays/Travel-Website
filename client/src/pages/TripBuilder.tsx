@@ -5,7 +5,7 @@ import {
     useDroppable, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragStartEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { AlertTriangle, GripVertical, Lightbulb, Loader2, MapPinned, Package, RotateCcw, Trash2, X } from "lucide-react";
+import { AlertTriangle, GripVertical, Lightbulb, Loader2, MapPinned, MessageSquareText, Package, RotateCcw, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,7 +16,7 @@ import { RouteBoard } from "@/components/trip-builder/RouteBoard";
 import { DayPlanner } from "@/components/trip-builder/DayPlanner";
 import { TripSummary } from "@/components/trip-builder/TripSummary";
 import { SendTripDialog } from "@/components/trip-builder/SendTripDialog";
-import { StepHeading, thumb, useAnimatedNumber, type DragData, type DropData } from "@/components/trip-builder/shared";
+import { thumb, useAnimatedNumber, type DragData, type DropData } from "@/components/trip-builder/shared";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useTripBuilder } from "@/hooks/use-trip-builder";
 import { useTour } from "@/hooks/use-tours";
@@ -273,10 +273,10 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                 description="Pick your places, nights, hotels and extras, plan each day, and see your estimated budget straight away, priced for the season. Our team confirms your final price within 24 hours."
             />
             <Container>
-                <header className="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <header className="mb-6 lg:mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                     <div className="min-w-0">
                         <h1 className="text-4xl md:text-5xl font-display font-bold text-balance">Build your own trip</h1>
-                        <p className="text-lg text-muted-foreground mt-2 text-pretty max-w-2xl">
+                        <p className="text-muted-foreground mt-1 text-pretty max-w-xl">
                             Drag in the places you want, set the nights, plan your days. Your budget updates as you go, priced for the season you travel in.
                         </p>
                     </div>
@@ -307,12 +307,12 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                 </header>
 
                 <DndContext sensors={sensors} collisionDetection={collision} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setActive(null)}>
-                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,21rem)_minmax(0,1fr)_minmax(0,22rem)] lg:items-start">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,21rem)] lg:items-start">
                         <aside className={cn(panel === "places" ? "block" : "hidden", "lg:block lg:sticky lg:top-24 min-w-0")}>
                             <PlacePalette places={visiblePlaces} catalogue={catalogue} stops={draft.stops} inTrip={inTrip} onAdd={(p) => addPlace(p.id)} full={full} />
                         </aside>
 
-                        <main className={cn(panel === "trip" ? "block" : "hidden", "lg:block space-y-10 min-w-0")}>
+                        <main className={cn(panel === "trip" ? "block" : "hidden", "lg:block space-y-8 min-w-0")}>
                             <div>
                                 <label htmlFor="trip-title" className="sr-only">Trip name</label>
                                 <input
@@ -321,20 +321,20 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                                     onChange={(e) => update({ title: e.target.value })}
                                     maxLength={120}
                                     placeholder={routeLabel || "Name your trip"}
-                                    className="w-full bg-transparent text-2xl font-semibold text-slate-900 placeholder:text-slate-400 border-b border-transparent hover:border-slate-200 focus:border-brand-orange focus:outline-none py-1 transition-colors"
+                                    className="w-full bg-transparent text-xl font-semibold text-slate-900 placeholder:text-slate-400 border-b border-transparent hover:border-slate-200 focus:border-brand-orange focus:outline-none py-1 transition-colors"
                                 />
                             </div>
                             <RouteBoard stops={draft.stops} places={places} catalogue={catalogue} route={route} onNights={setNights} onRemove={removeStop} placeDragging={active?.type === "place"} />
                             {(stopping.length > 0 || tips.length > 0) && (
                                 <div className="space-y-2" aria-live="polite">
                                     {stopping.map((i) => (
-                                        <p key={i.message} role="alert" className="flex gap-2.5 rounded-2xl bg-amber-50 text-amber-950 text-base px-4 py-3 text-pretty ring-1 ring-amber-200">
-                                            <AlertTriangle className="size-5 shrink-0 mt-0.5 text-amber-600" aria-hidden /> {i.message}
+                                        <p key={i.message} role="alert" className="flex gap-2.5 rounded-2xl bg-amber-50 text-amber-900 text-sm px-4 py-3 text-pretty">
+                                            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" aria-hidden /> {i.message}
                                         </p>
                                     ))}
                                     {tips.map((i) => (
-                                        <p key={i.message} className="flex gap-2.5 rounded-2xl bg-sky-50 text-sky-950 text-base px-4 py-3 text-pretty">
-                                            <Lightbulb className="size-5 shrink-0 mt-0.5 text-sky-600" aria-hidden /> {i.message}
+                                        <p key={i.message} className="flex gap-2.5 rounded-2xl bg-sky-50 text-sky-900 text-sm px-4 py-3 text-pretty">
+                                            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-sky-600" aria-hidden /> {i.message}
                                         </p>
                                     ))}
                                 </div>
@@ -352,8 +352,13 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                                 onRemoveItem={(id) => setStops((stops) => removeItem(stops, id))}
                                 planDragging={active?.type === "idea" || active?.type === "item"}
                             />
-                            <section aria-labelledby="wishes-heading">
-                                <StepHeading id="wishes-heading" step={4} title="Anything else you'd like?" hint="A place not in the list, a special stay, a celebration, food needs, or the city you're leaving from." />
+                            <section aria-labelledby="wishes-heading" className="rounded-3xl bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_0_0_1px_rgba(15,23,42,0.06)]">
+                                <h2 id="wishes-heading" className="font-semibold text-slate-900 flex items-center gap-2">
+                                    <MessageSquareText className="w-4 h-4 text-brand-orange" aria-hidden /> Anything else you'd like?
+                                </h2>
+                                <p className="text-xs text-muted-foreground mt-0.5 mb-3 text-pretty">
+                                    Tell us about anything you couldn't add above: a place not in the list, a special stay, a celebration, food needs, or the city you're leaving from.
+                                </p>
                                 <label htmlFor="trip-wishes" className="sr-only">Anything else you'd like</label>
                                 <Textarea
                                     id="trip-wishes"
@@ -362,13 +367,13 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                                     value={draft.notes}
                                     onChange={(e) => update({ notes: e.target.value })}
                                     placeholder="For example: we'd like a stop in Kasol, a houseboat with a private deck, and it's our anniversary on day 4."
-                                    className="rounded-2xl resize-y text-base sm:text-sm p-3.5 bg-white"
+                                    className="rounded-2xl resize-y"
                                 />
-                                <p className="text-xs text-muted-foreground mt-1.5 text-right tabular-nums">{draft.notes.length}/2000</p>
+                                <p className="text-[11px] text-muted-foreground mt-1.5 text-right tabular-nums">{draft.notes.length}/2000</p>
                             </section>
                         </main>
 
-                        <aside className={cn(panel === "summary" ? "block" : "hidden", "lg:block lg:col-start-2 xl:col-start-auto xl:sticky xl:top-24 min-w-0")}>
+                        <aside className={cn(panel === "summary" ? "block" : "hidden", "lg:block lg:sticky lg:top-24 min-w-0")}>
                             {tooLong && (
                                 <p className="mb-3 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3" role="alert">
                                     Trips can be up to {catalogue.maxNights} nights. Take off {estimate.nights - catalogue.maxNights} to send this one.
@@ -464,7 +469,7 @@ function DragPreview({ data, catalogue, draft }: { data: DragData; catalogue: Tr
         return x ? <div className={cn(card, "py-2.5 px-4 text-sm font-medium")}>{x.label}</div> : null;
     }
     const title = data.type === "idea" ? data.idea.title : data.title;
-    return <div className={cn(card, "py-2 px-3 text-sm font-medium max-w-xs")}><GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden />{title}</div>;
+    return <div className={cn(card, "py-2 px-3 text-[13px] font-medium max-w-xs")}><GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden />{title}</div>;
 }
 
 function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
@@ -475,14 +480,14 @@ function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
     const tabs: { id: Panel; label: string }[] = [
         { id: "places", label: "Places" },
         { id: "trip", label: stops ? `Your trip (${stops})` : "Your trip" },
-        { id: "summary", label: "Budget & send" },
+        { id: "summary", label: "Price & send" },
     ];
     return (
         <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center justify-between gap-3 px-4 pt-2.5">
                 <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground leading-none">Your estimated budget</p>
-                    <p className="text-base font-bold tabular-nums text-slate-900 truncate mt-0.5">{stops ? `${format(shownLow)} – ${format(shownHigh)}` : "Add a place"}</p>
+                    <p className="text-[11px] text-muted-foreground leading-none">Your estimated budget</p>
+                    <p className="font-bold tabular-nums text-slate-900 truncate">{stops ? `${format(shownLow)} – ${format(shownHigh)}` : "Add a place"}</p>
                 </div>
                 <Button variant="brand" size="sm" className="shrink-0 rounded-full px-4" disabled={!stops} onClick={onSend}>Send my trip</Button>
             </div>
@@ -495,7 +500,7 @@ function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
                         aria-selected={panel === t.id}
                         onClick={() => { setPanel(t.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                         className={cn(
-                            "h-11 rounded-xl text-sm font-semibold transition-colors",
+                            "h-10 rounded-xl text-xs font-semibold transition-colors",
                             panel === t.id ? "bg-brand-blue text-white" : "text-slate-600 hover:bg-slate-100",
                         )}
                     >

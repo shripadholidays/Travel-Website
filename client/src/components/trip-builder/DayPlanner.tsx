@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Lightbulb, Plane, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BuilderActivity, BuilderPlace, DaySlot, DraftStop, PlanItem } from "@/lib/trip-builder";
-import { StepHeading, type DragData, type DropData } from "./shared";
+import type { DragData, DropData } from "./shared";
 
 interface Props {
     stops: DraftStop[];
@@ -24,7 +24,10 @@ export function DayPlanner({ stops, places, onAddIdea, onAddOwn, onRemoveItem, p
 
     return (
         <section aria-labelledby="days-heading">
-            <StepHeading id="days-heading" step={3} title="Plan your days" hint="Tap or drag ideas into days. Optional: we can plan it for you." />
+            <div className="flex items-baseline justify-between gap-2 mb-3">
+                <h2 id="days-heading" className="font-semibold text-slate-900">Day by day</h2>
+                <p className="text-xs text-muted-foreground">Drag ideas into days, or plans between days</p>
+            </div>
             <div className="space-y-5">
                 {stops.map((stop) => {
                     const place = places.get(stop.placeId);
@@ -35,7 +38,7 @@ export function DayPlanner({ stops, places, onAddIdea, onAddOwn, onRemoveItem, p
                     const ideas = place.activities.filter((a) => !used.has(a.title));
                     return (
                         <div key={stop.uid} className="rounded-3xl bg-slate-50/80 p-3 sm:p-4 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.05)]">
-                            <h3 className="text-base font-semibold text-slate-900 mb-3 px-1">
+                            <h3 className="text-sm font-semibold text-slate-900 mb-3 px-1">
                                 {place.name}
                                 <span className="font-normal text-muted-foreground tabular-nums"> · {stop.nights === 1 ? `Day ${first}` : `Days ${first}–${first + stop.nights - 1}`}</span>
                             </h3>
@@ -54,8 +57,8 @@ export function DayPlanner({ stops, places, onAddIdea, onAddOwn, onRemoveItem, p
                             </div>
                             {ideas.length > 0 && (
                                 <div className="mt-3 px-1">
-                                    <p className="text-sm font-medium text-slate-600 mb-2 flex items-center gap-1.5">
-                                        <Lightbulb className="size-4 text-amber-500" aria-hidden /> Ideas for {place.name}
+                                    <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1.5">
+                                        <Lightbulb className="w-3.5 h-3.5 text-amber-500" aria-hidden /> Ideas for {place.name}
                                     </p>
                                     <div className="flex flex-wrap gap-1.5">
                                         {ideas.map((idea) => (
@@ -68,7 +71,7 @@ export function DayPlanner({ stops, places, onAddIdea, onAddOwn, onRemoveItem, p
                     );
                 })}
                 <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_0_0_1px_rgba(15,23,42,0.06)]">
-                    <span className="inline-flex h-7 items-center rounded-full bg-slate-100 px-3 text-sm font-bold text-slate-700 tabular-nums">Day {day + 1}</span>
+                    <span className="inline-flex h-7 items-center rounded-full bg-slate-100 px-2.5 text-xs font-bold text-slate-700 tabular-nums">Day {day + 1}</span>
                     <p className="text-sm text-slate-600 flex items-center gap-1.5"><Plane className="w-4 h-4 text-slate-400" aria-hidden /> Head home</p>
                 </div>
             </div>
@@ -94,16 +97,16 @@ function DayBox({ number, slot, items, onAddOwn, onRemoveItem, highlight }: {
         <div
             ref={setNodeRef}
             className={cn(
-                "rounded-2xl bg-white p-3 min-h-[7rem] flex flex-col transition-[box-shadow,background-color] duration-150",
+                "rounded-2xl bg-white p-2.5 min-h-[6.5rem] flex flex-col transition-[box-shadow,background-color] duration-150",
                 isOver ? "shadow-[0_0_0_2px_#F97316] bg-orange-50/50" : highlight ? "shadow-[0_0_0_1.5px_rgba(249,115,22,0.35)]" : "shadow-[0_1px_2px_rgba(15,23,42,0.05),0_0_0_1px_rgba(15,23,42,0.06)]",
             )}
         >
-            <span className="inline-flex self-start h-6 items-center rounded-full bg-brand-blue px-2.5 text-xs font-bold text-white tabular-nums mb-2">Day {number}</span>
+            <span className="inline-flex self-start h-6 items-center rounded-full bg-brand-blue px-2.5 text-[11px] font-bold text-white tabular-nums mb-2">Day {number}</span>
             <SortableContext items={items.map((x) => `item:${x.uid}`)} strategy={verticalListSortingStrategy}>
                 <ul className="space-y-1.5 flex-1">
                     {items.map((item) => <PlanChip key={item.uid} item={item} slot={slot} onRemove={() => onRemoveItem(item.uid)} />)}
                     {items.length === 0 && !adding && (
-                        <li className="text-sm text-muted-foreground px-1 py-2">Free day. Drop an idea here.</li>
+                        <li className="text-xs text-muted-foreground px-1 py-2">Free day. Drop an idea here.</li>
                     )}
                 </ul>
             </SortableContext>
@@ -125,7 +128,7 @@ function DayBox({ number, slot, items, onAddOwn, onRemoveItem, highlight }: {
                 <button
                     type="button"
                     onClick={() => setAdding(true)}
-                    className="mt-2 self-start inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-slate-600 hover:text-brand-orange hover:bg-orange-50 transition-colors"
+                    className="mt-2 self-start inline-flex items-center gap-1 rounded-lg px-1.5 py-1 text-xs font-medium text-slate-500 hover:text-brand-orange hover:bg-orange-50 transition-colors"
                 >
                     <Plus className="w-3.5 h-3.5" aria-hidden /> Add your own
                 </button>
@@ -154,8 +157,8 @@ function PlanChip({ item, slot, onRemove }: { item: PlanItem; slot: DaySlot; onR
                 <GripVertical className="w-3.5 h-3.5" />
             </button>
             <div className="min-w-0 flex-1 py-0.5">
-                <p className="text-sm font-medium text-slate-900 leading-snug">{item.title}</p>
-                {item.note && <p className="text-xs text-slate-600 leading-snug line-clamp-2 text-pretty mt-0.5">{item.note}</p>}
+                <p className="text-[13px] font-medium text-slate-800 leading-snug">{item.title}</p>
+                {item.note && <p className="text-[11px] text-slate-500 leading-snug line-clamp-2 text-pretty">{item.note}</p>}
             </div>
             <button
                 type="button"
@@ -182,7 +185,7 @@ function IdeaChip({ placeId, idea, onAdd }: { placeId: string; idea: BuilderActi
             title={idea.note}
             aria-label={`${idea.title}. Tap to add to the freest day, or drag to a day.`}
             className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-white pl-2.5 pr-3 py-1.5 text-sm font-medium text-slate-700 shadow-[0_0_0_1px_rgba(15,23,42,0.1)] hover:shadow-[0_0_0_1px_rgba(249,115,22,0.6)] hover:text-brand-orange transition-[box-shadow,color,scale] active:scale-[0.96] cursor-grab touch-manipulation select-none",
+                "inline-flex items-center gap-1 rounded-full bg-white pl-2 pr-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-[0_0_0_1px_rgba(15,23,42,0.1)] hover:shadow-[0_0_0_1px_rgba(249,115,22,0.6)] hover:text-brand-orange transition-[box-shadow,color,scale] active:scale-[0.96] cursor-grab touch-manipulation select-none",
                 isDragging && "opacity-40",
             )}
         >
