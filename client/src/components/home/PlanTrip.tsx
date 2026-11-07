@@ -70,14 +70,13 @@ export const PlanTrip = () => {
                                     <motion.div
                                         animate={{
                                             scale: isCurrent ? 1.2 : isActive ? 1 : 0.9,
-                                            backgroundColor: isActive ? "#F97316" : "#0F172A",
-                                            borderColor: isActive ? "#F97316" : "#334155",
                                             y: isCurrent ? -10 : 0,
                                         }}
                                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                         className={cn(
-                                            "w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 border-4 shadow-xl",
-                                            isActive ? "shadow-orange-500/20" : "shadow-none"
+                                            "w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-[background-color,border-color,box-shadow] duration-300 border-4 shadow-xl",
+                                            // Colours as classes so they follow light/dark mode
+                                            isActive ? "bg-brand-orange border-brand-orange shadow-orange-500/20" : "bg-brand-blue border-slate-700 shadow-none"
                                         )}
                                     >
                                         <Icon className={cn("w-7 h-7 transition-colors duration-300", isActive ? "text-white" : "text-white/40")} />

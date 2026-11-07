@@ -35,38 +35,7 @@
     --radius: 0.75rem;
   }
 
-  /* Dark mode: navy-slate surfaces, same orange accent (colour classes flip in tailwind.dark.js) */
-  .dark {
-    color-scheme: dark;
-
-    --background: 222 49% 8%;        /* #0B1120 page */
-    --foreground: 210 40% 96%;
-
-    --card: 221 44% 13%;             /* #121B2E */
-    --card-foreground: 210 40% 96%;
-
-    --popover: 221 44% 13%;
-    --popover-foreground: 210 40% 96%;
-
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 8%;
-
-    --secondary: 220 36% 17%;        /* #1B2539 */
-    --secondary-foreground: 210 40% 96%;
-
-    --muted: 220 36% 17%;
-    --muted-foreground: 216 20% 68%;
-
-    --accent: 220 36% 17%;
-    --accent-foreground: 210 40% 96%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 219 32% 20%;           /* #222D42 */
-    --input: 219 27% 25%;
-    --ring: 25 95% 53%;
-  }
+  /* Dark mode values (theme tokens and every colour class) live in tailwind.dark.js */
 }
 
 @layer base {
@@ -99,10 +68,10 @@
     background: #94a3b8;
 }
 .dark ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: rgb(var(--c-bg-slate-300));
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: rgb(var(--c-bg-slate-400));
 }
 
 /* Switching theme: colours ease across instead of snapping (skipped for reduced motion) */
@@ -222,29 +191,29 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Map in dark mode: night-style tiles (inverted, hue kept) and dark controls */
 .dark .leaflet-container {
-  background: #0b1a2b;
+  background: rgb(var(--c-bg-slate-50));
 }
 .dark .leaflet-tile-pane {
   filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9) saturate(0.6);
 }
 .dark .leaflet-control-zoom a {
-  color: #f1f5f9 !important;
-  background: rgba(18, 27, 46, 0.92) !important;
+  color: rgb(var(--c-text-slate-900)) !important;
+  background: rgb(var(--c-bg-white) / 0.92) !important;
 }
 .dark .leaflet-control-zoom a:first-child {
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 .dark .leaflet-control-attribution {
-  background: rgba(18, 27, 46, 0.8) !important;
-  color: #8090a6 !important;
+  background: rgb(var(--c-bg-white) / 0.8) !important;
+  color: rgb(var(--c-text-slate-400)) !important;
 }
 .dark .leaflet-control-attribution a {
-  color: #b6c1d1 !important;
+  color: rgb(var(--c-text-slate-600)) !important;
 }
 .dark .leaflet-popup-content-wrapper,
 .dark .leaflet-popup-tip {
-  background: #121b2e;
-  color: #f1f5f9;
+  background: rgb(var(--c-bg-white));
+  color: rgb(var(--c-text-slate-900));
 }
 
 /* Article body (blog posts) — readable long-form type without the typography plugin */

@@ -89,7 +89,7 @@ export default {
         require("tailwindcss-animate"),
         // The colour variables behind every class, light by default and dark under .dark
         function ({ addBase }) {
-            addBase({ ':root': lightCssVars, '.dark': darkCssVars });
+            addBase({ ':root': lightCssVars, ':root.dark': darkCssVars });
         },
     ],
 }
