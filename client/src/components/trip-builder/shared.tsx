@@ -24,23 +24,7 @@ export function thumb(url: string, width = 320) {
     return /images\.unsplash\.com/.test(url) ? url.replace(/([?&])w=\d+/, `$1w=${width}`) : url;
 }
 
-/** A numbered step title, so the page reads as 1, 2, 3… */
-export function StepHeading({ id, step, title, hint, children }: { id: string; step: number; title: string; hint?: string; children?: React.ReactNode }) {
-    return (
-        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 mb-5">
-            <div className="flex items-start gap-3 min-w-0">
-                <span className="size-8 shrink-0 rounded-full bg-brand-blue text-white text-sm font-bold flex items-center justify-center tabular-nums" aria-hidden>{step}</span>
-                <div className="min-w-0">
-                    <h2 id={id} className="text-xl font-semibold text-slate-900 text-balance leading-8">{title}</h2>
-                    {hint && <p className="text-sm text-muted-foreground text-pretty mt-0.5">{hint}</p>}
-                </div>
-            </div>
-            {children}
-        </div>
-    );
-}
-
-const reducedMotion =() => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const reducedMotion = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 /** Counts smoothly from the last value to the new one, so the price visibly reacts */
 export function useAnimatedNumber(value: number, ms = 450) {

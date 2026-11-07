@@ -5,7 +5,7 @@ import {
     useDroppable, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragStartEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { AlertTriangle, GripVertical, Lightbulb, Loader2, MapPinned, Package, RotateCcw, Trash2, X } from "lucide-react";
+import { AlertTriangle, GripVertical, Lightbulb, Loader2, MapPinned, MessageSquareText, Package, RotateCcw, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,16 +14,16 @@ import { PageTitle } from "@/components/PageTitle";
 import { PlacePalette } from "@/components/trip-builder/PlacePalette";
 import { RouteBoard } from "@/components/trip-builder/RouteBoard";
 import { DayPlanner } from "@/components/trip-builder/DayPlanner";
-import { BudgetCard, TripDetails } from "@/components/trip-builder/TripSummary";
+import { TripSummary } from "@/components/trip-builder/TripSummary";
 import { SendTripDialog } from "@/components/trip-builder/SendTripDialog";
-import { StepHeading, thumb, useAnimatedNumber, type DragData, type DropData } from "@/components/trip-builder/shared";
+import { thumb, useAnimatedNumber, type DragData, type DropData } from "@/components/trip-builder/shared";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useTripBuilder } from "@/hooks/use-trip-builder";
 import { useTour } from "@/hooks/use-tours";
 import { cn } from "@/lib/utils";
 import {
     blocking, draftFromTour, emptyDraft, estimateTrip, insertItem, moveItem, newStop, placeFit, planRoute, quietestDay, removeItem, resizeStop, uid,
-    type BuilderActivity, type BuilderPlace, type DaySlot, type TripBuilderCatalogue, type TripDraft,
+    type BuilderActivity, type DaySlot, type TripBuilderCatalogue, type TripDraft,
 } from "@/lib/trip-builder";
 
 const STORAGE_KEY = "wandeazy.tripDraft";
@@ -273,129 +273,121 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                 description="Pick your places, nights, hotels and extras, plan each day, and see your estimated budget straight away, priced for the season. Our team confirms your final price within 24 hours."
             />
             <Container>
-                <header className="mb-10 lg:mb-12 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+                <header className="mb-6 lg:mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                     <div className="min-w-0">
                         <h1 className="text-4xl md:text-5xl font-display font-bold text-balance">Build your own trip</h1>
-                        <p className="text-lg text-muted-foreground mt-3 text-pretty max-w-2xl">
-                            Pick your places, set the nights and plan your days. Your budget updates as you go, priced for the season you travel in.
+                        <p className="text-muted-foreground mt-1 text-pretty max-w-xl">
+                            Drag in the places you want, set the nights, plan your days. Your budget updates as you go, priced for the season you travel in.
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2.5">
+                    <div className="flex flex-wrap items-center gap-2">
                         {draft.basedOn && (
-                            <span className="inline-flex items-center gap-2 rounded-full bg-orange-50 text-orange-900 pl-3.5 pr-1.5 py-1.5 text-sm font-medium">
-                                <Package className="size-4" aria-hidden /> Based on {draft.basedOn}
-                                <button type="button" onClick={() => update({ basedOn: undefined })} aria-label="Not based on a package" className="size-6 rounded-full flex items-center justify-center hover:bg-orange-100">
-                                    <X className="size-3.5" />
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 text-orange-800 pl-3 pr-1 py-1 text-xs font-medium">
+                                <Package className="w-3.5 h-3.5" aria-hidden /> Based on {draft.basedOn}
+                                <button type="button" onClick={() => update({ basedOn: undefined })} aria-label="Not based on a package" className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-orange-100">
+                                    <X className="w-3 h-3" />
                                 </button>
                             </span>
                         )}
-                        <Button variant="outline" asChild>
-                            <Link to="/tours"><Package className="size-4 mr-2" aria-hidden /> Start from a package</Link>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link to="/tours"><Package className="w-4 h-4 mr-1.5" aria-hidden /> Start from a package</Link>
                         </Button>
                         {draft.stops.length > 0 && (confirmReset ? (
-                            <span className="inline-flex items-center gap-1 text-base">
+                            <span className="inline-flex items-center gap-1 text-sm">
                                 Clear everything?
-                                <Button variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => { setDraft(emptyDraft(catalogue)); setConfirmReset(false); setPanel("places"); }}>Yes</Button>
-                                <Button variant="ghost" onClick={() => setConfirmReset(false)}>No</Button>
+                                <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => { setDraft(emptyDraft(catalogue)); setConfirmReset(false); setPanel("places"); }}>Yes</Button>
+                                <Button size="sm" variant="ghost" onClick={() => setConfirmReset(false)}>No</Button>
                             </span>
                         ) : (
-                            <Button variant="ghost" onClick={() => setConfirmReset(true)}>
-                                <RotateCcw className="size-4 mr-2" aria-hidden /> Start over
+                            <Button variant="ghost" size="sm" onClick={() => setConfirmReset(true)}>
+                                <RotateCcw className="w-4 h-4 mr-1.5" aria-hidden /> Start over
                             </Button>
                         ))}
                     </div>
                 </header>
 
                 <DndContext sensors={sensors} collisionDetection={collision} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setActive(null)}>
-                    <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-12">
-                        <div className="min-w-0 space-y-14">
-                            <div className={cn(panel === "places" ? "block" : "hidden", "lg:block")}>
-                                <PlacePalette places={visiblePlaces} catalogue={catalogue} stops={draft.stops} inTrip={inTrip} onAdd={(p) => addPlace(p.id)} full={full} />
-                            </div>
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,21rem)] lg:items-start">
+                        <aside className={cn(panel === "places" ? "block" : "hidden", "lg:block lg:sticky lg:top-24 min-w-0")}>
+                            <PlacePalette places={visiblePlaces} catalogue={catalogue} stops={draft.stops} inTrip={inTrip} onAdd={(p) => addPlace(p.id)} full={full} />
+                        </aside>
 
-                            <div className={cn(panel === "trip" ? "block" : "hidden", "lg:block space-y-14")}>
-                                <div>
-                                    <RouteBoard
-                                        stops={draft.stops}
-                                        places={places}
-                                        catalogue={catalogue}
-                                        route={route}
-                                        onNights={setNights}
-                                        onRemove={removeStop}
-                                        placeDragging={active?.type === "place"}
-                                    />
-                                    {(stopping.length > 0 || tips.length > 0) && (
-                                        <div className="space-y-2.5 mt-4" aria-live="polite">
-                                            {stopping.map((i) => (
-                                                <p key={i.message} role="alert" className="flex gap-3 rounded-2xl bg-amber-50 text-amber-950 text-base px-4 py-3.5 text-pretty ring-1 ring-amber-200">
-                                                    <AlertTriangle className="size-5 shrink-0 mt-0.5 text-amber-600" aria-hidden /> {i.message}
-                                                </p>
-                                            ))}
-                                            {tips.map((i) => (
-                                                <p key={i.message} className="flex gap-3 rounded-2xl bg-sky-50 text-sky-950 text-base px-4 py-3.5 text-pretty">
-                                                    <Lightbulb className="size-5 shrink-0 mt-0.5 text-sky-600" aria-hidden /> {i.message}
-                                                </p>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {draft.stops.length > 0 && (
-                                        <div className="mt-5 max-w-lg">
-                                            <label htmlFor="trip-title" className="text-sm font-medium text-slate-700">Name your trip <span className="text-muted-foreground font-normal">(optional)</span></label>
-                                            <input
-                                                id="trip-title"
-                                                value={draft.title}
-                                                onChange={(e) => update({ title: e.target.value })}
-                                                maxLength={120}
-                                                placeholder={routeLabel}
-                                                className="mt-1.5 w-full rounded-xl border border-input bg-white px-3.5 h-11 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-                                            />
-                                        </div>
-                                    )}
-                                    {draft.stops.length === 0 && (
-                                        <Button variant="outline" className="w-full mt-4 h-12 text-base lg:hidden" onClick={() => setPanel("places")}>
-                                            <MapPinned className="size-4 mr-2" aria-hidden /> Pick places
-                                        </Button>
-                                    )}
-                                </div>
-
-                                <DayPlanner
-                                    stops={draft.stops}
-                                    places={places}
-                                    onAddIdea={addIdea}
-                                    onAddOwn={addOwn}
-                                    onRemoveItem={(id) => setStops((stops) => removeItem(stops, id))}
-                                    planDragging={active?.type === "idea" || active?.type === "item"}
+                        <main className={cn(panel === "trip" ? "block" : "hidden", "lg:block space-y-8 min-w-0")}>
+                            <div>
+                                <label htmlFor="trip-title" className="sr-only">Trip name</label>
+                                <input
+                                    id="trip-title"
+                                    value={draft.title}
+                                    onChange={(e) => update({ title: e.target.value })}
+                                    maxLength={120}
+                                    placeholder={routeLabel || "Name your trip"}
+                                    className="w-full bg-transparent text-xl font-semibold text-slate-900 placeholder:text-slate-400 border-b border-transparent hover:border-slate-200 focus:border-brand-orange focus:outline-none py-1 transition-colors"
                                 />
-
-                                <TripDetails catalogue={catalogue} draft={draft} update={update} toggleExtra={toggleExtra} extraDragging={active?.type === "extra"} />
-
-                                <section aria-labelledby="wishes-heading">
-                                    <StepHeading id="wishes-heading" step={5} title="Anything else you'd like?" hint="Tell us anything you couldn't add above: a place not in the list, a special stay, a celebration, food needs, or the city you're leaving from." />
-                                    <label htmlFor="trip-wishes" className="sr-only">Anything else you'd like</label>
-                                    <Textarea
-                                        id="trip-wishes"
-                                        rows={5}
-                                        maxLength={2000}
-                                        value={draft.notes}
-                                        onChange={(e) => update({ notes: e.target.value })}
-                                        placeholder="For example: we'd like a stop in Kasol, a houseboat with a private deck, and it's our anniversary on day 4."
-                                        className="rounded-2xl resize-y text-base p-4 bg-white"
-                                    />
-                                    <p className="text-sm text-muted-foreground mt-2 text-right tabular-nums">{draft.notes.length}/2000</p>
-                                </section>
                             </div>
-                        </div>
+                            <RouteBoard stops={draft.stops} places={places} catalogue={catalogue} route={route} onNights={setNights} onRemove={removeStop} placeDragging={active?.type === "place"} />
+                            {(stopping.length > 0 || tips.length > 0) && (
+                                <div className="space-y-2" aria-live="polite">
+                                    {stopping.map((i) => (
+                                        <p key={i.message} role="alert" className="flex gap-2.5 rounded-2xl bg-amber-50 text-amber-900 text-sm px-4 py-3 text-pretty">
+                                            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" aria-hidden /> {i.message}
+                                        </p>
+                                    ))}
+                                    {tips.map((i) => (
+                                        <p key={i.message} className="flex gap-2.5 rounded-2xl bg-sky-50 text-sky-900 text-sm px-4 py-3 text-pretty">
+                                            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-sky-600" aria-hidden /> {i.message}
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
+                            {draft.stops.length === 0 && (
+                                <Button variant="outline" className="w-full lg:hidden" onClick={() => setPanel("places")}>
+                                    <MapPinned className="w-4 h-4 mr-2" aria-hidden /> Pick places
+                                </Button>
+                            )}
+                            <DayPlanner
+                                stops={draft.stops}
+                                places={places}
+                                onAddIdea={addIdea}
+                                onAddOwn={addOwn}
+                                onRemoveItem={(id) => setStops((stops) => removeItem(stops, id))}
+                                planDragging={active?.type === "idea" || active?.type === "item"}
+                            />
+                            <section aria-labelledby="wishes-heading" className="rounded-3xl bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_0_0_1px_rgba(15,23,42,0.06)]">
+                                <h2 id="wishes-heading" className="font-semibold text-slate-900 flex items-center gap-2">
+                                    <MessageSquareText className="w-4 h-4 text-brand-orange" aria-hidden /> Anything else you'd like?
+                                </h2>
+                                <p className="text-xs text-muted-foreground mt-0.5 mb-3 text-pretty">
+                                    Tell us about anything you couldn't add above: a place not in the list, a special stay, a celebration, food needs, or the city you're leaving from.
+                                </p>
+                                <label htmlFor="trip-wishes" className="sr-only">Anything else you'd like</label>
+                                <Textarea
+                                    id="trip-wishes"
+                                    rows={4}
+                                    maxLength={2000}
+                                    value={draft.notes}
+                                    onChange={(e) => update({ notes: e.target.value })}
+                                    placeholder="For example: we'd like a stop in Kasol, a houseboat with a private deck, and it's our anniversary on day 4."
+                                    className="rounded-2xl resize-y"
+                                />
+                                <p className="text-[11px] text-muted-foreground mt-1.5 text-right tabular-nums">{draft.notes.length}/2000</p>
+                            </section>
+                        </main>
 
-                        <aside className={cn(panel === "summary" ? "block" : "hidden", "lg:block min-w-0")} aria-label="Your budget">
-                            <div className="lg:sticky lg:top-24 space-y-3">
-                                {tooLong && (
-                                    <p className="rounded-2xl bg-red-50 text-red-800 text-base px-4 py-3" role="alert">
-                                        Trips can be up to {catalogue.maxNights} nights. Take off {estimate.nights - catalogue.maxNights} to send this one.
-                                    </p>
-                                )}
-                                <BudgetCard catalogue={catalogue} estimate={estimate} draft={draft} onSend={trySend} />
-                                {draft.stops.length > 0 && <TripGlance draft={draft} places={places} regions={estimate.regions ?? []} />}
-                            </div>
+                        <aside className={cn(panel === "summary" ? "block" : "hidden", "lg:block lg:sticky lg:top-24 min-w-0")}>
+                            {tooLong && (
+                                <p className="mb-3 rounded-2xl bg-red-50 text-red-700 text-sm px-4 py-3" role="alert">
+                                    Trips can be up to {catalogue.maxNights} nights. Take off {estimate.nights - catalogue.maxNights} to send this one.
+                                </p>
+                            )}
+                            <TripSummary
+                                catalogue={catalogue}
+                                draft={draft}
+                                estimate={estimate}
+                                update={update}
+                                toggleExtra={toggleExtra}
+                                onSend={trySend}
+                                extraDragging={active?.type === "extra"}
+                            />
                         </aside>
                     </div>
 
@@ -477,7 +469,7 @@ function DragPreview({ data, catalogue, draft }: { data: DragData; catalogue: Tr
         return x ? <div className={cn(card, "py-2.5 px-4 text-sm font-medium")}>{x.label}</div> : null;
     }
     const title = data.type === "idea" ? data.idea.title : data.title;
-    return <div className={cn(card, "py-2 px-3 text-sm font-medium max-w-xs")}><GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden />{title}</div>;
+    return <div className={cn(card, "py-2 px-3 text-[13px] font-medium max-w-xs")}><GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden />{title}</div>;
 }
 
 function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
@@ -488,16 +480,16 @@ function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
     const tabs: { id: Panel; label: string }[] = [
         { id: "places", label: "Places" },
         { id: "trip", label: stops ? `Your trip (${stops})` : "Your trip" },
-        { id: "summary", label: "Budget & send" },
+        { id: "summary", label: "Price & send" },
     ];
     return (
-        <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
+        <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center justify-between gap-3 px-4 pt-2.5">
                 <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground leading-none">Your estimated budget</p>
-                    <p className="text-base font-bold tabular-nums text-slate-900 truncate mt-1">{stops ? `${format(shownLow)} – ${format(shownHigh)}` : "Add a place"}</p>
+                    <p className="text-[11px] text-muted-foreground leading-none">Your estimated budget</p>
+                    <p className="font-bold tabular-nums text-slate-900 truncate">{stops ? `${format(shownLow)} – ${format(shownHigh)}` : "Add a place"}</p>
                 </div>
-                <Button variant="brand" className="shrink-0 rounded-full px-5" disabled={!stops} onClick={onSend}>Send my trip</Button>
+                <Button variant="brand" size="sm" className="shrink-0 rounded-full px-4" disabled={!stops} onClick={onSend}>Send my trip</Button>
             </div>
             <div className="grid grid-cols-3 gap-1 p-2" role="tablist" aria-label="Trip builder sections">
                 {tabs.map((t) => (
@@ -508,7 +500,7 @@ function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
                         aria-selected={panel === t.id}
                         onClick={() => { setPanel(t.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                         className={cn(
-                            "h-11 rounded-xl text-sm font-semibold transition-colors",
+                            "h-10 rounded-xl text-xs font-semibold transition-colors",
                             panel === t.id ? "bg-brand-blue text-white" : "text-slate-600 hover:bg-slate-100",
                         )}
                     >
@@ -516,24 +508,6 @@ function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
                     </button>
                 ))}
             </div>
-        </div>
-    );
-}
-
-/** The route in a few lines under the budget, so the sidebar shows the whole trip at a glance */
-function TripGlance({ draft, places, regions }: { draft: TripDraft; places: Map<string, BuilderPlace>; regions: string[] }) {
-    return (
-        <div className="rounded-3xl bg-white p-5 ring-1 ring-slate-900/5 shadow-sm">
-            <p className="text-base font-semibold text-slate-900">Your trip</p>
-            {regions.length > 0 && <p className="text-sm text-muted-foreground mt-0.5">{regions.join(" + ")}</p>}
-            <ol className="mt-3 space-y-2">
-                {draft.stops.map((s, i) => (
-                    <li key={s.uid} className="flex items-center justify-between gap-3 text-base">
-                        <span className="min-w-0 truncate"><span className="text-muted-foreground tabular-nums mr-2">{i + 1}.</span>{places.get(s.placeId)?.name}</span>
-                        <span className="text-sm text-slate-600 tabular-nums shrink-0">{s.nights} {s.nights === 1 ? "night" : "nights"}</span>
-                    </li>
-                ))}
-            </ol>
         </div>
     );
 }
