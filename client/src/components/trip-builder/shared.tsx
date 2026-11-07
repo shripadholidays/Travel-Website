@@ -24,7 +24,20 @@ export function thumb(url: string, width = 320) {
     return /images\.unsplash\.com/.test(url) ? url.replace(/([?&])w=\d+/, `$1w=${width}`) : url;
 }
 
-const reducedMotion = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+/** A numbered section title, so the page reads 1, 2, 3… */
+export function StepHeading({ id, step, title, hint }: { id: string; step: number; title: string; hint?: string }) {
+    return (
+        <div className="flex items-start gap-2.5 mb-4">
+            <span className="size-7 shrink-0 rounded-full bg-brand-blue text-white text-sm font-bold flex items-center justify-center tabular-nums" aria-hidden>{step}</span>
+            <div className="min-w-0">
+                <h2 id={id} className="text-lg font-semibold text-slate-900 leading-7 text-balance">{title}</h2>
+                {hint && <p className="text-sm text-muted-foreground text-pretty">{hint}</p>}
+            </div>
+        </div>
+    );
+}
+
+const reducedMotion =() => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 /** Counts smoothly from the last value to the new one, so the price visibly reacts */
 export function useAnimatedNumber(value: number, ms = 450) {
