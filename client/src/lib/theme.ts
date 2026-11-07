@@ -21,10 +21,11 @@ function readChoice(): ThemeChoice {
         const v = localStorage.getItem(STORAGE_KEY);
         if (v === 'light' || v === 'dark' || v === 'system') return v;
     } catch { /* private mode, blocked storage */ }
-    return 'system';
+    // Light unless the visitor picks otherwise: the light design is the site's main look
+    return 'light';
 }
 
-let choice: ThemeChoice = typeof window !== 'undefined' ? readChoice() : 'system';
+let choice: ThemeChoice = typeof window !== 'undefined' ? readChoice() : 'light';
 
 export function resolve(c: ThemeChoice): ResolvedTheme {
     if (c === 'system') return media?.matches ? 'dark' : 'light';
@@ -77,7 +78,7 @@ function subscribe(l: () => void) {
 const snapshot = () => `${choice}:${resolve(choice)}`;
 
 export function useTheme() {
-    const snap = useSyncExternalStore(subscribe, snapshot, () => 'system:light');
+    const snap = useSyncExternalStore(subscribe, snapshot, () => 'light:light');
     const [c, r] = snap.split(':') as [ThemeChoice, ResolvedTheme];
     return { theme: c, resolvedTheme: r, setTheme };
 }

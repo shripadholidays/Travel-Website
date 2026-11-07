@@ -8,14 +8,14 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#F97316" />
-  <meta name="color-scheme" content="light dark" />
+  <meta name="color-scheme" content="light" />
 
   <!-- Light/dark before first paint (no white flash). Same key and rules as src/lib/theme.ts -->
   <script>
     (function () {
       try {
         var c = localStorage.getItem('wz-theme');
-        var dark = c === 'dark' || ((!c || c === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var dark = c === 'dark' || (c === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         if (dark) {
           document.documentElement.classList.add('dark');
           document.documentElement.style.colorScheme = 'dark';
