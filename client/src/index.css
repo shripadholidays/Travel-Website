@@ -34,6 +34,39 @@
 
     --radius: 0.75rem;
   }
+
+  /* Dark mode: navy-slate surfaces, same orange accent (colour classes flip in tailwind.dark.js) */
+  .dark {
+    color-scheme: dark;
+
+    --background: 222 49% 8%;        /* #0B1120 page */
+    --foreground: 210 40% 96%;
+
+    --card: 221 44% 13%;             /* #121B2E */
+    --card-foreground: 210 40% 96%;
+
+    --popover: 221 44% 13%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 8%;
+
+    --secondary: 220 36% 17%;        /* #1B2539 */
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 220 36% 17%;
+    --muted-foreground: 216 20% 68%;
+
+    --accent: 220 36% 17%;
+    --accent-foreground: 210 40% 96%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 219 32% 20%;           /* #222D42 */
+    --input: 219 27% 25%;
+    --ring: 25 95% 53%;
+  }
 }
 
 @layer base {
@@ -64,6 +97,28 @@
 }
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Switching theme: colours ease across instead of snapping (skipped for reduced motion) */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, fill 0.25s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    .theme-transition, .theme-transition * { transition: none !important; }
+}
+
+/* Dark mode: photos sit a touch dimmer so they don't glare against the dark page */
+.dark img:not([data-keep-bright]) {
+    filter: brightness(0.94);
 }
 
 /* Scroll areas inside rounded windows (tour quick view): a slim brand-orange thumb,
@@ -163,6 +218,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 .leaflet-control-attribution a {
   color: #64748b !important;
+}
+
+/* Map in dark mode: night-style tiles (inverted, hue kept) and dark controls */
+.dark .leaflet-container {
+  background: #0b1a2b;
+}
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9) saturate(0.6);
+}
+.dark .leaflet-control-zoom a {
+  color: #f1f5f9 !important;
+  background: rgba(18, 27, 46, 0.92) !important;
+}
+.dark .leaflet-control-zoom a:first-child {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .leaflet-control-attribution {
+  background: rgba(18, 27, 46, 0.8) !important;
+  color: #8090a6 !important;
+}
+.dark .leaflet-control-attribution a {
+  color: #b6c1d1 !important;
+}
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background: #121b2e;
+  color: #f1f5f9;
 }
 
 /* Article body (blog posts) — readable long-form type without the typography plugin */

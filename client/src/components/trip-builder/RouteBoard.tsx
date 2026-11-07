@@ -5,7 +5,7 @@ import { Fragment } from "react";
 import { GripVertical, MapPinned, Minus, Plane, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { zoneLabel, type BuilderPlace, type DraftStop, type RoutePlan, type TripBuilderCatalogue } from "@/lib/trip-builder";
-import { thumb, type DragData, type DropData } from "./shared";
+import { StepHeading, thumb, type DragData, type DropData } from "./shared";
 
 interface Props {
     stops: DraftStop[];
@@ -16,10 +16,12 @@ interface Props {
     onRemove: (stopUid: string) => void;
     /** A place is being dragged, so the route should invite the drop */
     placeDragging: boolean;
+    /** The trip name field, shown beside the heading */
+    title?: React.ReactNode;
 }
 
 /** The trip's places in order: drag to reorder, drop new places in */
-export function RouteBoard({ stops, places, catalogue, route, onNights, onRemove, placeDragging }: Props) {
+export function RouteBoard({ stops, places, catalogue, route, onNights, onRemove, placeDragging, title }: Props) {
     const drop: DropData = { type: "route" };
     const { setNodeRef, isOver } = useDroppable({ id: "route", data: drop });
     // Day numbers each stop covers
@@ -32,15 +34,15 @@ export function RouteBoard({ stops, places, catalogue, route, onNights, onRemove
 
     return (
         <section aria-labelledby="route-heading">
-            <div className="flex items-baseline justify-between gap-2 mb-3">
-                <h2 id="route-heading" className="font-semibold text-slate-900">Your route</h2>
-                {stops.length > 1 && <p className="text-xs text-muted-foreground">Drag to change the order</p>}
-            </div>
+            <StepHeading id="route-heading" step={2} title="Your route" hint={stops.length > 1 ? "Set the nights in each place. Drag the handle to change the order." : "Set how many nights you stay in each place."}>
+                {title}
+            </StepHeading>
             {route.regions.length > 0 && (
-                <ul className="flex flex-wrap gap-1.5 mb-3" aria-label="Regions this trip covers">
+                <ul className="flex flex-wrap items-center gap-2 mb-4" aria-label="Regions this trip covers">
+                    <li className="text-sm text-muted-foreground mr-1">{route.regions.length === 1 ? "Region:" : "Regions:"}</li>
                     {route.regions.map((id, i) => (
                         <li key={id} className={cn(
-                            "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                            "rounded-full px-3 py-1 text-sm font-medium",
                             i === 0 ? "bg-emerald-50 text-emerald-800" : i < (catalogue.maxRegions ?? 2) ? "bg-sky-50 text-sky-800" : "bg-amber-50 text-amber-900",
                         )}>
                             {zoneLabel(catalogue, id)}
@@ -62,12 +64,12 @@ export function RouteBoard({ stops, places, catalogue, route, onNights, onRemove
                         <div className="w-12 h-12 rounded-2xl bg-orange-100 text-brand-orange flex items-center justify-center mx-auto mb-3">
                             <MapPinned className="w-6 h-6" aria-hidden />
                         </div>
-                        <p className="font-medium text-slate-900">Drop your first place here</p>
-                        <p className="text-sm text-muted-foreground mt-1 text-pretty">Drag a place from the list, or tap its + button. Add as many as you like, in any order.</p>
+                        <p className="text-lg font-semibold text-slate-900">Your route is empty</p>
+                        <p className="text-base text-muted-foreground mt-1 text-pretty max-w-md mx-auto">Tap Add on a place above, or drag it here. Add as many as you like, in any order.</p>
                     </div>
                 ) : (
                     <SortableContext items={stops.map((s) => `stop:${s.uid}`)} strategy={verticalListSortingStrategy}>
-                        <ol className="space-y-2">
+                        <ol className="space-y-3">
                             {stops.map((s, i) => {
                                 const place = places.get(s.placeId);
                                 if (!place) return null;
@@ -84,9 +86,8 @@ export function RouteBoard({ stops, places, catalogue, route, onNights, onRemove
                                             onRemove={() => onRemove(s.uid)}
                                         />
                                         {hop && (
-                                            <li aria-label={`Travel to ${zoneLabel(catalogue, hop.to)}`} className="flex items-center gap-2 pl-6 text-xs font-medium text-sky-800">
-                                                <span className="h-px flex-1 max-w-6 bg-sky-200" aria-hidden />
-                                                <Plane className="w-3.5 h-3.5" aria-hidden />
+                                            <li aria-label={`Travel to ${zoneLabel(catalogue, hop.to)}`} className="flex items-center gap-2 rounded-xl bg-sky-50 px-4 py-2.5 text-sm font-medium text-sky-900">
+                                                <Plane className="size-4 shrink-0" aria-hidden />
                                                 Travel to {zoneLabel(catalogue, hop.to)} · flight or train added to your budget
                                             </li>
                                         )}
@@ -113,8 +114,8 @@ function StopCard({ stop, place, index, last, days, onNights, onRemove }: {
     return (
         <li ref={setNodeRef} style={style} className={cn("relative", isDragging && "z-10 opacity-40")}>
             {/* The line joining one stop to the next */}
-            {!last && <span aria-hidden className="absolute left-[2.15rem] top-full h-2 w-0.5 bg-slate-200" />}
-            <div className="flex items-center gap-2.5 rounded-2xl bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_0_0_1px_rgba(15,23,42,0.06)]">
+            {!last && <span aria-hidden className="absolute left-[2.6rem] top-full h-3 w-0.5 bg-slate-200" />}
+            <div className="flex items-center gap-3 rounded-2xl bg-white p-2.5 sm:p-3 shadow-sm ring-1 ring-slate-900/5">
                 <button
                     ref={setActivatorNodeRef}
                     {...listeners}
@@ -126,14 +127,14 @@ function StopCard({ stop, place, index, last, days, onNights, onRemove }: {
                     <GripVertical className="w-4 h-4" />
                 </button>
                 <div className="relative shrink-0">
-                    <img src={thumb(place.image, 160)} alt="" className="w-12 h-12 rounded-xl object-cover outline outline-1 -outline-offset-1 outline-black/10" />
-                    <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-brand-blue text-white text-[11px] font-bold flex items-center justify-center tabular-nums ring-2 ring-white">
+                    <img src={thumb(place.image, 160)} alt="" className="size-14 sm:size-16 rounded-xl object-cover outline outline-1 -outline-offset-1 outline-black/10" />
+                    <span className="absolute -top-2 -left-2 size-6 rounded-full bg-brand-blue text-white text-xs font-bold flex items-center justify-center tabular-nums ring-2 ring-white">
                         {index + 1}
                     </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm text-slate-900 truncate">{place.name}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums">
+                    <p className="font-semibold text-base text-slate-900 truncate">{place.name}</p>
+                    <p className="text-sm text-muted-foreground tabular-nums">
                         {days[0] === days[1] ? `Day ${days[0]}` : `Days ${days[0]}–${days[1]}`}
                     </p>
                 </div>
@@ -143,11 +144,11 @@ function StopCard({ stop, place, index, last, days, onNights, onRemove }: {
                         onClick={() => onNights(stop.nights - 1)}
                         disabled={stop.nights <= place.minNights}
                         aria-label={`One night less in ${place.name}`}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 transition-[background-color,scale] active:scale-[0.96]"
+                        className="size-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-white disabled:opacity-30 transition-[background-color,scale] active:scale-[0.96]"
                     >
                         <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="min-w-[3.25rem] text-center text-xs font-semibold tabular-nums text-slate-800" aria-live="polite">
+                    <span className="min-w-[4.5rem] text-center text-sm font-semibold tabular-nums text-slate-800" aria-live="polite">
                         {stop.nights} {stop.nights === 1 ? "night" : "nights"}
                     </span>
                     <button
@@ -155,7 +156,7 @@ function StopCard({ stop, place, index, last, days, onNights, onRemove }: {
                         onClick={() => onNights(stop.nights + 1)}
                         disabled={stop.nights >= place.maxNights}
                         aria-label={`One night more in ${place.name}`}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-slate-600 hover:bg-white disabled:opacity-30 transition-[background-color,scale] active:scale-[0.96]"
+                        className="size-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-white disabled:opacity-30 transition-[background-color,scale] active:scale-[0.96]"
                     >
                         <Plus className="w-3.5 h-3.5" />
                     </button>

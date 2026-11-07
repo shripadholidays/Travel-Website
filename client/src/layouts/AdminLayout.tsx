@@ -5,6 +5,7 @@ import {
     FileText, Globe, Menu, X, ExternalLink,
     Home, Layers, MessageSquare, Mail, Star,
     CreditCard, HelpCircle, Info, Tag, Plane, History, Route } from 'lucide-react';
+import { ThemeToggle, ThemeSegmented } from '@/components/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { PageTitle } from '@/components/PageTitle';
@@ -171,6 +172,10 @@ export const AdminLayout = () => {
                             </div>
                         </div>
                     )}
+                    <div className="flex items-center justify-between gap-2 px-4 py-1.5">
+                        <span className="text-sm font-medium text-slate-600">Theme</span>
+                        <ThemeSegmented className="[&_span]:hidden" />
+                    </div>
                     <Link
                         to="/"
                         className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
@@ -237,6 +242,7 @@ export const AdminLayout = () => {
                 {hasPermission(user, 'dashboard.view') && section !== 'Dashboard' && (
                     <span className="ml-auto truncate text-sm font-semibold text-slate-600">{section}</span>
                 )}
+                <ThemeToggle className={cn("shrink-0 text-slate-600 hover:bg-slate-100", !(hasPermission(user, 'dashboard.view') && section !== 'Dashboard') && "ml-auto")} />
             </header>
 
             {/* Main content */}

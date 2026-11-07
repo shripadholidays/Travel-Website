@@ -145,7 +145,7 @@ const DesktopHero = ({ slides }: { slides: HeroSlide[] }) => {
                                                 Immerse yourself in the world's most breathtaking landscapes. Your journey begins here.
                                             </p>
 
-                                            <Button asChild className="bg-white text-black hover:bg-brand-orange hover:text-white rounded-full px-8 py-6 text-lg font-bold group transition-all duration-300">
+                                            <Button asChild className="bg-snow text-ink hover:bg-brand-orange hover:text-white rounded-full px-8 py-6 text-lg font-bold group transition-all duration-300">
                                                 <Link to={slide.ctaLink || "/destinations"}>
                                                     {slide.ctaLabel || `Explore ${slide.subtitle}`}
                                                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -275,7 +275,7 @@ const MobileHero = ({ slides }: { slides: HeroSlide[] }) => {
                         <motion.div variants={textItem} className="flex items-center justify-between">
                             <Link
                                 to={slide.ctaLink || "/destinations"}
-                                className="inline-flex h-12 items-center gap-2 rounded-full bg-white pl-6 pr-5 text-[15px] font-semibold text-black transition-transform duration-150 active:scale-[0.96]"
+                                className="inline-flex h-12 items-center gap-2 rounded-full bg-snow pl-6 pr-5 text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.96]"
                             >
                                 {slide.ctaLabel || `Explore ${slide.subtitle}`}
                                 <ArrowRight className="h-4 w-4" strokeWidth={2} />

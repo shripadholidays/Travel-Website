@@ -54,9 +54,9 @@ export const PlaneLoader = ({ label }: { label: string }) => {
     return (
         <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-16 text-center">
             <svg viewBox="0 0 320 120" className="w-72 max-w-full h-28" aria-hidden="true">
-                <path ref={pathRef} d="M10 100 C 90 10, 230 10, 310 100" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 8" />
+                <path ref={pathRef} d="M10 100 C 90 10, 230 10, 310 100" fill="none" className="stroke-slate-300 dark:stroke-slate-600" strokeWidth="2" strokeDasharray="6 8" />
                 <circle cx="10" cy="100" r="5" fill="#F97316" />
-                <circle cx="310" cy="100" r="5" fill="#0F172A" />
+                <circle cx="310" cy="100" r="5" className="fill-brand-blue" />
                 <g ref={planeRef}>
                     <g transform="translate(-12 -12)">
                         <Plane width={24} height={24} color="#F97316" strokeWidth={2.2} />

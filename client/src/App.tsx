@@ -12,6 +12,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { AuthProvider } from '@/context/AuthContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { Toaster } from 'sonner';
+import { useTheme } from '@/lib/theme';
 import { FeatureRoute } from '@/components/FeatureGate';
 
 // Lazily loaded: every page but the homepage, so the first visit downloads only what it shows
@@ -83,7 +84,7 @@ const RootLayout = () => {
                         <Outlet />
                     </Suspense>
                 </ErrorBoundary>
-                <Toaster richColors position="top-right" />
+                <ThemedToaster />
             </CurrencyProvider>
         </AuthProvider>
     );
@@ -210,3 +211,9 @@ function App() {
 }
 
 export default App;
+
+// Toasts follow the light/dark setting
+function ThemedToaster() {
+    const { resolvedTheme } = useTheme();
+    return <Toaster richColors position="top-right" theme={resolvedTheme} />;
+}

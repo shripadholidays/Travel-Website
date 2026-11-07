@@ -8,6 +8,7 @@ import { Logo } from '@/components/ui/Logo';
 import { useCurrency, type Currency } from '@/context/CurrencyContext';
 import { useAuth } from '@/context/AuthContext';
 import { SearchDialog } from '@/components/SearchDialog';
+import { ThemeToggle, ThemeSegmented } from '@/components/ThemeToggle';
 import { usePublicSettings } from '@/hooks/use-settings';
 import {
     Select,
@@ -224,6 +225,9 @@ export const Navbar = () => {
                                 </SelectContent>
                             </Select>
 
+                            {/* Light / dark */}
+                            <ThemeToggle className={cn(textColor, hoverBg)} />
+
                             <div className={cn("h-5 w-px mx-1", isOverlay ? "bg-white/25" : "bg-slate-200")} />
 
                             {user ? (
@@ -384,6 +388,12 @@ export const Navbar = () => {
                                             {CURRENCIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
+                                </div>
+
+                                {/* Light / dark on phones */}
+                                <div className="flex items-center justify-between px-3.5 py-2">
+                                    <span className="text-sm font-medium text-slate-600">Theme</span>
+                                    <ThemeSegmented />
                                 </div>
 
                                 <div className="border-t border-slate-100 my-2" />
