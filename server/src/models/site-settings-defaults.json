@@ -191,13 +191,13 @@
     ],
     "navLinks": [
       {
-        "label": "Destinations",
-        "path": "/destinations",
+        "label": "Tours",
+        "path": "/tours",
         "order": 0
       },
       {
-        "label": "Tours",
-        "path": "/tours",
+        "label": "Destinations",
+        "path": "/destinations",
         "order": 1
       },
       {

@@ -2,6 +2,7 @@ import { Outlet, ScrollRestoration } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TourQuickView } from "@/components/tour/TourQuickView";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export const MainLayout = () => {
     return (
@@ -18,6 +19,7 @@ export const MainLayout = () => {
             </main>
             <div className="print:hidden"><Footer /></div>
             <TourQuickView />
+            <WhatsAppButton />
             <ScrollRestoration />
         </div>
     );

@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
-import { Ban, Check, GripVertical, Plane, Plus, Search } from "lucide-react";
+import { Ban, Check, GripVertical, MapPin, Plane, Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCurrency } from "@/context/CurrencyContext";
 import { cn } from "@/lib/utils";
 import { placeFit, seasonOf, type BuilderPlace, type DraftStop, type TripBuilderCatalogue } from "@/lib/trip-builder";
@@ -38,6 +39,16 @@ export function PlacePalette({ places, catalogue, stops, inTrip, onAdd, full }: 
         return ["All", ...(hasTrip ? [NEARBY] : []), ...seen.sort(), ...(places.some((p) => groupOf(p) === ABROAD) ? [ABROAD] : [])];
     }, [places, hasTrip]);
 
+    // How many places each choice shows (in the dropdown, so empty regions are obvious)
+    const counts = useMemo(() => {
+        const m = new Map<string, number>([["All", places.length]]);
+        for (const p of places) {
+            m.set(groupOf(p), (m.get(groupOf(p)) ?? 0) + 1);
+            if (fits.get(p.id) === "fits") m.set(NEARBY, (m.get(NEARBY) ?? 0) + 1);
+        }
+        return m;
+    }, [places, fits]);
+
     const q = search.trim().toLowerCase();
     const shown = places.filter((p) =>
         (active === "All" || (active === NEARBY ? fits.get(p.id) === "fits" : groupOf(p) === active)) &&
@@ -59,22 +70,27 @@ export function PlacePalette({ places, catalogue, stops, inTrip, onAdd, full }: 
                     className="pl-9 h-10 rounded-xl"
                 />
             </div>
-            <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 mb-1 [scrollbar-width:none]" role="group" aria-label="Filter by region">
-                {groups.map((g) => (
-                    <button
-                        key={g}
-                        type="button"
-                        onClick={() => setGroup(g)}
-                        aria-pressed={active === g}
-                        className={cn(
-                            "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                            active === g ? "bg-brand-blue text-white" : g === NEARBY ? "bg-emerald-50 text-emerald-800 hover:bg-emerald-100" : "bg-slate-100 text-slate-600 hover:bg-slate-200",
-                        )}
-                    >
-                        {g}
-                    </button>
-                ))}
-            </div>
+            {/* Region filter: a dropdown, so every region is reachable by tap or keyboard (no sideways scrolling) */}
+            <Select value={active} onValueChange={setGroup}>
+                <SelectTrigger aria-label="Filter by region" className="mb-3 h-10 justify-start gap-2 rounded-xl text-sm text-left [&>svg:last-child]:ml-auto">
+                    <MapPin className="h-4 w-4 shrink-0 text-brand-orange" aria-hidden />
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                    {groups.map((g) => (
+                        <Fragment key={g}>
+                            {g === ABROAD && <SelectSeparator />}
+                            <SelectItem value={g}>
+                                <span className={cn(g === NEARBY && "text-emerald-700 font-medium")}>
+                                    {g === "All" ? "All regions" : g}
+                                </span>
+                                <span className="ml-2 text-xs text-muted-foreground tabular-nums">{counts.get(g) ?? 0}</span>
+                            </SelectItem>
+                            {(g === "All" && !hasTrip) || g === NEARBY ? <SelectSeparator /> : null}
+                        </Fragment>
+                    ))}
+                </SelectContent>
+            </Select>
             <ul className="space-y-2 overflow-y-auto lg:max-h-[calc(100svh-17rem)] pr-1 -mr-1">
                 {shown.map((p) => (
                     <PlaceCard key={p.id} place={p} currency={currency} count={inTrip.get(p.id) ?? 0} onAdd={() => onAdd(p)} full={full} fit={fits.get(p.id) ?? "fits"} minNights={catalogue.multiRegionMinNights ?? 10} />

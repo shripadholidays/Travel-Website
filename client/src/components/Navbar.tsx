@@ -33,8 +33,8 @@ import { rememberReturnTo } from '@/lib/return-to';
 import { adminHome, hasPermission, isStaff } from '@/lib/admin-access';
 
 const DEFAULT_NAV = [
-    { label: 'Destinations', path: '/destinations', order: 0 },
-    { label: 'Tours', path: '/tours', order: 1 },
+    { label: 'Tours', path: '/tours', order: 0 },
+    { label: 'Destinations', path: '/destinations', order: 1 },
     { label: 'Collections', path: '/collections', order: 2 },
     { label: 'Magazine', path: '/blog', order: 3 },
     { label: 'About', path: '/about', order: 4 },

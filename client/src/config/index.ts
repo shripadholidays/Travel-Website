@@ -21,6 +21,12 @@ export const config = {
         logoText:  read('LOGO_TEXT')    || 'Wandeazy',
     },
 
+    /** WhatsApp chat button (bottom right of public pages): number with country code, digits only */
+    whatsapp: {
+        number:    (read('WHATSAPP_NUMBER') || '919406841345').replace(/\D/g, ''),
+        message:   read('WHATSAPP_MESSAGE') || 'Hi! I would like to know more about your tours.',
+    },
+
     /** Public address of the site, used for canonical links, the sitemap and structured data (no trailing slash) */
     site: {
         url:       (read('SITE_URL')    || 'https://wandeazy.com').replace(/\/+$/, ''),
