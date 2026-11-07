@@ -218,44 +218,92 @@
     ],
     "heroSlides": [
       {
-        "title": "Paradise Found",
-        "subtitle": "Pristine Beaches",
-        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
-        "color": "from-blue-500/80",
-        "ctaLink": "/tours?category=Beach",
-        "ctaLabel": "Explore Beaches"
-      },
-      {
-        "title": "Alpine Peaks",
-        "subtitle": "Mountain Escapes",
-        "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
+        "title": "Into the Himalayas",
+        "subtitle": "Hills & Mountains",
+        "description": "Snow peaks, houseboats on Dal Lake and high mountain passes: Shimla, Manali, Kashmir and Leh.",
+        "image": "/images/hero/dal-lake.webp",
         "color": "from-emerald-600/80",
-        "ctaLink": "/tours?category=Trekking",
-        "ctaLabel": "Explore Mountains"
+        "ctaLink": "/tours?category=Hill",
+        "ctaLabel": "See mountain trips",
+        "bestMonths": [
+          3,
+          4,
+          5,
+          6,
+          9,
+          10
+        ]
       },
       {
-        "title": "Urban Lights",
-        "subtitle": "City Breaks",
-        "image": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2144&auto=format&fit=crop",
-        "color": "from-purple-600/80",
-        "ctaLink": "/tours?category=City",
-        "ctaLabel": "Explore Cities"
-      },
-      {
-        "title": "Golden Sands",
-        "subtitle": "Desert Safaris",
-        "image": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=2070&auto=format&fit=crop",
+        "title": "Royal Rajasthan",
+        "subtitle": "Forts & Deserts",
+        "description": "Palaces in Jaipur, lakes in Udaipur and camel rides across the Jaisalmer dunes.",
+        "image": "/images/hero/hawa-mahal.webp",
         "color": "from-orange-600/80",
-        "ctaLink": "/tours?q=Dubai",
-        "ctaLabel": "Explore Deserts"
+        "ctaLink": "/tours?place=Rajasthan",
+        "ctaLabel": "See Rajasthan trips",
+        "bestMonths": [
+          10,
+          11,
+          12,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "title": "Deep Wilds",
-        "subtitle": "Jungle Trekking",
-        "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop",
-        "color": "from-green-800/80",
-        "ctaLink": "/tours?category=Adventure",
-        "ctaLabel": "Explore Jungles"
+        "title": "Sacred Journeys",
+        "subtitle": "Pilgrimages",
+        "description": "Char Dham, Varanasi, Vaishno Devi, Dwarka and more, with stays and travel arranged for you.",
+        "image": "/images/hero/varanasi.webp",
+        "color": "from-amber-600/80",
+        "ctaLink": "/tours?category=Pilgrimage",
+        "ctaLabel": "See pilgrimages",
+        "bestMonths": []
+      },
+      {
+        "title": "Backwaters & Beaches",
+        "subtitle": "Kerala, Goa & Andaman",
+        "description": "Houseboats on the Kerala backwaters, tea hills, and quiet beaches in Goa and the Andamans.",
+        "image": "/images/hero/alleppey.webp",
+        "color": "from-cyan-600/80",
+        "ctaLink": "/tours?category=Beach",
+        "ctaLabel": "See beach trips",
+        "bestMonths": [
+          10,
+          11,
+          12,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "title": "Beyond India",
+        "subtitle": "Dubai · Bali · Thailand",
+        "description": "Dubai, Bali, Thailand, Sri Lanka, Nepal and more, planned from India.",
+        "image": "/images/hero/dubai-marina.webp",
+        "color": "from-blue-500/80",
+        "ctaLink": "/tours?category=International",
+        "ctaLabel": "See trips abroad",
+        "bestMonths": [
+          11,
+          12,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "Your Trip, Your Way",
+        "subtitle": "Build Your Own",
+        "description": "Pick the places, set the days and watch your estimated budget as you go.",
+        "image": "/images/hero/pangong.webp",
+        "color": "from-rose-600/80",
+        "ctaLink": "/build-trip",
+        "ctaLabel": "Build my trip",
+        "bestMonths": []
       }
     ],
     "promoSlides": [
@@ -352,8 +400,10 @@
       "subtitle": "",
       "image": "",
       "color": "from-blue-500/80",
-      "ctaLink": "/destinations",
-      "ctaLabel": "Explore"
+      "ctaLink": "/tours",
+      "ctaLabel": "Explore",
+      "description": "",
+      "bestMonths": []
     },
     "promoSlides": {
       "partner": "",

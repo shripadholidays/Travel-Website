@@ -38,6 +38,8 @@ const COLOR_OPTIONS = [
     { label: 'Cyan',   value: 'from-cyan-600/80' },
 ];
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 const SECTION_NAMES: Record<string, string> = {
     offerBar: 'Offer bar', heroSlides: 'Hero slides', promoSlides: 'Promo deals', planTrip: 'Plan your trip',
     testimonials: 'Testimonials', supportSection: 'Support', navLinks: 'Navigation', footerExploreLinks: 'Footer (Explore)', footerCompanyLinks: 'Footer (Company)',
@@ -266,7 +268,7 @@ export const AdminHomepage = () => {
                             <div className="flex items-start justify-between">
                                 <div>
                                     <CardTitle>Hero Accordion Slides</CardTitle>
-                                    <CardDescription>Full-screen hero with expandable panels. Each slide has title, subtitle, image, gradient, and CTA.</CardDescription>
+                                    <CardDescription>Full-screen hero at the top of the homepage. Slides are reordered for each visitor: the one matching the tours they viewed comes first, then the ones in their best months. Each slide shows the lowest price of the tours its button links to (links like /tours?category=Hill or /tours?place=Rajasthan).</CardDescription>
                                 </div>
                                 <Badge variant="secondary">{heroSlides.length} slides</Badge>
                             </div>
@@ -276,7 +278,7 @@ export const AdminHomepage = () => {
                                 items={heroSlides}
                                 onChange={setHeroSlides}
                                 addLabel="Add slide"
-                                createEmpty={() => ({ title: '', subtitle: '', image: '', color: 'from-blue-500/80', ctaLink: '/destinations', ctaLabel: 'Explore' })}
+                                createEmpty={() => ({ title: '', subtitle: '', description: '', image: '', color: 'from-blue-500/80', ctaLink: '/tours', ctaLabel: 'Explore', bestMonths: [] })}
                                 renderItem={(slide, _i, onChange) => (
                                     <div className="space-y-3">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -296,6 +298,30 @@ export const AdminHomepage = () => {
                                                 <Label className="text-xs">CTA Link</Label>
                                                 <Input value={slide.ctaLink} onChange={e => onChange({ ...slide, ctaLink: e.target.value })} placeholder="/destinations" />
                                             </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">Description</Label>
+                                            <Textarea rows={2} value={slide.description ?? ''} onChange={e => onChange({ ...slide, description: e.target.value })} placeholder="Snow peaks, houseboats on Dal Lake and high mountain passes." />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">Best months to go</Label>
+                                            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Best months to go">
+                                                {MONTH_NAMES.map((m, i) => {
+                                                    const on = slide.bestMonths?.includes(i + 1) ?? false;
+                                                    return (
+                                                        <button
+                                                            key={m}
+                                                            type="button"
+                                                            aria-pressed={on}
+                                                            onClick={() => onChange({ ...slide, bestMonths: on ? (slide.bestMonths ?? []).filter(x => x !== i + 1) : [...(slide.bestMonths ?? []), i + 1].sort((a, b) => a - b) })}
+                                                            className={on ? 'rounded-md px-2.5 py-1 text-xs font-medium bg-brand-blue text-white' : 'rounded-md px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200'}
+                                                        >
+                                                            {m}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">In these months the slide says "Best time to go". Leave all off for trips that suit any time of year.</p>
                                         </div>
                                         <div className="space-y-1">
                                             <Label className="text-xs">Gradient Color</Label>

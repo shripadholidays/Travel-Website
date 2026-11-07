@@ -12,6 +12,10 @@ export interface HeroSlide {
     color: string;
     ctaLink: string;
     ctaLabel: string;
+    /** The line under the title */
+    description?: string;
+    /** Months (1–12) when these trips are at their best; the slide shows "Best time to go" then */
+    bestMonths?: number[];
 }
 
 export interface PromoSlide {

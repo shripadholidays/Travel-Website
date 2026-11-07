@@ -1,42 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
+import { api } from "@/services/api";
 import { usePublicSettings, type HeroSlide } from "@/hooks/use-settings";
+import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
+import { useTours } from "@/hooks/use-tours";
+import { useAuth } from "@/context/AuthContext";
+import { useCurrency } from "@/context/CurrencyContext";
+import { DEFAULT_HERO_SLIDES, inSeason, orderSlides, pickSlide, slideFilter } from "@/lib/hero-slides";
+import type { PaginatedData, Tour } from "@/types";
 
-const FALLBACK_SLIDES: HeroSlide[] = [
-    {
-        title: "Paradise Found", subtitle: "Pristine Beaches",
-        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
-        color: "from-blue-500/80", ctaLink: "/destinations", ctaLabel: "Explore",
-    },
-    {
-        title: "Alpine Peaks", subtitle: "Mountain Escapes",
-        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
-        color: "from-emerald-600/80", ctaLink: "/destinations", ctaLabel: "Explore",
-    },
-    {
-        title: "Urban Lights", subtitle: "City Breaks",
-        image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2144&auto=format&fit=crop",
-        color: "from-purple-600/80", ctaLink: "/destinations", ctaLabel: "Explore",
-    },
-    {
-        title: "Golden Sands", subtitle: "Desert Safaris",
-        image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=2070&auto=format&fit=crop",
-        color: "from-orange-600/80", ctaLink: "/destinations", ctaLabel: "Explore",
-    },
-    {
-        title: "Deep Wilds", subtitle: "Jungle Trekking",
-        image: "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop",
-        color: "from-green-800/80", ctaLink: "/destinations", ctaLabel: "Explore",
-    },
-];
+/** A slide as shown to this visitor: with a personal note and the cheapest trip it leads to */
+interface ShownSlide extends HeroSlide {
+    key: string;
+    badge?: string;
+    priceFrom?: string;
+}
 
-// The slide the desktop accordion starts with open; its photo is fetched first
-const INITIAL_SLIDE = 1;
+const FALLBACK_TEXT = "Handpicked trips across India and abroad, planned around you.";
+// The slide this visitor's recent browsing pointed to, so it can come first straight away next visit
+const PICK_KEY = "wandeazy.heroPick";
 // How long each slide stays on a phone before the next one
 const SLIDE_MS = 4000;
 const EASE_OUT = [0.2, 0, 0, 1] as const;
@@ -54,18 +42,102 @@ function useIsMobile() {
     return mobile;
 }
 
+function readPick() {
+    try { return localStorage.getItem(PICK_KEY); } catch { return null; }
+}
+
+/**
+ * Puts the slide that matches the tours this visitor looked at first ("Picked for you"), then the
+ * trips in season this month ("Best time to go"), greets signed-in travellers by name and adds
+ * the starting price of each slide's trips.
+ */
+function usePersonalSlides(base: HeroSlide[]): ShownSlide[] {
+    const { user } = useAuth();
+    const { formatPrice } = useCurrency();
+    const { ids } = useRecentlyViewed();
+    // The same request as "Recently viewed" further down the page, so it is only fetched once
+    const viewed = useTours({ ids: ids.join(","), limit: ids.length || 1 }, { enabled: ids.length > 0 });
+    const cheapest = useQueries({
+        queries: base.map((slide) => {
+            const filter = slideFilter(slide);
+            const params = { ...filter, limit: 1, sort: "price_low" };
+            const query = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined).map(([k, v]) => [k, String(v)]));
+            return {
+                queryKey: ["tours", params],
+                queryFn: () => api.get<PaginatedData<Tour>>(`/tours?${query}`),
+                enabled: !!filter,
+                staleTime: 5 * 60_000,
+            };
+        }),
+    });
+    const prices = cheapest.map((q) => q.data?.tours?.[0]);
+
+    // null until the viewed tours have loaded; until then last visit's pick stands in
+    const livePick = useMemo(() => {
+        if (!viewed.data) return null;
+        const byId = new Map(viewed.data.tours.map((t) => [t._id, t]));
+        return pickSlide(base, ids.map((id) => byId.get(id)).filter((t): t is Tour => !!t));
+    }, [viewed.data, ids, base]);
+    const picked = ids.length === 0 ? -1 : livePick ?? base.findIndex((s) => s.title === readPick());
+
+    useEffect(() => {
+        try {
+            if (ids.length === 0 || livePick === -1) localStorage.removeItem(PICK_KEY);
+            else if (livePick !== null) localStorage.setItem(PICK_KEY, base[livePick].title);
+        } catch {
+            // storage blocked: the pick just isn't remembered
+        }
+    }, [ids.length, livePick, base]);
+
+    const firstName = user?.displayName?.trim().split(/\s+/)[0];
+    const priceKey = prices.map((t) => (t ? `${t.price}${t.currency}` : "")).join("|");
+    return useMemo(() => {
+        const month = new Date().getMonth() + 1;
+        return orderSlides(base, picked, month).map(({ slide, picked: isPick }, pos) => {
+            const tour = prices[base.indexOf(slide)];
+            const notes = [
+                isPick ? (firstName ? `Picked for you, ${firstName}` : "Picked for you") : pos === 0 && firstName ? `Hi ${firstName}` : "",
+                !isPick && inSeason(slide, month) ? "Best time to go" : "",
+            ].filter(Boolean);
+            return {
+                ...slide,
+                key: slide._id ?? slide.title,
+                badge: notes.join(" · ") || undefined,
+                priceFrom: tour ? formatPrice(tour.price, tour.currency) : undefined,
+            };
+        });
+        // prices is a new array each render; priceKey says when its contents change
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [base, picked, firstName, formatPrice, priceKey]);
+}
+
 export const Hero = () => {
     const { data } = usePublicSettings();
-    const slides = (data?.settings?.heroSlides?.length ?? 0) > 0
+    const base = (data?.settings?.heroSlides?.length ?? 0) > 0
         ? data!.settings!.heroSlides
-        : FALLBACK_SLIDES;
+        : DEFAULT_HERO_SLIDES;
+    const slides = usePersonalSlides(base);
     const isMobile = useIsMobile();
 
     return isMobile ? <MobileHero slides={slides} /> : <DesktopHero slides={slides} />;
 };
 
-const DesktopHero = ({ slides }: { slides: HeroSlide[] }) => {
-    const [activeIdx, setActiveIdx] = useState(INITIAL_SLIDE);
+const SlideBadge = ({ text }: { text?: string }) => text ? (
+    <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-black/35 px-3 py-1 text-xs font-medium text-white">
+        <Sparkles className="h-3.5 w-3.5 text-brand-orange" aria-hidden />
+        {text}
+    </span>
+) : null;
+
+const PriceFrom = ({ price, className }: { price?: string; className?: string }) => price ? (
+    <p className={cn("text-white/70 tabular-nums", className)}>
+        Trips from <span className="font-semibold text-white">{price}</span>
+    </p>
+) : null;
+
+const DesktopHero = ({ slides }: { slides: ShownSlide[] }) => {
+    // The first slide (this visitor's pick, or what's in season) starts open
+    const [activeIdx, setActiveIdx] = useState(0);
 
     return (
         <div className="relative h-screen w-full overflow-hidden bg-black flex flex-col">
@@ -75,7 +147,7 @@ const DesktopHero = ({ slides }: { slides: HeroSlide[] }) => {
                     const isActive = idx === activeIdx;
                     return (
                         <motion.div
-                            key={idx}
+                            key={slide.key}
                             layout
                             onClick={() => setActiveIdx(idx)}
                             onHoverStart={() => setActiveIdx(idx)}
@@ -93,7 +165,7 @@ const DesktopHero = ({ slides }: { slides: HeroSlide[] }) => {
                                 <Image
                                     src={slide.image}
                                     alt={slide.title}
-                                    priority={idx === INITIAL_SLIDE}
+                                    priority={idx === 0}
                                     className={cn(
                                         "w-full h-full object-cover brightness-75 transition-all duration-500",
                                         isActive ? "grayscale-0" : "grayscale"
@@ -129,10 +201,11 @@ const DesktopHero = ({ slides }: { slides: HeroSlide[] }) => {
                                             transition={{ delay: 0.2, duration: 0.5 }}
                                             className="max-w-2xl"
                                         >
+                                            <SlideBadge text={slide.badge} />
                                             <motion.span
                                                 initial={{ x: -20, opacity: 0 }}
                                                 animate={{ x: 0, opacity: 1 }}
-                                                className="inline-block text-brand-orange font-bold text-sm tracking-[0.3em] uppercase mb-4"
+                                                className="block text-brand-orange font-bold text-sm tracking-[0.3em] uppercase mb-4"
                                             >
                                                 {slide.subtitle}
                                             </motion.span>
@@ -141,9 +214,10 @@ const DesktopHero = ({ slides }: { slides: HeroSlide[] }) => {
                                                 {slide.title}
                                             </h2>
 
-                                            <p className="text-white/80 text-lg md:text-xl max-w-md mb-8 font-light">
-                                                Immerse yourself in the world's most breathtaking landscapes. Your journey begins here.
+                                            <p className={cn("text-white/80 text-lg md:text-xl max-w-md font-light text-pretty", slide.priceFrom ? "mb-3" : "mb-8")}>
+                                                {slide.description || FALLBACK_TEXT}
                                             </p>
+                                            <PriceFrom price={slide.priceFrom} className="text-base mb-8" />
 
                                             <Button asChild className="bg-snow text-ink hover:bg-brand-orange hover:text-white rounded-full px-8 py-6 text-lg font-bold group transition-all duration-300">
                                                 <Link to={slide.ctaLink || "/destinations"}>
@@ -172,7 +246,7 @@ const textItem = {
  * Phones: one full-screen photo at a time that cross-fades to the next every few seconds, with
  * story-style progress bars. Swipe or tap a bar to move; holding a finger on it pauses.
  */
-const MobileHero = ({ slides }: { slides: HeroSlide[] }) => {
+const MobileHero = ({ slides }: { slides: ShownSlide[] }) => {
     const reduceMotion = useReducedMotion();
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
@@ -222,7 +296,7 @@ const MobileHero = ({ slides }: { slides: HeroSlide[] }) => {
                 const isActive = idx === active;
                 return (
                     <div
-                        key={s._id ?? idx}
+                        key={s.key}
                         aria-hidden={!isActive}
                         className={cn(
                             "absolute inset-0 transition-opacity duration-700 ease-out",
@@ -263,15 +337,21 @@ const MobileHero = ({ slides }: { slides: HeroSlide[] }) => {
                         animate="show"
                         variants={{ show: { transition: { staggerChildren: 0.05 } } }}
                     >
+                        {slide.badge && (
+                            <motion.div variants={textItem}><SlideBadge text={slide.badge} /></motion.div>
+                        )}
                         <motion.p variants={textItem} className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-brand-orange">
                             {slide.subtitle}
                         </motion.p>
                         <motion.h2 variants={textItem} className="mb-3 font-display text-[2.75rem] font-bold leading-[0.95] text-white text-balance">
                             {slide.title}
                         </motion.h2>
-                        <motion.p variants={textItem} className="mb-6 max-w-[34ch] text-[15px] leading-relaxed text-white/75 text-pretty">
-                            Immerse yourself in the world's most breathtaking landscapes. Your journey begins here.
+                        <motion.p variants={textItem} className={cn("max-w-[34ch] text-[15px] leading-relaxed text-white/75 text-pretty", slide.priceFrom ? "mb-2" : "mb-6")}>
+                            {slide.description || FALLBACK_TEXT}
                         </motion.p>
+                        {slide.priceFrom && (
+                            <motion.div variants={textItem}><PriceFrom price={slide.priceFrom} className="mb-5 text-sm" /></motion.div>
+                        )}
                         <motion.div variants={textItem} className="flex items-center justify-between">
                             <Link
                                 to={slide.ctaLink || "/destinations"}
