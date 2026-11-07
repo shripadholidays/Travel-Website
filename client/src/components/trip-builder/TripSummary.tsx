@@ -78,9 +78,9 @@ function PriceCard({ catalogue, estimate, draft, onSend }: { catalogue: TripBuil
 
     return (
         <section aria-labelledby="price-heading" className="rounded-3xl bg-brand-blue text-white p-5 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.5)]">
-            <h2 id="price-heading" className="text-xs font-medium uppercase tracking-wider text-white/70">Estimated price</h2>
+            <h2 id="price-heading" className="text-xs font-medium uppercase tracking-wider text-white/70">Your estimated budget</h2>
             {empty ? (
-                <p className="mt-2 text-lg font-semibold text-pretty">Add a place to see your price</p>
+                <p className="mt-2 text-lg font-semibold text-pretty">Add a place to see your budget</p>
             ) : (
                 <>
                     <p className="mt-1.5 text-[1.65rem] leading-tight font-bold tabular-nums" aria-live="polite">
@@ -91,23 +91,29 @@ function PriceCard({ catalogue, estimate, draft, onSend }: { catalogue: TripBuil
                         {draft.children ? ` · ${draft.children} child${draft.children === 1 ? "" : "ren"}` : ""}
                     </p>
                     <p className="text-xs text-white/60 mt-0.5 tabular-nums">About {money(perPerson[0])} – {money(perPerson[1])} a person</p>
+                    <p className="text-xs text-white/75 mt-2 flex items-start gap-1.5 text-pretty">
+                        <CalendarIcon className="w-3.5 h-3.5 shrink-0 mt-px" aria-hidden />
+                        {estimate.seasonal
+                            ? "Priced for your dates: peak and off-season rates of each place are used."
+                            : "Priced at regular-season rates. Pick a start date to see peak or off-season prices."}
+                    </p>
                     <button
                         type="button"
                         onClick={() => setOpen((o) => !o)}
                         aria-expanded={open}
                         className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-white/80 hover:text-white"
                     >
-                        What's in this price <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} aria-hidden />
+                        What's in this budget <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} aria-hidden />
                     </button>
                     {open && (
                         <ul className="mt-2 space-y-1.5 text-xs">
-                            {estimate.lines.map((l) => (
-                                <li key={l.label} className="flex justify-between gap-3">
+                            {estimate.lines.map((l, i) => (
+                                <li key={`${l.label}-${i}`} className="flex justify-between gap-3">
                                     <span className="text-white/75 min-w-0">{l.label}</span>
                                     <span className="tabular-nums whitespace-nowrap">{money(l.low)} – {money(l.high)}</span>
                                 </li>
                             ))}
-                            <li className="text-white/60 pt-1">Stays include hotel ({estimate.hotelLabel}), transfers and sightseeing.</li>
+                            <li className="text-white/60 pt-1">Stays include hotel ({estimate.hotelLabel}), breakfast, transfers and sightseeing.</li>
                         </ul>
                     )}
                 </>
@@ -117,7 +123,8 @@ function PriceCard({ catalogue, estimate, draft, onSend }: { catalogue: TripBuil
             </Button>
             <p className="mt-2.5 text-[11px] text-white/60 flex gap-1.5 text-pretty">
                 <Info className="w-3.5 h-3.5 shrink-0 mt-px" aria-hidden />
-                A price range, not a bill. Our team sends your final price within 24 hours. You pay nothing now.
+                An estimate, not a bill. It depends on availability, current market prices and the season at each place.
+                Our team sends your final price within 24 hours. You pay nothing now.
             </p>
         </section>
     );

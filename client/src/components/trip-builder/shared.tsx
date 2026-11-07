@@ -17,9 +17,10 @@ export type DropData =
     | { type: "extras" }
     | { type: "trash" };
 
-/** A smaller copy of an Unsplash photo for thumbnails; other images as they are */
+/** A smaller copy of a photo for thumbnails: our own destination photos have a "-sm" copy, Unsplash takes a width */
 export function thumb(url: string, width = 320) {
     if (!url) return url;
+    if (width <= 480 && /^\/images\/trips\/[^/]+\.webp$/.test(url)) return url.replace(/\.webp$/, "-sm.webp");
     return /images\.unsplash\.com/.test(url) ? url.replace(/([?&])w=\d+/, `$1w=${width}`) : url;
 }
 

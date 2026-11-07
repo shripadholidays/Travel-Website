@@ -84,7 +84,7 @@ export function MyCustomTrips() {
                                 </div>
                             ) : (
                                 <div>
-                                    <p className="text-xs text-muted-foreground">Estimated price</p>
+                                    <p className="text-xs text-muted-foreground">Your estimated budget</p>
                                     <p className="font-semibold text-slate-900 tabular-nums">{est ? `${formatPrice(est.low, currency)} – ${formatPrice(est.high, currency)}` : "—"}</p>
                                 </div>
                             )}

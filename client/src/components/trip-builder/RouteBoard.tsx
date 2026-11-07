@@ -1,14 +1,17 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MapPinned, Minus, Plus, X } from "lucide-react";
+import { Fragment } from "react";
+import { GripVertical, MapPinned, Minus, Plane, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { BuilderPlace, DraftStop } from "@/lib/trip-builder";
+import { zoneLabel, type BuilderPlace, type DraftStop, type RoutePlan, type TripBuilderCatalogue } from "@/lib/trip-builder";
 import { thumb, type DragData, type DropData } from "./shared";
 
 interface Props {
     stops: DraftStop[];
     places: Map<string, BuilderPlace>;
+    catalogue: TripBuilderCatalogue;
+    route: RoutePlan;
     onNights: (stopUid: string, nights: number) => void;
     onRemove: (stopUid: string) => void;
     /** A place is being dragged, so the route should invite the drop */
@@ -16,7 +19,7 @@ interface Props {
 }
 
 /** The trip's places in order: drag to reorder, drop new places in */
-export function RouteBoard({ stops, places, onNights, onRemove, placeDragging }: Props) {
+export function RouteBoard({ stops, places, catalogue, route, onNights, onRemove, placeDragging }: Props) {
     const drop: DropData = { type: "route" };
     const { setNodeRef, isOver } = useDroppable({ id: "route", data: drop });
     // Day numbers each stop covers
@@ -33,6 +36,18 @@ export function RouteBoard({ stops, places, onNights, onRemove, placeDragging }:
                 <h2 id="route-heading" className="font-semibold text-slate-900">Your route</h2>
                 {stops.length > 1 && <p className="text-xs text-muted-foreground">Drag to change the order</p>}
             </div>
+            {route.regions.length > 0 && (
+                <ul className="flex flex-wrap gap-1.5 mb-3" aria-label="Regions this trip covers">
+                    {route.regions.map((id, i) => (
+                        <li key={id} className={cn(
+                            "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                            i === 0 ? "bg-emerald-50 text-emerald-800" : i < (catalogue.maxRegions ?? 2) ? "bg-sky-50 text-sky-800" : "bg-amber-50 text-amber-900",
+                        )}>
+                            {zoneLabel(catalogue, id)}
+                        </li>
+                    ))}
+                </ul>
+            )}
             <div
                 ref={setNodeRef}
                 className={cn(
@@ -56,17 +71,26 @@ export function RouteBoard({ stops, places, onNights, onRemove, placeDragging }:
                             {stops.map((s, i) => {
                                 const place = places.get(s.placeId);
                                 if (!place) return null;
+                                const hop = route.hops.find((h) => h.after === i);
                                 return (
-                                    <StopCard
-                                        key={s.uid}
-                                        stop={s}
-                                        place={place}
-                                        index={i}
-                                        last={i === stops.length - 1}
-                                        days={ranges[i]}
-                                        onNights={(n) => onNights(s.uid, n)}
-                                        onRemove={() => onRemove(s.uid)}
-                                    />
+                                    <Fragment key={s.uid}>
+                                        <StopCard
+                                            stop={s}
+                                            place={place}
+                                            index={i}
+                                            last={i === stops.length - 1 || !!hop}
+                                            days={ranges[i]}
+                                            onNights={(n) => onNights(s.uid, n)}
+                                            onRemove={() => onRemove(s.uid)}
+                                        />
+                                        {hop && (
+                                            <li aria-label={`Travel to ${zoneLabel(catalogue, hop.to)}`} className="flex items-center gap-2 pl-6 text-xs font-medium text-sky-800">
+                                                <span className="h-px flex-1 max-w-6 bg-sky-200" aria-hidden />
+                                                <Plane className="w-3.5 h-3.5" aria-hidden />
+                                                Travel to {zoneLabel(catalogue, hop.to)} · flight or train added to your budget
+                                            </li>
+                                        )}
+                                    </Fragment>
                                 );
                             })}
                         </ol>

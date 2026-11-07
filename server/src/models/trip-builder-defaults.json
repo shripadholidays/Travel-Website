@@ -9,9 +9,9 @@
       "name": "Shimla",
       "region": "Himachal Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4600,
+      "image": "/images/trips/shimla.webp",
+      "nightlyFrom": 2300,
+      "nightlyTo": 3400,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -32,6 +32,30 @@
           "title": "Shimla",
           "note": "Jakhu, Kufri, Chail, Nature Park."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1700,
+      "offTo": 2600,
+      "peakFrom": 2800,
+      "peakTo": 4200,
+      "peakMonths": [
+        4,
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/shimla-church.webp",
+        "/images/trips/kufri.webp"
       ]
     },
     {
@@ -39,9 +63,9 @@
       "name": "Manali",
       "region": "Himachal Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4600,
+      "image": "/images/trips/manali.webp",
+      "nightlyFrom": 2400,
+      "nightlyTo": 3700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -66,6 +90,31 @@
           "title": "Solang & Sissu",
           "note": "Solang Valley, Atal Tunnel, Lahaul Valley."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1800,
+      "offTo": 2800,
+      "peakFrom": 3000,
+      "peakTo": 4500,
+      "peakMonths": [
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        2,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/solang.webp",
+        "/images/trips/rohtang.webp",
+        "/images/trips/hadimba.webp"
       ]
     },
     {
@@ -73,9 +122,9 @@
       "name": "Chandigarh",
       "region": "Punjab",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4600,
+      "image": "/images/trips/chandigarh.webp",
+      "nightlyFrom": 1700,
+      "nightlyTo": 2500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -88,6 +137,32 @@
           "title": "Chandigarh Sightseeing",
           "note": "Capitol Complex, Le Corbusier Centre, Pinjore Gardens, Government Museum."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1500,
+      "offTo": 2200,
+      "peakFrom": 1800,
+      "peakTo": 2800,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/sukhna.webp"
       ]
     },
     {
@@ -95,9 +170,9 @@
       "name": "Dharamshala & McLeod Ganj",
       "region": "Himachal Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3600,
-      "nightlyTo": 4800,
+      "image": "/images/trips/mcleodganj.webp",
+      "nightlyFrom": 2200,
+      "nightlyTo": 3200,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -118,6 +193,32 @@
           "title": "Anandpur Sahib en route",
           "note": "Anandpur Sahib en route — birthplace of the Khalsa."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1700,
+      "offTo": 2500,
+      "peakFrom": 2600,
+      "peakTo": 3800,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        6,
+        10
+      ],
+      "offMonths": [
+        1,
+        2,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/triund.webp",
+        "/images/trips/dharamshala.webp"
       ]
     },
     {
@@ -125,9 +226,9 @@
       "name": "Dalhousie & Khajjiar",
       "region": "Himachal Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3600,
-      "nightlyTo": 4800,
+      "image": "/images/trips/khajjiar.webp",
+      "nightlyFrom": 2100,
+      "nightlyTo": 3100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -140,6 +241,29 @@
           "title": "Khajjiar & Kalatop",
           "note": "Mini Switzerland Khajjiar, Kalatop Wildlife Sanctuary trek — deodar forests."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1600,
+      "offTo": 2400,
+      "peakFrom": 2500,
+      "peakTo": 3700,
+      "peakMonths": [
+        4,
+        5,
+        6
+      ],
+      "offMonths": [
+        1,
+        2,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/dalhousie.webp"
       ]
     },
     {
@@ -147,9 +271,9 @@
       "name": "Amritsar",
       "region": "Punjab",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 3600,
-      "nightlyTo": 4800,
+      "image": "/images/trips/golden-temple.webp",
+      "nightlyFrom": 1800,
+      "nightlyTo": 2700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -166,6 +290,32 @@
           "title": "Amritsar Local",
           "note": "Durgiana Temple, Gobindgarh Fort (multimedia Punjab history show). Try kulcha, lassi, makki di roti."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1500,
+      "offTo": 2200,
+      "peakFrom": 2000,
+      "peakTo": 3200,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/wagah.webp"
       ]
     },
     {
@@ -173,9 +323,9 @@
       "name": "Spiti Valley",
       "region": "Himachal Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 4500,
-      "nightlyTo": 5900,
+      "image": "/images/trips/key-monastery.webp",
+      "nightlyFrom": 2400,
+      "nightlyTo": 3800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -208,6 +358,34 @@
           "title": "Atal Tunnel or Rohtang",
           "note": "Atal Tunnel or Rohtang. Bhuntar Airport."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 2000,
+      "offTo": 3000,
+      "peakFrom": 2800,
+      "peakTo": 4500,
+      "peakMonths": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "offMonths": [
+        3,
+        4,
+        11
+      ],
+      "closedMonths": [
+        1,
+        2,
+        12
+      ],
+      "seasonNote": "roads are snowbound",
+      "images": [
+        "/images/trips/spiti.webp",
+        "/images/trips/chandratal.webp"
       ]
     },
     {
@@ -215,9 +393,9 @@
       "name": "Leh & Ladakh",
       "region": "Ladakh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 5200,
-      "nightlyTo": 6700,
+      "image": "/images/trips/pangong.webp",
+      "nightlyFrom": 3300,
+      "nightlyTo": 4700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -246,6 +424,34 @@
           "title": "Nubra Valley",
           "note": "Khardung La, Diskit, Hunder, Panamik hot springs."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 2800,
+      "offTo": 3800,
+      "peakFrom": 3800,
+      "peakTo": 5500,
+      "peakMonths": [
+        6,
+        7,
+        8
+      ],
+      "offMonths": [
+        3,
+        4,
+        11,
+        12
+      ],
+      "closedMonths": [
+        1,
+        2
+      ],
+      "seasonNote": "deep winter, most hotels shut",
+      "images": [
+        "/images/trips/leh.webp",
+        "/images/trips/nubra.webp",
+        "/images/trips/thiksey.webp"
       ]
     },
     {
@@ -253,9 +459,9 @@
       "name": "Srinagar",
       "region": "Kashmir",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/dal-lake.webp",
+      "nightlyFrom": 2500,
+      "nightlyTo": 3800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -272,6 +478,28 @@
           "title": "Patnitop & Srinagar",
           "note": "Patnitop hill station (2024m) — meadows, pine forests, beautiful. Continue Srinagar."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 2000,
+      "offTo": 3000,
+      "peakFrom": 3000,
+      "peakTo": 4500,
+      "peakMonths": [
+        4,
+        5,
+        6
+      ],
+      "offMonths": [
+        1,
+        2,
+        11
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/shikara.webp"
       ]
     },
     {
@@ -279,9 +507,9 @@
       "name": "Gulmarg",
       "region": "Kashmir",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/gulmarg.webp",
+      "nightlyFrom": 2900,
+      "nightlyTo": 4400,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -290,6 +518,28 @@
           "title": "Gulmarg",
           "note": "Gondola, snow, meadow walk."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 2200,
+      "offTo": 3200,
+      "peakFrom": 3500,
+      "peakTo": 5500,
+      "peakMonths": [
+        1,
+        2,
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        11
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/sonamarg.webp"
       ]
     },
     {
@@ -297,9 +547,9 @@
       "name": "Pahalgam",
       "region": "Kashmir",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/pahalgam.webp",
+      "nightlyFrom": 2500,
+      "nightlyTo": 3700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -308,16 +558,37 @@
           "title": "Pahalgam",
           "note": "Betaab Valley, Aru Village, Lidder River."
         }
-      ]
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 2000,
+      "offTo": 2800,
+      "peakFrom": 3000,
+      "peakTo": 4500,
+      "peakMonths": [
+        4,
+        5,
+        6
+      ],
+      "offMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "katra",
       "name": "Katra (Vaishno Devi)",
       "region": "Jammu",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5600,
+      "image": "/images/trips/vaishno-devi.webp",
+      "nightlyFrom": 1700,
+      "nightlyTo": 2900,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -326,16 +597,39 @@
           "title": "Vaishno Devi",
           "note": "Katra, trek/helicopter, darshan, return."
         }
-      ]
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1400,
+      "offTo": 2200,
+      "peakFrom": 2000,
+      "peakTo": 3500,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        6,
+        10
+      ],
+      "offMonths": [
+        1,
+        2,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "delhi",
       "name": "Delhi",
       "region": "Delhi",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
-      "nightlyFrom": 2700,
-      "nightlyTo": 3600,
+      "image": "/images/trips/india-gate.webp",
+      "nightlyFrom": 2200,
+      "nightlyTo": 3400,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -352,6 +646,36 @@
           "title": "New Delhi",
           "note": "Humayun's Tomb, Qutub Minar, Lotus Temple, Akshardham."
         }
+      ],
+      "zones": [
+        "north",
+        "rajasthan",
+        "ganga"
+      ],
+      "offFrom": 1800,
+      "offTo": 2800,
+      "peakFrom": 2500,
+      "peakTo": 4000,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/humayun.webp",
+        "/images/trips/qutub.webp",
+        "/images/trips/red-fort.webp"
       ]
     },
     {
@@ -359,9 +683,9 @@
       "name": "Agra",
       "region": "Uttar Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
-      "nightlyFrom": 2700,
-      "nightlyTo": 3600,
+      "image": "/images/trips/taj-mahal.webp",
+      "nightlyFrom": 1900,
+      "nightlyTo": 3000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -370,6 +694,34 @@
           "title": "Agra",
           "note": "Taj Mahal sunrise, Agra Fort, marble craft."
         }
+      ],
+      "zones": [
+        "north",
+        "rajasthan",
+        "ganga"
+      ],
+      "offFrom": 1600,
+      "offTo": 2500,
+      "peakFrom": 2200,
+      "peakTo": 3500,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/agra-fort.webp"
       ]
     },
     {
@@ -377,9 +729,9 @@
       "name": "Mathura & Vrindavan",
       "region": "Uttar Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
-      "nightlyFrom": 2700,
-      "nightlyTo": 3600,
+      "image": "/images/trips/prem-mandir.webp",
+      "nightlyFrom": 1900,
+      "nightlyTo": 2900,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -392,6 +744,32 @@
           "title": "Braj Mandal",
           "note": "Govardhan Hill, Radha Kund, Barsana (Lathmar Holi famous), Nandgaon — rarely visited sacred sites."
         }
+      ],
+      "zones": [
+        "north",
+        "rajasthan",
+        "ganga"
+      ],
+      "offFrom": 1500,
+      "offTo": 2300,
+      "peakFrom": 2200,
+      "peakTo": 3500,
+      "peakMonths": [
+        3,
+        8,
+        10,
+        11
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/vrindavan.webp"
       ]
     },
     {
@@ -399,9 +777,9 @@
       "name": "Rishikesh",
       "region": "Uttarakhand",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=1200&q=80",
-      "nightlyFrom": 3100,
-      "nightlyTo": 4100,
+      "image": "/images/trips/rishikesh.webp",
+      "nightlyFrom": 2000,
+      "nightlyTo": 3200,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -414,16 +792,39 @@
           "title": "Rishikesh Adventure",
           "note": "Ganga rafting, bungee, Neer Garh Waterfall trek — hidden gem."
         }
-      ]
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1600,
+      "offTo": 2500,
+      "peakFrom": 2400,
+      "peakTo": 3800,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        6,
+        10
+      ],
+      "offMonths": [
+        1,
+        7,
+        8,
+        12
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "haridwar",
       "name": "Haridwar",
       "region": "Uttarakhand",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=1200&q=80",
-      "nightlyFrom": 3100,
-      "nightlyTo": 4100,
+      "image": "/images/trips/haridwar.webp",
+      "nightlyFrom": 1700,
+      "nightlyTo": 2700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -436,16 +837,39 @@
           "title": "Haridwar Temples",
           "note": "Mansa Devi, Chandi Devi, Maya Devi, Sapt Rishi Ashram."
         }
-      ]
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1400,
+      "offTo": 2200,
+      "peakFrom": 2000,
+      "peakTo": 3200,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "offMonths": [
+        1,
+        8,
+        9,
+        12
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "nainital",
       "name": "Nainital",
       "region": "Uttarakhand",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 5100,
+      "image": "/images/trips/nainital.webp",
+      "nightlyFrom": 2300,
+      "nightlyTo": 3400,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -462,16 +886,39 @@
           "title": "Nainital & Almora",
           "note": "Snow View, Bhimtal. Drive to Almora. Kasar Devi, Chitai Temple."
         }
-      ]
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1700,
+      "offTo": 2600,
+      "peakFrom": 2800,
+      "peakTo": 4200,
+      "peakMonths": [
+        4,
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        1,
+        2,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "almora",
       "name": "Almora & Ranikhet",
       "region": "Uttarakhand",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4400,
+      "image": "/images/trips/almora.webp",
+      "nightlyFrom": 2000,
+      "nightlyTo": 3000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -484,6 +931,30 @@
           "title": "Ranikhet",
           "note": "Jhula Devi, Chaubatia, golf course, Upat viewpoint."
         }
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 1600,
+      "offTo": 2400,
+      "peakFrom": 2400,
+      "peakTo": 3600,
+      "peakMonths": [
+        4,
+        5,
+        6,
+        10
+      ],
+      "offMonths": [
+        1,
+        2,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/ranikhet.webp"
       ]
     },
     {
@@ -491,9 +962,9 @@
       "name": "Jim Corbett",
       "region": "Uttarakhand",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=1200&q=80",
-      "nightlyFrom": 4000,
-      "nightlyTo": 5100,
+      "image": "/images/trips/corbett.webp",
+      "nightlyFrom": 2500,
+      "nightlyTo": 4000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -506,16 +977,37 @@
           "title": "Jim Corbett Full Day",
           "note": "Morning canter safari in Dhikala grasslands. Afternoon zone safari. 650+ bird species."
         }
-      ]
+      ],
+      "zones": [
+        "north"
+      ],
+      "offFrom": 2000,
+      "offTo": 3000,
+      "peakFrom": 3000,
+      "peakTo": 5000,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        12
+      ],
+      "offMonths": [
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "jaipur",
       "name": "Jaipur",
       "region": "Rajasthan",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
-      "nightlyFrom": 3000,
-      "nightlyTo": 4000,
+      "image": "/images/trips/hawa-mahal.webp",
+      "nightlyFrom": 2100,
+      "nightlyTo": 3300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -552,6 +1044,32 @@
           "title": "Salasar Balaji",
           "note": "Temple darshan overnight."
         }
+      ],
+      "zones": [
+        "rajasthan"
+      ],
+      "offFrom": 1600,
+      "offTo": 2500,
+      "peakFrom": 2500,
+      "peakTo": 4000,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/amer-fort.webp"
       ]
     },
     {
@@ -559,9 +1077,9 @@
       "name": "Pushkar & Ajmer",
       "region": "Rajasthan",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
-      "nightlyFrom": 3100,
-      "nightlyTo": 4000,
+      "image": "/images/trips/pushkar.webp",
+      "nightlyFrom": 1800,
+      "nightlyTo": 2900,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -574,6 +1092,32 @@
           "title": "Pushkar",
           "note": "Brahma Temple, lake ghats, Savitri Temple, bazaar, Naga Pahar viewpoint."
         }
+      ],
+      "zones": [
+        "rajasthan"
+      ],
+      "offFrom": 1400,
+      "offTo": 2200,
+      "peakFrom": 2200,
+      "peakTo": 3500,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/ajmer.webp"
       ]
     },
     {
@@ -581,9 +1125,9 @@
       "name": "Jodhpur",
       "region": "Rajasthan",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200&q=80",
-      "nightlyFrom": 3800,
-      "nightlyTo": 4900,
+      "image": "/images/trips/mehrangarh.webp",
+      "nightlyFrom": 2000,
+      "nightlyTo": 3100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -596,16 +1140,40 @@
           "title": "Jodhpur",
           "note": "Mehrangarh, Jaswant Thada, Umaid Bhawan."
         }
-      ]
+      ],
+      "zones": [
+        "rajasthan"
+      ],
+      "offFrom": 1500,
+      "offTo": 2400,
+      "peakFrom": 2400,
+      "peakTo": 3800,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "jaisalmer",
       "name": "Jaisalmer",
       "region": "Rajasthan",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200&q=80",
-      "nightlyFrom": 3800,
-      "nightlyTo": 4900,
+      "image": "/images/trips/jaisalmer.webp",
+      "nightlyFrom": 2200,
+      "nightlyTo": 3500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -618,6 +1186,33 @@
           "title": "Fort & Dunes",
           "note": "Fort, Havelis, camel safari, overnight camp, stargazing."
         }
+      ],
+      "zones": [
+        "rajasthan"
+      ],
+      "offFrom": 1500,
+      "offTo": 2400,
+      "peakFrom": 2800,
+      "peakTo": 4500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/sam-dunes.webp",
+        "/images/trips/thar.webp"
       ]
     },
     {
@@ -625,9 +1220,9 @@
       "name": "Udaipur",
       "region": "Rajasthan",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1200&q=80",
-      "nightlyFrom": 3200,
-      "nightlyTo": 4600,
+      "image": "/images/trips/pichola.webp",
+      "nightlyFrom": 2300,
+      "nightlyTo": 3700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -664,6 +1259,32 @@
           "title": "Chittorgarh",
           "note": "Greatest Rajput fort. Vijay Stambha. Meera Temple."
         }
+      ],
+      "zones": [
+        "rajasthan",
+        "gujarat"
+      ],
+      "offFrom": 1800,
+      "offTo": 2800,
+      "peakFrom": 2800,
+      "peakTo": 4500,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/udaipur.webp"
       ]
     },
     {
@@ -671,9 +1292,9 @@
       "name": "Mount Abu",
       "region": "Rajasthan",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1200&q=80",
-      "nightlyFrom": 3600,
-      "nightlyTo": 4600,
+      "image": "/images/trips/mount-abu.webp",
+      "nightlyFrom": 1900,
+      "nightlyTo": 3000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -686,16 +1307,38 @@
           "title": "Mount Abu",
           "note": "Dilwara Temples, Guru Shikhar, Achalgarh Fort, wildlife walk."
         }
-      ]
+      ],
+      "zones": [
+        "rajasthan",
+        "gujarat"
+      ],
+      "offFrom": 1500,
+      "offTo": 2300,
+      "peakFrom": 2300,
+      "peakTo": 3600,
+      "peakMonths": [
+        5,
+        6,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "kutch",
       "name": "Kutch & Rann",
       "region": "Gujarat",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 3600,
-      "nightlyTo": 5000,
+      "image": "/images/trips/white-rann.webp",
+      "nightlyFrom": 2300,
+      "nightlyTo": 3800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -716,6 +1359,34 @@
           "title": "Mandvi Beach",
           "note": "Bhujodi weavers, Nirona artists. Mandvi Beach — 400-year-old wooden shipbuilding still active. Vijay Vilas Palace."
         }
+      ],
+      "zones": [
+        "gujarat"
+      ],
+      "offFrom": 1800,
+      "offTo": 2800,
+      "peakFrom": 2800,
+      "peakTo": 4800,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4
+      ],
+      "closedMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "seasonNote": "the white desert floods in the monsoon",
+      "images": [
+        "/images/trips/kutch.webp",
+        "/images/trips/kutch-foxes.webp"
       ]
     },
     {
@@ -723,9 +1394,9 @@
       "name": "Dwarka",
       "region": "Gujarat",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 3200,
-      "nightlyTo": 4300,
+      "image": "/images/trips/dwarka.webp",
+      "nightlyFrom": 2000,
+      "nightlyTo": 3100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -742,6 +1413,32 @@
           "title": "Bet Dwarka",
           "note": "Ferry to island, Krishna's residence, coral temples."
         }
+      ],
+      "zones": [
+        "gujarat"
+      ],
+      "offFrom": 1500,
+      "offTo": 2400,
+      "peakFrom": 2400,
+      "peakTo": 3800,
+      "peakMonths": [
+        1,
+        2,
+        8,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/bet-dwarka.webp"
       ]
     },
     {
@@ -749,9 +1446,9 @@
       "name": "Somnath",
       "region": "Gujarat",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 3200,
-      "nightlyTo": 4300,
+      "image": "/images/trips/somnath.webp",
+      "nightlyFrom": 2000,
+      "nightlyTo": 3100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -764,16 +1461,39 @@
           "title": "Dev & Gir",
           "note": "Dev Surya Temple. Gir National Park — last Asiatic lions (jeep safari)."
         }
-      ]
+      ],
+      "zones": [
+        "gujarat"
+      ],
+      "offFrom": 1500,
+      "offTo": 2400,
+      "peakFrom": 2400,
+      "peakTo": 3800,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "mumbai",
       "name": "Mumbai",
       "region": "Maharashtra",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1200&q=80",
-      "nightlyFrom": 2700,
-      "nightlyTo": 3600,
+      "image": "/images/trips/gateway.webp",
+      "nightlyFrom": 3600,
+      "nightlyTo": 5500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -794,6 +1514,33 @@
           "title": "Film City & Kanheri",
           "note": "Film City Studios (Bollywood). Sanjay Gandhi National Park — leopards and ancient Buddhist caves inside Mumbai!"
         }
+      ],
+      "zones": [
+        "west"
+      ],
+      "offFrom": 3000,
+      "offTo": 4500,
+      "peakFrom": 4200,
+      "peakTo": 6500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/marine-drive.webp",
+        "/images/trips/cst.webp"
       ]
     },
     {
@@ -801,9 +1548,9 @@
       "name": "Lonavala",
       "region": "Maharashtra",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1200&q=80",
-      "nightlyFrom": 2700,
-      "nightlyTo": 3600,
+      "image": "/images/trips/lonavala.webp",
+      "nightlyFrom": 2900,
+      "nightlyTo": 4500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -816,16 +1563,37 @@
           "title": "Khandala & Caves",
           "note": "Rajmachi Fort trek, Karla Bhaja Caves, Lohagad Fort."
         }
-      ]
+      ],
+      "zones": [
+        "west"
+      ],
+      "offFrom": 2200,
+      "offTo": 3500,
+      "peakFrom": 3500,
+      "peakTo": 5500,
+      "peakMonths": [
+        7,
+        8,
+        9,
+        12
+      ],
+      "offMonths": [
+        3,
+        4,
+        5
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "mahabaleshwar",
       "name": "Mahabaleshwar",
       "region": "Maharashtra",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3900,
-      "nightlyTo": 5200,
+      "image": "/images/trips/mahabaleshwar.webp",
+      "nightlyFrom": 2800,
+      "nightlyTo": 4400,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -842,6 +1610,31 @@
           "title": "Pratapgarh Fort",
           "note": "Pratapgarh Fort (Shivaji defeated Afzal Khan — 1659). Panchganga Temple. Lingmala Falls."
         }
+      ],
+      "zones": [
+        "west"
+      ],
+      "offFrom": 2000,
+      "offTo": 3200,
+      "peakFrom": 3500,
+      "peakTo": 5500,
+      "peakMonths": [
+        4,
+        5,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/mahabaleshwar-sunset.webp"
       ]
     },
     {
@@ -849,9 +1642,9 @@
       "name": "Shirdi & Nashik",
       "region": "Maharashtra",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 2900,
-      "nightlyTo": 3800,
+      "image": "/images/trips/shirdi.webp",
+      "nightlyFrom": 2300,
+      "nightlyTo": 3700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -884,6 +1677,30 @@
           "title": "Bhimashankar & Departure",
           "note": "Jyotirlinga. Pune Airport."
         }
+      ],
+      "zones": [
+        "west"
+      ],
+      "offFrom": 1800,
+      "offTo": 2800,
+      "peakFrom": 2800,
+      "peakTo": 4500,
+      "peakMonths": [
+        1,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/trimbakeshwar.webp",
+        "/images/trips/ellora.webp",
+        "/images/trips/ajanta.webp"
       ]
     },
     {
@@ -891,9 +1708,9 @@
       "name": "Goa",
       "region": "Goa",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 2900,
-      "nightlyTo": 3800,
+      "image": "/images/trips/goa-beach.webp",
+      "nightlyFrom": 2700,
+      "nightlyTo": 4800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -910,6 +1727,34 @@
           "title": "Offbeat Goa",
           "note": "Divar Island (village life, no tourists). Fontainhas Latin Quarter. Spice plantation lunch."
         }
+      ],
+      "zones": [
+        "west",
+        "south"
+      ],
+      "offFrom": 1800,
+      "offTo": 3000,
+      "peakFrom": 3500,
+      "peakTo": 6500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/palolem.webp",
+        "/images/trips/bom-jesus.webp",
+        "/images/trips/goa-fort.webp"
       ]
     },
     {
@@ -917,9 +1762,9 @@
       "name": "Kochi",
       "region": "Kerala",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/kochi.webp",
+      "nightlyFrom": 2600,
+      "nightlyTo": 4300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -932,16 +1777,39 @@
           "title": "Fort Kochi walk",
           "note": "Fort Kochi walk."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 2000,
+      "offTo": 3500,
+      "peakFrom": 3200,
+      "peakTo": 5000,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "munnar",
       "name": "Munnar",
       "region": "Kerala",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/munnar.webp",
+      "nightlyFrom": 2800,
+      "nightlyTo": 4500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -954,16 +1822,37 @@
           "title": "Munnar Offbeat",
           "note": "Top Station (highest in Kerala). Lockhart Gap. Nyayamakad Waterfalls — hidden gem."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 2000,
+      "offTo": 3500,
+      "peakFrom": 3500,
+      "peakTo": 5500,
+      "peakMonths": [
+        1,
+        4,
+        5,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "thekkady",
       "name": "Thekkady",
       "region": "Kerala",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/thekkady.webp",
+      "nightlyFrom": 2500,
+      "nightlyTo": 4100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -972,16 +1861,37 @@
           "title": "Thekkady",
           "note": "Periyar Lake, spice garden, Kathakali."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 1800,
+      "offTo": 3200,
+      "peakFrom": 3200,
+      "peakTo": 5000,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "alleppey",
       "name": "Alleppey (Houseboat)",
       "region": "Kerala",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/alleppey.webp",
+      "nightlyFrom": 4000,
+      "nightlyTo": 6300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -990,16 +1900,38 @@
           "title": "Alleppey Houseboat",
           "note": "Overnight luxury houseboat."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 3000,
+      "offTo": 4500,
+      "peakFrom": 5000,
+      "peakTo": 8000,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "kovalam",
       "name": "Kovalam & Varkala",
       "region": "Kerala",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 4200,
-      "nightlyTo": 5700,
+      "image": "/images/trips/varkala.webp",
+      "nightlyFrom": 2900,
+      "nightlyTo": 4500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -1012,6 +1944,32 @@
           "title": "Kovalam + Kanyakumari",
           "note": "Beach then three-sea confluence."
         }
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 2200,
+      "offTo": 3500,
+      "peakFrom": 3500,
+      "peakTo": 5500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/kovalam.webp"
       ]
     },
     {
@@ -1019,8 +1977,8 @@
       "name": "Madurai",
       "region": "Tamil Nadu",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 2900,
+      "image": "/images/trips/madurai.webp",
+      "nightlyFrom": 2300,
       "nightlyTo": 3800,
       "minNights": 1,
       "maxNights": 7,
@@ -1030,16 +1988,40 @@
           "title": "Madurai",
           "note": "Meenakshi Amman Temple — 14 towers, 33,000 sculptures. Evening ceremony."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 1800,
+      "offTo": 3000,
+      "peakFrom": 2800,
+      "peakTo": 4500,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "rameswaram",
       "name": "Rameswaram",
       "region": "Tamil Nadu",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 2900,
-      "nightlyTo": 3800,
+      "image": "/images/trips/pamban.webp",
+      "nightlyFrom": 2100,
+      "nightlyTo": 3500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -1052,15 +2034,37 @@
           "title": "Rameswaram",
           "note": "Pamban Bridge, Dhanushkodi, Gandamadana Parvatham."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 1600,
+      "offTo": 2800,
+      "peakFrom": 2600,
+      "peakTo": 4200,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "kanyakumari",
       "name": "Kanyakumari",
       "region": "Tamil Nadu",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      "nightlyFrom": 2900,
+      "image": "/images/trips/kanyakumari.webp",
+      "nightlyFrom": 2300,
       "nightlyTo": 3800,
       "minNights": 1,
       "maxNights": 7,
@@ -1074,16 +2078,39 @@
           "title": "Kanyakumari",
           "note": "Sunrise, Vivekananda Rock, temple."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 1800,
+      "offTo": 3000,
+      "peakFrom": 2800,
+      "peakTo": 4500,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "varanasi",
       "name": "Varanasi",
       "region": "Uttar Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4400,
+      "image": "/images/trips/varanasi.webp",
+      "nightlyFrom": 2300,
+      "nightlyTo": 3500,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1104,6 +2131,32 @@
           "title": "Sarnath & Prayagraj",
           "note": "Sarnath Buddhist site. Triveni Sangam boat ride."
         }
+      ],
+      "zones": [
+        "ganga"
+      ],
+      "offFrom": 1800,
+      "offTo": 2800,
+      "peakFrom": 2800,
+      "peakTo": 4200,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/ganga-aarti.webp"
       ]
     },
     {
@@ -1111,9 +2164,9 @@
       "name": "Ayodhya & Prayagraj",
       "region": "Uttar Pradesh",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4400,
+      "image": "/images/trips/ayodhya.webp",
+      "nightlyFrom": 2100,
+      "nightlyTo": 3300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -1122,6 +2175,31 @@
           "title": "Ayodhya",
           "note": "Ram Mandir, Hanuman Garhi, Kanak Bhawan, Saryu aarti."
         }
+      ],
+      "zones": [
+        "ganga"
+      ],
+      "offFrom": 1600,
+      "offTo": 2600,
+      "peakFrom": 2600,
+      "peakTo": 4000,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/sangam.webp"
       ]
     },
     {
@@ -1129,9 +2207,9 @@
       "name": "Port Blair & Havelock",
       "region": "Andaman Islands",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80",
-      "nightlyFrom": 4900,
-      "nightlyTo": 6300,
+      "image": "/images/trips/radhanagar.webp",
+      "nightlyFrom": 3800,
+      "nightlyTo": 5800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1160,6 +2238,34 @@
           "title": "Neil Island",
           "note": "Natural Bridge, three beaches, beach walks."
         }
+      ],
+      "zones": [
+        "andaman"
+      ],
+      "offFrom": 3000,
+      "offTo": 4500,
+      "peakFrom": 4500,
+      "peakTo": 7000,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/havelock.webp",
+        "/images/trips/cellular-jail.webp",
+        "/images/trips/andaman.webp"
       ]
     },
     {
@@ -1167,9 +2273,9 @@
       "name": "Shillong & Cherrapunji",
       "region": "Meghalaya",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 4500,
-      "nightlyTo": 5700,
+      "image": "/images/trips/root-bridge.webp",
+      "nightlyFrom": 3300,
+      "nightlyTo": 4700,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1186,6 +2292,33 @@
           "title": "Mawlynnong & Dawki",
           "note": "Cleanest village Asia, glass-clear river."
         }
+      ],
+      "zones": [
+        "east"
+      ],
+      "offFrom": 2800,
+      "offTo": 3800,
+      "peakFrom": 3800,
+      "peakTo": 5500,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/dawki.webp",
+        "/images/trips/shillong.webp",
+        "/images/trips/cherrapunji.webp"
       ]
     },
     {
@@ -1193,9 +2326,9 @@
       "name": "Kaziranga",
       "region": "Assam",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 4500,
-      "nightlyTo": 5700,
+      "image": "/images/trips/kaziranga.webp",
+      "nightlyFrom": 3500,
+      "nightlyTo": 5100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1212,16 +2345,39 @@
           "title": "Kaziranga Morning",
           "note": "Elephant safari sunrise. Drive Shillong."
         }
-      ]
+      ],
+      "zones": [
+        "east"
+      ],
+      "offFrom": 3000,
+      "offTo": 4200,
+      "peakFrom": 4000,
+      "peakTo": 6000,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ],
+      "offMonths": [],
+      "closedMonths": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "seasonNote": "the park shuts for the monsoon",
+      "images": []
     },
     {
       "id": "darjeeling",
       "name": "Darjeeling",
       "region": "West Bengal",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3800,
-      "nightlyTo": 5000,
+      "image": "/images/trips/darjeeling.webp",
+      "nightlyFrom": 3200,
+      "nightlyTo": 4800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1238,6 +2394,32 @@
           "title": "Darjeeling Offbeat",
           "note": "Sandakphu trek option or Mirik Lake (1495m — orange orchards, Himalayan views). Ghoom Monastery (oldest in Darjeeling)."
         }
+      ],
+      "zones": [
+        "east"
+      ],
+      "offFrom": 2500,
+      "offTo": 3500,
+      "peakFrom": 3800,
+      "peakTo": 6000,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        10,
+        11
+      ],
+      "offMonths": [
+        1,
+        2,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/toy-train.webp",
+        "/images/trips/kanchenjunga.webp"
       ]
     },
     {
@@ -1245,9 +2427,9 @@
       "name": "Gangtok",
       "region": "Sikkim",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80",
-      "nightlyFrom": 3800,
-      "nightlyTo": 5000,
+      "image": "/images/trips/tsomgo.webp",
+      "nightlyFrom": 3300,
+      "nightlyTo": 5100,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -1260,6 +2442,31 @@
           "title": "Tsomgo & Baba Mandir",
           "note": "High-altitude lake, sacred mandir."
         }
+      ],
+      "zones": [
+        "east"
+      ],
+      "offFrom": 2500,
+      "offTo": 3600,
+      "peakFrom": 4000,
+      "peakTo": 6500,
+      "peakMonths": [
+        3,
+        4,
+        5,
+        6,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/gangtok.webp"
       ]
     },
     {
@@ -1267,9 +2474,9 @@
       "name": "Ooty",
       "region": "Tamil Nadu",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 3100,
-      "nightlyTo": 4000,
+      "image": "/images/trips/ooty.webp",
+      "nightlyFrom": 2800,
+      "nightlyTo": 4800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -1282,6 +2489,28 @@
           "title": "Ooty",
           "note": "Doddabetta, Rose Garden, Toda village, toy train."
         }
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 2000,
+      "offTo": 3500,
+      "peakFrom": 3500,
+      "peakTo": 6000,
+      "peakMonths": [
+        4,
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/nilgiri.webp"
       ]
     },
     {
@@ -1289,9 +2518,9 @@
       "name": "Coorg",
       "region": "Karnataka",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 3100,
-      "nightlyTo": 4000,
+      "image": "/images/trips/coorg.webp",
+      "nightlyFrom": 3300,
+      "nightlyTo": 5300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1308,15 +2537,37 @@
           "title": "Coorg Offbeat",
           "note": "Iruppu Falls (sacred waterfall), Brahmagiri Hills trek, Talacauvery (Cauvery source — sacred). Local village."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 2500,
+      "offTo": 4000,
+      "peakFrom": 4000,
+      "peakTo": 6500,
+      "peakMonths": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "mysore",
       "name": "Mysore",
       "region": "Karnataka",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
-      "nightlyFrom": 3100,
+      "image": "/images/trips/mysore.webp",
+      "nightlyFrom": 2400,
       "nightlyTo": 4000,
       "minNights": 1,
       "maxNights": 7,
@@ -1326,16 +2577,39 @@
           "title": "Mysore",
           "note": "Mysore Palace (Sunday lights), Chamundeshwari Temple."
         }
-      ]
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 1800,
+      "offTo": 3000,
+      "peakFrom": 3000,
+      "peakTo": 5000,
+      "peakMonths": [
+        1,
+        10,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "hampi",
       "name": "Hampi & Badami",
       "region": "Karnataka",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
-      "nightlyFrom": 3400,
-      "nightlyTo": 4400,
+      "image": "/images/trips/hampi.webp",
+      "nightlyFrom": 2400,
+      "nightlyTo": 3800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1356,6 +2630,32 @@
           "title": "Badami & Aihole",
           "note": "Badami caves. Aihole — cradle of Indian temple architecture, 125 temples, 600 AD."
         }
+      ],
+      "zones": [
+        "south"
+      ],
+      "offFrom": 1800,
+      "offTo": 3000,
+      "peakFrom": 3000,
+      "peakTo": 4500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/virupaksha.webp",
+        "/images/trips/badami.webp"
       ]
     },
     {
@@ -1363,8 +2663,8 @@
       "name": "Gokarna",
       "region": "Karnataka",
       "country": "India",
-      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80",
-      "nightlyFrom": 3400,
+      "image": "/images/trips/gokarna.webp",
+      "nightlyFrom": 2800,
       "nightlyTo": 4400,
       "minNights": 1,
       "maxNights": 7,
@@ -1374,16 +2674,40 @@
           "title": "Gokarna",
           "note": "Mahabaleshwar Temple. Om Beach. Beach hopping by boat."
         }
-      ]
+      ],
+      "zones": [
+        "west",
+        "south"
+      ],
+      "offFrom": 2000,
+      "offTo": 3200,
+      "peakFrom": 3500,
+      "peakTo": 5500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "bali",
       "name": "Bali",
       "region": "Bali",
       "country": "Indonesia",
-      "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80",
-      "nightlyFrom": 9900,
-      "nightlyTo": 12900,
+      "image": "/images/trips/tanah-lot.webp",
+      "nightlyFrom": 5500,
+      "nightlyTo": 8000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1412,6 +2736,34 @@
           "title": "Spa & Seminyak",
           "note": "Couples spa. Beach club sunset. Farewell dinner."
         }
+      ],
+      "zones": [
+        "bali"
+      ],
+      "offFrom": 4500,
+      "offTo": 6500,
+      "peakFrom": 6500,
+      "peakTo": 9500,
+      "peakMonths": [
+        6,
+        7,
+        8,
+        12
+      ],
+      "offMonths": [
+        1,
+        2,
+        3,
+        11
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "visaFrom": 3300,
+      "visaTo": 4000,
+      "images": [
+        "/images/trips/ubud.webp",
+        "/images/trips/bali-temple.webp",
+        "/images/trips/uluwatu.webp"
       ]
     },
     {
@@ -1419,9 +2771,9 @@
       "name": "Bangkok & Pattaya",
       "region": "Thailand",
       "country": "Thailand",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 7700,
-      "nightlyTo": 10200,
+      "image": "/images/trips/wat-arun.webp",
+      "nightlyFrom": 3200,
+      "nightlyTo": 4800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1438,6 +2790,29 @@
           "title": "Bangkok Offbeat",
           "note": "Floating Market (Amphawa or Damnoen Saduak). Jim Thompson House. Chinatown (Yaowarat) street food tour at night."
         }
+      ],
+      "zones": [
+        "thailand"
+      ],
+      "offFrom": 2500,
+      "offTo": 4000,
+      "peakFrom": 3800,
+      "peakTo": 5500,
+      "peakMonths": [
+        1,
+        11,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/grand-palace.webp"
       ]
     },
     {
@@ -1445,9 +2820,9 @@
       "name": "Phuket & Krabi",
       "region": "Thailand",
       "country": "Thailand",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 7700,
-      "nightlyTo": 10200,
+      "image": "/images/trips/phi-phi.webp",
+      "nightlyFrom": 4800,
+      "nightlyTo": 6800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -1460,6 +2835,31 @@
           "title": "Phi Phi Islands",
           "note": "Maya Bay, snorkelling, lagoons."
         }
+      ],
+      "zones": [
+        "thailand"
+      ],
+      "offFrom": 4000,
+      "offTo": 5500,
+      "peakFrom": 5500,
+      "peakTo": 8000,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/phuket.webp"
       ]
     },
     {
@@ -1467,9 +2867,9 @@
       "name": "Sri Lanka",
       "region": "Sri Lanka",
       "country": "Sri Lanka",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 7000,
-      "nightlyTo": 9000,
+      "image": "/images/trips/sigiriya.webp",
+      "nightlyFrom": 5300,
+      "nightlyTo": 7300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1498,6 +2898,32 @@
           "title": "Galle & Beach",
           "note": "Galle Fort, Unawatuna Beach sunset."
         }
+      ],
+      "zones": [
+        "srilanka"
+      ],
+      "offFrom": 4500,
+      "offTo": 6000,
+      "peakFrom": 6000,
+      "peakTo": 8500,
+      "peakMonths": [
+        1,
+        2,
+        3,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        9,
+        10
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/nine-arch.webp",
+        "/images/trips/kandy.webp",
+        "/images/trips/galle.webp"
       ]
     },
     {
@@ -1505,9 +2931,9 @@
       "name": "Kathmandu",
       "region": "Nepal",
       "country": "Nepal",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 5200,
-      "nightlyTo": 6700,
+      "image": "/images/trips/boudhanath.webp",
+      "nightlyFrom": 3500,
+      "nightlyTo": 4900,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1524,6 +2950,30 @@
           "title": "Nagarkot Sunrise",
           "note": "Drive to Nagarkot (2195m) — 360° Himalayan sunrise including Everest on clear days. Changu Narayan Temple (UNESCO, 1700 years old)."
         }
+      ],
+      "zones": [
+        "nepal"
+      ],
+      "offFrom": 3000,
+      "offTo": 4200,
+      "peakFrom": 4000,
+      "peakTo": 5500,
+      "peakMonths": [
+        3,
+        4,
+        10,
+        11
+      ],
+      "offMonths": [
+        1,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/swayambhu.webp"
       ]
     },
     {
@@ -1531,9 +2981,9 @@
       "name": "Pokhara",
       "region": "Nepal",
       "country": "Nepal",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 5200,
-      "nightlyTo": 6700,
+      "image": "/images/trips/pokhara.webp",
+      "nightlyFrom": 3500,
+      "nightlyTo": 5000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1550,6 +3000,30 @@
           "title": "Chitwan",
           "note": "Rhino, tiger, crocodile safaris. Tharu village walk."
         }
+      ],
+      "zones": [
+        "nepal"
+      ],
+      "offFrom": 3000,
+      "offTo": 4200,
+      "peakFrom": 4000,
+      "peakTo": 5800,
+      "peakMonths": [
+        3,
+        4,
+        10,
+        11
+      ],
+      "offMonths": [
+        1,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/annapurna.webp"
       ]
     },
     {
@@ -1557,9 +3031,9 @@
       "name": "Thimphu & Paro",
       "region": "Bhutan",
       "country": "Bhutan",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 11800,
-      "nightlyTo": 15200,
+      "image": "/images/trips/tigers-nest.webp",
+      "nightlyFrom": 6500,
+      "nightlyTo": 9000,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1588,6 +3062,33 @@
           "title": "Tiger's Nest & Departure",
           "note": "Morning Tiger's Nest trek. Paro Airport."
         }
+      ],
+      "zones": [
+        "bhutan",
+        "east"
+      ],
+      "offFrom": 5500,
+      "offTo": 7500,
+      "peakFrom": 7500,
+      "peakTo": 10500,
+      "peakMonths": [
+        3,
+        4,
+        10,
+        11
+      ],
+      "offMonths": [
+        1,
+        2,
+        6,
+        7,
+        8
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/punakha.webp",
+        "/images/trips/thimphu.webp"
       ]
     },
     {
@@ -1595,9 +3096,9 @@
       "name": "Singapore",
       "region": "Singapore",
       "country": "Singapore",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 8500,
-      "nightlyTo": 11200,
+      "image": "/images/trips/marina-bay.webp",
+      "nightlyFrom": 9300,
+      "nightlyTo": 12300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1622,6 +3123,33 @@
           "title": "Day Trip Batam/Johor",
           "note": "Short ferry to Batam Indonesia or drive to Johor Bahru Malaysia — shopping and local food."
         }
+      ],
+      "zones": [
+        "malaysia-singapore"
+      ],
+      "offFrom": 8000,
+      "offTo": 10500,
+      "peakFrom": 10500,
+      "peakTo": 14000,
+      "peakMonths": [
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        2,
+        3,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "visaFrom": 3000,
+      "visaTo": 4200,
+      "images": [
+        "/images/trips/gardens-bay.webp",
+        "/images/trips/merlion.webp"
       ]
     },
     {
@@ -1629,9 +3157,9 @@
       "name": "Kuala Lumpur",
       "region": "Malaysia",
       "country": "Malaysia",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 5900,
-      "nightlyTo": 7700,
+      "image": "/images/trips/petronas.webp",
+      "nightlyFrom": 4200,
+      "nightlyTo": 5800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 2,
@@ -1644,6 +3172,30 @@
           "title": "KL",
           "note": "Batu Caves, Bird Park, Merdeka Square."
         }
+      ],
+      "zones": [
+        "malaysia-singapore"
+      ],
+      "offFrom": 3500,
+      "offTo": 5000,
+      "peakFrom": 4800,
+      "peakTo": 6500,
+      "peakMonths": [
+        5,
+        6,
+        12
+      ],
+      "offMonths": [
+        3,
+        4,
+        9,
+        10,
+        11
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": [
+        "/images/trips/batu.webp"
       ]
     },
     {
@@ -1651,9 +3203,9 @@
       "name": "Langkawi",
       "region": "Malaysia",
       "country": "Malaysia",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 5900,
-      "nightlyTo": 7700,
+      "image": "/images/trips/langkawi.webp",
+      "nightlyFrom": 4800,
+      "nightlyTo": 6800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -1662,16 +3214,38 @@
           "title": "Langkawi",
           "note": "Cable car, Sky Bridge, mangroves, duty-free."
         }
-      ]
+      ],
+      "zones": [
+        "malaysia-singapore"
+      ],
+      "offFrom": 4000,
+      "offTo": 5500,
+      "peakFrom": 5500,
+      "peakTo": 8000,
+      "peakMonths": [
+        1,
+        2,
+        12
+      ],
+      "offMonths": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "images": []
     },
     {
       "id": "dubai",
       "name": "Dubai",
       "region": "UAE",
       "country": "UAE",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 9500,
-      "nightlyTo": 12400,
+      "image": "/images/trips/burj-khalifa.webp",
+      "nightlyFrom": 6500,
+      "nightlyTo": 9300,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 3,
@@ -1692,6 +3266,37 @@
           "title": "Desert Safari",
           "note": "Palm Jumeirah, Burj Al Arab photo. Desert dune bashing, camel, BBQ, stars."
         }
+      ],
+      "zones": [
+        "uae"
+      ],
+      "offFrom": 5000,
+      "offTo": 7000,
+      "peakFrom": 8000,
+      "peakTo": 11500,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "visaFrom": 6900,
+      "visaTo": 10000,
+      "images": [
+        "/images/trips/dubai-marina.webp",
+        "/images/trips/dubai-desert.webp",
+        "/images/trips/burj-al-arab.webp",
+        "/images/trips/dubai-frame.webp",
+        "/images/trips/dubai-creek.webp"
       ]
     },
     {
@@ -1699,9 +3304,9 @@
       "name": "Abu Dhabi",
       "region": "UAE",
       "country": "UAE",
-      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-      "nightlyFrom": 9500,
-      "nightlyTo": 12400,
+      "image": "/images/trips/zayed-mosque.webp",
+      "nightlyFrom": 7000,
+      "nightlyTo": 9800,
       "minNights": 1,
       "maxNights": 7,
       "suggestedNights": 1,
@@ -1710,6 +3315,33 @@
           "title": "Abu Dhabi",
           "note": "Sheikh Zayed Grand Mosque. Louvre Abu Dhabi. Ferrari World (optional)."
         }
+      ],
+      "zones": [
+        "uae"
+      ],
+      "offFrom": 5500,
+      "offTo": 7500,
+      "peakFrom": 8500,
+      "peakTo": 12000,
+      "peakMonths": [
+        1,
+        2,
+        11,
+        12
+      ],
+      "offMonths": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "closedMonths": [],
+      "seasonNote": "",
+      "visaFrom": 6900,
+      "visaTo": 10000,
+      "images": [
+        "/images/trips/louvre-ad.webp"
       ]
     }
   ],
@@ -1752,11 +3384,11 @@
     {
       "id": "flights",
       "label": "Return flights",
-      "description": "Economy flights from your city and back.",
+      "description": "Economy flights from a major Indian city and back, priced for where you are going.",
       "icon": "Plane",
-      "priceFrom": 5000,
-      "priceTo": 14000,
-      "per": "person"
+      "priceFrom": 3000,
+      "priceTo": 6000,
+      "per": "flight"
     },
     {
       "id": "meals",
@@ -1811,6 +3443,130 @@
       "priceFrom": 4000,
       "priceTo": 9000,
       "per": "trip"
+    }
+  ],
+  "multiRegionMinNights": 10,
+  "maxRegions": 2,
+  "zones": [
+    {
+      "id": "north",
+      "label": "North India & the Himalayas",
+      "hopFrom": 3500,
+      "hopTo": 8000,
+      "fareFrom": 6000,
+      "fareTo": 14000
+    },
+    {
+      "id": "rajasthan",
+      "label": "Rajasthan",
+      "hopFrom": 2500,
+      "hopTo": 6000,
+      "fareFrom": 5000,
+      "fareTo": 12000
+    },
+    {
+      "id": "gujarat",
+      "label": "Gujarat",
+      "hopFrom": 3500,
+      "hopTo": 8000,
+      "fareFrom": 7000,
+      "fareTo": 15000
+    },
+    {
+      "id": "ganga",
+      "label": "Varanasi & Ayodhya",
+      "hopFrom": 3500,
+      "hopTo": 7500,
+      "fareFrom": 7000,
+      "fareTo": 14000
+    },
+    {
+      "id": "west",
+      "label": "Mumbai, Maharashtra & Goa",
+      "hopFrom": 3500,
+      "hopTo": 8000,
+      "fareFrom": 6000,
+      "fareTo": 15000
+    },
+    {
+      "id": "south",
+      "label": "South India",
+      "hopFrom": 5000,
+      "hopTo": 11000,
+      "fareFrom": 9000,
+      "fareTo": 20000
+    },
+    {
+      "id": "east",
+      "label": "Northeast & Darjeeling",
+      "hopFrom": 5000,
+      "hopTo": 10000,
+      "fareFrom": 10000,
+      "fareTo": 18000
+    },
+    {
+      "id": "andaman",
+      "label": "Andaman Islands",
+      "hopFrom": 8000,
+      "hopTo": 16000,
+      "fareFrom": 14000,
+      "fareTo": 30000
+    },
+    {
+      "id": "nepal",
+      "label": "Nepal",
+      "hopFrom": 8000,
+      "hopTo": 15000,
+      "fareFrom": 10000,
+      "fareTo": 22000
+    },
+    {
+      "id": "bhutan",
+      "label": "Bhutan",
+      "hopFrom": 8000,
+      "hopTo": 20000,
+      "fareFrom": 15000,
+      "fareTo": 45000
+    },
+    {
+      "id": "thailand",
+      "label": "Thailand",
+      "hopFrom": 10000,
+      "hopTo": 18000,
+      "fareFrom": 18000,
+      "fareTo": 35000
+    },
+    {
+      "id": "malaysia-singapore",
+      "label": "Singapore & Malaysia",
+      "hopFrom": 10000,
+      "hopTo": 18000,
+      "fareFrom": 18000,
+      "fareTo": 35000
+    },
+    {
+      "id": "bali",
+      "label": "Bali",
+      "hopFrom": 16000,
+      "hopTo": 26000,
+      "fareFrom": 30000,
+      "fareTo": 50000
+    },
+    {
+      "id": "srilanka",
+      "label": "Sri Lanka",
+      "hopFrom": 10000,
+      "hopTo": 17000,
+      "fareFrom": 20000,
+      "fareTo": 32000
+    },
+    {
+      "id": "uae",
+      "label": "Dubai & Abu Dhabi",
+      "hopFrom": 9000,
+      "hopTo": 17000,
+      "fareFrom": 18000,
+      "fareTo": 32000
     }
   ]
 }

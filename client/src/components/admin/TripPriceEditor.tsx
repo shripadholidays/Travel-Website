@@ -14,17 +14,18 @@ import { useAdminTripBuilder, useSaveTripBuilder } from "@/hooks/use-trip-builde
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { ICON_NAMES, resolveIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
-import { PER_LABELS, type BuilderActivity, type BuilderExtra, type BuilderHotelClass, type BuilderPlace, type ExtraPer, type TripBuilderCatalogue } from "@/lib/trip-builder";
+import { MONTHS, PER_LABELS, SEASON_LABELS, seasonOf, type BuilderActivity, type BuilderExtra, type BuilderHotelClass, type BuilderPlace, type BuilderZone, type ExtraPer, type Season, type TripBuilderCatalogue } from "@/lib/trip-builder";
 import { SearchField } from "./AdminUI";
 import { SortableRows } from "./SortableRows";
 
 // Rows get a browser-only key so they can be dragged and edited; it is dropped before saving
 type Keyed<T> = T & { _key: string };
 type EditPlace = Keyed<Omit<BuilderPlace, "activities">> & { activities: Keyed<BuilderActivity>[] };
-interface Editable extends Omit<TripBuilderCatalogue, "places" | "hotelClasses" | "extras"> {
+interface Editable extends Omit<TripBuilderCatalogue, "places" | "hotelClasses" | "extras" | "zones"> {
     places: EditPlace[];
     hotelClasses: Keyed<BuilderHotelClass>[];
     extras: Keyed<BuilderExtra>[];
+    zones: Keyed<BuilderZone>[];
 }
 
 let n = 0;
@@ -34,6 +35,7 @@ const withKeys = (b: TripBuilderCatalogue): Editable => ({
     places: b.places.map((p) => ({ ...p, _key: key(), activities: p.activities.map((a) => ({ ...a, _key: key() })) })),
     hotelClasses: b.hotelClasses.map((h) => ({ ...h, _key: key() })),
     extras: b.extras.map((x) => ({ ...x, _key: key() })),
+    zones: (b.zones ?? []).map((z) => ({ ...z, _key: key() })),
 });
 const strip = <T extends { _key: string }>({ _key, ...rest }: T) => rest;
 const withoutKeys = (e: Editable): TripBuilderCatalogue => ({
@@ -41,6 +43,7 @@ const withoutKeys = (e: Editable): TripBuilderCatalogue => ({
     places: e.places.map((p) => ({ ...strip(p), activities: p.activities.map(strip) })),
     hotelClasses: e.hotelClasses.map(strip),
     extras: e.extras.map(strip),
+    zones: e.zones.map(strip),
 });
 
 const num = (v: string) => v.replace(/[^0-9]/g, "");
@@ -86,11 +89,13 @@ export function TripPriceEditor() {
             <Tabs defaultValue="places">
                 <TabsList className="flex-wrap h-auto">
                     <TabsTrigger value="places">Places ({edit.places.length})</TabsTrigger>
+                    <TabsTrigger value="regions">Regions ({edit.zones.length})</TabsTrigger>
                     <TabsTrigger value="hotels">Hotel classes</TabsTrigger>
                     <TabsTrigger value="extras">Extras ({edit.extras.length})</TabsTrigger>
                     <TabsTrigger value="rules">Limits</TabsTrigger>
                 </TabsList>
-                <TabsContent value="places"><PlacesEditor places={edit.places} currency={edit.currency} onChange={(places) => set({ places })} /></TabsContent>
+                <TabsContent value="places"><PlacesEditor places={edit.places} zones={edit.zones} currency={edit.currency} onChange={(places) => set({ places })} /></TabsContent>
+                <TabsContent value="regions"><ZonesEditor zones={edit.zones} places={edit.places} onChange={(zones) => set({ zones })} /></TabsContent>
                 <TabsContent value="hotels"><HotelsEditor hotels={edit.hotelClasses} onChange={(hotelClasses) => set({ hotelClasses })} /></TabsContent>
                 <TabsContent value="extras"><ExtrasEditor extras={edit.extras} onChange={(extras) => set({ extras })} /></TabsContent>
                 <TabsContent value="rules"><RulesEditor value={edit} onChange={set} /></TabsContent>
@@ -113,7 +118,7 @@ export function TripPriceEditor() {
     );
 }
 
-function PlacesEditor({ places, currency, onChange }: { places: EditPlace[]; currency: string; onChange: (p: EditPlace[]) => void }) {
+function PlacesEditor({ places, zones, currency, onChange }: { places: EditPlace[]; zones: Keyed<BuilderZone>[]; currency: string; onChange: (p: EditPlace[]) => void }) {
     const { formatPrice } = useCurrency();
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState<string | null>(null);
@@ -123,7 +128,7 @@ function PlacesEditor({ places, currency, onChange }: { places: EditPlace[]; cur
     const add = () => {
         const fresh: EditPlace = {
             _key: key(), id: "", name: "", region: "", country: "India", image: "", nightlyFrom: 3000, nightlyTo: 4000,
-            minNights: 1, maxNights: 7, suggestedNights: 2, hidden: false, activities: [],
+            minNights: 1, maxNights: 7, suggestedNights: 2, hidden: false, activities: [], zones: [], peakMonths: [], offMonths: [], closedMonths: [],
         };
         onChange([fresh, ...places]);
         setOpen(fresh._key);
@@ -135,7 +140,7 @@ function PlacesEditor({ places, currency, onChange }: { places: EditPlace[]; cur
             <CardHeader className="gap-3 sm:flex-row sm:items-end sm:justify-between space-y-0">
                 <div>
                     <CardTitle>Places</CardTitle>
-                    <CardDescription className="text-pretty">Prices are per person, per night, with Economy hotels, transfers and sightseeing. Drag to set the order travellers see.</CardDescription>
+                    <CardDescription className="text-pretty">Prices are per person, per night, with Economy hotels, breakfast, transfers and sightseeing, for the regular, off and peak seasons. Drag to set the order travellers see.</CardDescription>
                 </div>
                 <div className="flex gap-2">
                     <SearchField value={search} onChange={setSearch} placeholder="Find a place…" className="sm:w-56" />
@@ -175,9 +180,35 @@ function PlacesEditor({ places, currency, onChange }: { places: EditPlace[]; cur
                                             <Field label="Country"><Input value={p.country} onChange={(e) => update(p._key, { country: e.target.value })} /></Field>
                                         </div>
                                         <Field label="Photo address (URL)"><Input value={p.image} onChange={(e) => update(p._key, { image: e.target.value })} placeholder="https://…" /></Field>
+                                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-6">
+                                            <Field label="Regular from"><Input inputMode="numeric" className="tabular-nums" value={p.nightlyFrom} onChange={(e) => update(p._key, { nightlyFrom: Number(num(e.target.value)) })} /></Field>
+                                            <Field label="Regular up to"><Input inputMode="numeric" className="tabular-nums" value={p.nightlyTo} onChange={(e) => update(p._key, { nightlyTo: Number(num(e.target.value)) })} /></Field>
+                                            <Field label="Off season from"><Input inputMode="numeric" className="tabular-nums" value={p.offFrom ?? ""} placeholder="Same" onChange={(e) => update(p._key, { offFrom: Number(num(e.target.value)) || undefined })} /></Field>
+                                            <Field label="Off season up to"><Input inputMode="numeric" className="tabular-nums" value={p.offTo ?? ""} placeholder="Same" onChange={(e) => update(p._key, { offTo: Number(num(e.target.value)) || undefined })} /></Field>
+                                            <Field label="Peak from"><Input inputMode="numeric" className="tabular-nums" value={p.peakFrom ?? ""} placeholder="Same" onChange={(e) => update(p._key, { peakFrom: Number(num(e.target.value)) || undefined })} /></Field>
+                                            <Field label="Peak up to"><Input inputMode="numeric" className="tabular-nums" value={p.peakTo ?? ""} placeholder="Same" onChange={(e) => update(p._key, { peakTo: Number(num(e.target.value)) || undefined })} /></Field>
+                                        </div>
+                                        <SeasonPicker place={p} onChange={(changes) => update(p._key, changes)} />
+                                        <div>
+                                            <p className="text-sm font-medium mb-1">Regions</p>
+                                            <p className="text-xs text-muted-foreground mb-2">Places in the same region can be combined freely. Gateway cities (like Delhi) can be in more than one.</p>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {zones.map((z) => {
+                                                    const on = (p.zones ?? []).includes(z.id);
+                                                    return (
+                                                        <button key={z._key} type="button" aria-pressed={on} disabled={!z.id}
+                                                            onClick={() => update(p._key, { zones: on ? (p.zones ?? []).filter((id) => id !== z.id) : [...(p.zones ?? []), z.id] })}
+                                                            className={cn("rounded-full px-3 py-1.5 text-xs font-medium transition-colors", on ? "bg-brand-blue text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>
+                                                            {z.label || "New region"}
+                                                        </button>
+                                                    );
+                                                })}
+                                                {!zones.length && <span className="text-xs text-muted-foreground">Add regions in the Regions tab first.</span>}
+                                            </div>
+                                        </div>
                                         <div className="grid gap-3 grid-cols-2 sm:grid-cols-5">
-                                            <Field label="Per night from"><Input inputMode="numeric" className="tabular-nums" value={p.nightlyFrom} onChange={(e) => update(p._key, { nightlyFrom: Number(num(e.target.value)) })} /></Field>
-                                            <Field label="Per night up to"><Input inputMode="numeric" className="tabular-nums" value={p.nightlyTo} onChange={(e) => update(p._key, { nightlyTo: Number(num(e.target.value)) })} /></Field>
+                                            <Field label="Visa from (per person)"><Input inputMode="numeric" className="tabular-nums" value={p.visaFrom ?? ""} placeholder="None" onChange={(e) => update(p._key, { visaFrom: Number(num(e.target.value)) || undefined })} /></Field>
+                                            <Field label="Visa up to"><Input inputMode="numeric" className="tabular-nums" value={p.visaTo ?? ""} placeholder="None" onChange={(e) => update(p._key, { visaTo: Number(num(e.target.value)) || undefined })} /></Field>
                                             <Field label="Fewest nights"><Input inputMode="numeric" className="tabular-nums" value={p.minNights} onChange={(e) => update(p._key, { minNights: Number(num(e.target.value)) })} /></Field>
                                             <Field label="Most nights"><Input inputMode="numeric" className="tabular-nums" value={p.maxNights} onChange={(e) => update(p._key, { maxNights: Number(num(e.target.value)) })} /></Field>
                                             <Field label="Starts with"><Input inputMode="numeric" className="tabular-nums" value={p.suggestedNights} onChange={(e) => update(p._key, { suggestedNights: Number(num(e.target.value)) })} /></Field>
@@ -222,6 +253,99 @@ function PlacesEditor({ places, currency, onChange }: { places: EditPlace[]; cur
                         );
                     }}
                 />
+            </CardContent>
+        </Card>
+    );
+}
+
+const CYCLE: Season[] = ["regular", "peak", "off", "closed"];
+const SEASON_STYLE: Record<Season, string> = {
+    regular: "bg-slate-100 text-slate-700",
+    peak: "bg-orange-500 text-white",
+    off: "bg-sky-100 text-sky-800",
+    closed: "bg-slate-700 text-white",
+};
+
+/** Twelve month buttons; each tap moves the month to the next season */
+function SeasonPicker({ place, onChange }: { place: EditPlace; onChange: (c: Partial<EditPlace>) => void }) {
+    const setMonth = (m: number, season: Season) => {
+        const without = (list?: number[]) => (list ?? []).filter((x) => x !== m);
+        const next = { peakMonths: without(place.peakMonths), offMonths: without(place.offMonths), closedMonths: without(place.closedMonths) };
+        if (season === "peak") next.peakMonths.push(m);
+        if (season === "off") next.offMonths.push(m);
+        if (season === "closed") next.closedMonths.push(m);
+        onChange(next);
+    };
+    return (
+        <div>
+            <p className="text-sm font-medium mb-1">Seasons</p>
+            <p className="text-xs text-muted-foreground mb-2">Tap a month to change it: regular, peak, off season, closed. Travellers can't send a trip that stays here in a closed month.</p>
+            <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
+                {MONTHS.map((label, i) => {
+                    const m = i + 1;
+                    const season = seasonOf(place, m);
+                    return (
+                        <button key={label} type="button" onClick={() => setMonth(m, CYCLE[(CYCLE.indexOf(season) + 1) % CYCLE.length])}
+                            aria-label={`${label}: ${SEASON_LABELS[season]}`}
+                            className={cn("rounded-lg py-2 text-xs font-medium transition-[background-color,scale] active:scale-[0.96]", SEASON_STYLE[season])}>
+                            {label}
+                        </button>
+                    );
+                })}
+            </div>
+            <div className="flex flex-wrap gap-3 mt-2 text-[11px] text-muted-foreground">
+                {CYCLE.map((c) => <span key={c} className="inline-flex items-center gap-1"><span className={cn("w-2.5 h-2.5 rounded-sm", SEASON_STYLE[c])} />{SEASON_LABELS[c]}</span>)}
+            </div>
+            {(place.closedMonths?.length ?? 0) > 0 && (
+                <div className="mt-2 max-w-md">
+                    <Field label="Why it is closed (shown to travellers)">
+                        <Input value={place.seasonNote ?? ""} maxLength={120} onChange={(e) => onChange({ seasonNote: e.target.value })} placeholder="roads are snowbound" />
+                    </Field>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ZonesEditor({ zones, places, onChange }: { zones: Keyed<BuilderZone>[]; places: EditPlace[]; onChange: (z: Keyed<BuilderZone>[]) => void }) {
+    const update = (k: string, changes: Partial<BuilderZone>) => onChange(zones.map((z) => (z._key === k ? { ...z, ...changes } : z)));
+    const count = (id: string) => places.filter((p) => (p.zones ?? []).includes(id)).length;
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Regions</CardTitle>
+                <CardDescription className="text-pretty">
+                    Places in one region combine freely. A trip can cover a second region only if it is long enough (see Limits), and the travel between them is added to the budget.
+                    "Travel in" is one way, per person, from another region. "Return flight" is from a major Indian city and back, used for the Return flights extra.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <SortableRows
+                    items={zones}
+                    label={(z) => z.label}
+                    onChange={onChange}
+                    render={(z, _i, handle) => (
+                        <div className="flex items-end gap-2 rounded-2xl bg-white p-2 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]">
+                            {handle}
+                            <div className="grid flex-1 gap-2 grid-cols-2 sm:grid-cols-6">
+                                <div className="col-span-2">
+                                    <Field label={`Region (${count(z.id)} places)`}><Input value={z.label} onChange={(e) => update(z._key, { label: e.target.value })} placeholder="South India" /></Field>
+                                </div>
+                                <Field label="Travel in from"><Input inputMode="numeric" className="tabular-nums" value={z.hopFrom} onChange={(e) => update(z._key, { hopFrom: Number(num(e.target.value)) })} /></Field>
+                                <Field label="Travel in up to"><Input inputMode="numeric" className="tabular-nums" value={z.hopTo} onChange={(e) => update(z._key, { hopTo: Number(num(e.target.value)) })} /></Field>
+                                <Field label="Return flight from"><Input inputMode="numeric" className="tabular-nums" value={z.fareFrom} onChange={(e) => update(z._key, { fareFrom: Number(num(e.target.value)) })} /></Field>
+                                <Field label="Return flight up to"><Input inputMode="numeric" className="tabular-nums" value={z.fareTo} onChange={(e) => update(z._key, { fareTo: Number(num(e.target.value)) })} /></Field>
+                            </div>
+                            <button type="button" onClick={() => onChange(zones.filter((x) => x._key !== z._key))} aria-label={`Remove ${z.label}`} className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50">
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
+                />
+                <Button variant="outline" size="sm" onClick={() => onChange([...zones, { _key: key(), id: "", label: "", hopFrom: 4000, hopTo: 9000, fareFrom: 6000, fareTo: 14000 }])}>
+                    <Plus className="w-4 h-4 mr-1.5" aria-hidden /> Add a region
+                </Button>
+                <p className="text-xs text-muted-foreground">Save a new region before ticking it on places.</p>
             </CardContent>
         </Card>
     );
@@ -336,6 +460,12 @@ function RulesEditor({ value, onChange }: { value: Editable; onChange: (c: Parti
                 </Field>
                 <Field label="Longest trip (nights)">
                     <Input inputMode="numeric" className="tabular-nums" value={value.maxNights} onChange={(e) => onChange({ maxNights: Number(num(e.target.value)) })} />
+                </Field>
+                <Field label="Most regions in a trip">
+                    <Input inputMode="numeric" className="tabular-nums" value={value.maxRegions ?? 2} onChange={(e) => onChange({ maxRegions: Number(num(e.target.value)) })} />
+                </Field>
+                <Field label="Nights needed for 2+ regions">
+                    <Input inputMode="numeric" className="tabular-nums" value={value.multiRegionMinNights ?? 10} onChange={(e) => onChange({ multiRegionMinNights: Number(num(e.target.value)) })} />
                 </Field>
                 <p className="sm:col-span-3 text-sm text-muted-foreground">
                     All prices here are in {value.currency}. Travellers see them in the currency they pick on the site.

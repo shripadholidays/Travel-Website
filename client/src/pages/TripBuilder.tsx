@@ -5,9 +5,10 @@ import {
     useDroppable, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragStartEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { GripVertical, Loader2, MapPinned, Package, RotateCcw, Trash2, X } from "lucide-react";
+import { AlertTriangle, GripVertical, Lightbulb, Loader2, MapPinned, MessageSquareText, Package, RotateCcw, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Container } from "@/components/ui/container";
 import { PageTitle } from "@/components/PageTitle";
 import { PlacePalette } from "@/components/trip-builder/PlacePalette";
@@ -21,7 +22,7 @@ import { useTripBuilder } from "@/hooks/use-trip-builder";
 import { useTour } from "@/hooks/use-tours";
 import { cn } from "@/lib/utils";
 import {
-    draftFromTour, emptyDraft, estimateTrip, insertItem, moveItem, newStop, quietestDay, removeItem, resizeStop, uid,
+    blocking, draftFromTour, emptyDraft, estimateTrip, insertItem, moveItem, newStop, placeFit, planRoute, quietestDay, removeItem, resizeStop, uid,
     type BuilderActivity, type DaySlot, type TripBuilderCatalogue, type TripDraft,
 } from "@/lib/trip-builder";
 
@@ -142,7 +143,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
                 title="Build Your Own Trip"
-                description="Pick your places, nights, hotels and extras, plan each day, and see a price range straight away. Our team confirms your final price within 24 hours."
+                description="Pick your places, nights, hotels and extras, plan each day, and see your estimated budget straight away, priced for the season. Our team confirms your final price within 24 hours."
             />
             <Container>{children}</Container>
         </div>
@@ -166,6 +167,9 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
     }, [draft.stops]);
     const full = draft.stops.length >= catalogue.maxStops;
     const tooLong = estimate.nights > catalogue.maxNights;
+    const route = useMemo(() => planRoute(catalogue, draft.stops), [catalogue, draft.stops]);
+    const stopping = blocking(estimate.issues);
+    const tips = (estimate.issues ?? []).filter((i) => i.kind === "zigzag");
     const routeLabel = draft.stops.map((s) => places.get(s.placeId)?.name).filter(Boolean).join(" → ");
 
     const update = useCallback((changes: Partial<TripDraft>) => setDraft((d) => ({ ...d, ...changes })), [setDraft]);
@@ -175,6 +179,14 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
         const place = places.get(placeId);
         if (!place) return;
         if (full) { toast.error(`A trip can have up to ${catalogue.maxStops} places.`); return; }
+        const fit = placeFit(catalogue, draft.stops, place);
+        if (fit === "too-far") {
+            toast.error(`${place.name} is too far from the rest of your trip.`, { description: `A trip can cover up to ${catalogue.maxRegions ?? 2} regions. Start a separate trip for it.` });
+            return;
+        }
+        if (fit === "new-region") {
+            toast.info(`${place.name} is in another region`, { description: `Trips covering two regions must be longer than ${catalogue.multiRegionMinNights ?? 10} days, and travel between them is added to your budget.` });
+        }
         setStops((stops) => {
             const copy = [...stops];
             copy.splice(index ?? copy.length, 0, newStop(place));
@@ -248,19 +260,24 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
     };
 
     const removable = active?.type === "stop" || active?.type === "item";
+    const trySend = () => {
+        if (tooLong) { toast.error(`Trips can be up to ${catalogue.maxNights} nights.`); return; }
+        if (stopping.length) { toast.error("Your route needs a change first", { description: stopping[0].message }); setPanel("trip"); return; }
+        setSending(true);
+    };
 
     return (
         <div className="bg-background min-h-screen pt-24 pb-36 lg:pb-16">
             <PageTitle
                 title="Build Your Own Trip"
-                description="Pick your places, nights, hotels and extras, plan each day, and see a price range straight away. Our team confirms your final price within 24 hours."
+                description="Pick your places, nights, hotels and extras, plan each day, and see your estimated budget straight away, priced for the season. Our team confirms your final price within 24 hours."
             />
             <Container>
                 <header className="mb-6 lg:mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                     <div className="min-w-0">
                         <h1 className="text-4xl md:text-5xl font-display font-bold text-balance">Build your own trip</h1>
                         <p className="text-muted-foreground mt-1 text-pretty max-w-xl">
-                            Drag in the places you want, set the nights, plan your days. The price range updates as you go.
+                            Drag in the places you want, set the nights, plan your days. Your budget updates as you go, priced for the season you travel in.
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -292,7 +309,7 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                 <DndContext sensors={sensors} collisionDetection={collision} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setActive(null)}>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,21rem)] lg:items-start">
                         <aside className={cn(panel === "places" ? "block" : "hidden", "lg:block lg:sticky lg:top-24 min-w-0")}>
-                            <PlacePalette places={visiblePlaces} currency={catalogue.currency} inTrip={inTrip} onAdd={(p) => addPlace(p.id)} full={full} />
+                            <PlacePalette places={visiblePlaces} catalogue={catalogue} stops={draft.stops} inTrip={inTrip} onAdd={(p) => addPlace(p.id)} full={full} />
                         </aside>
 
                         <main className={cn(panel === "trip" ? "block" : "hidden", "lg:block space-y-8 min-w-0")}>
@@ -307,7 +324,21 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                                     className="w-full bg-transparent text-xl font-semibold text-slate-900 placeholder:text-slate-400 border-b border-transparent hover:border-slate-200 focus:border-brand-orange focus:outline-none py-1 transition-colors"
                                 />
                             </div>
-                            <RouteBoard stops={draft.stops} places={places} onNights={setNights} onRemove={removeStop} placeDragging={active?.type === "place"} />
+                            <RouteBoard stops={draft.stops} places={places} catalogue={catalogue} route={route} onNights={setNights} onRemove={removeStop} placeDragging={active?.type === "place"} />
+                            {(stopping.length > 0 || tips.length > 0) && (
+                                <div className="space-y-2" aria-live="polite">
+                                    {stopping.map((i) => (
+                                        <p key={i.message} role="alert" className="flex gap-2.5 rounded-2xl bg-amber-50 text-amber-900 text-sm px-4 py-3 text-pretty">
+                                            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" aria-hidden /> {i.message}
+                                        </p>
+                                    ))}
+                                    {tips.map((i) => (
+                                        <p key={i.message} className="flex gap-2.5 rounded-2xl bg-sky-50 text-sky-900 text-sm px-4 py-3 text-pretty">
+                                            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-sky-600" aria-hidden /> {i.message}
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
                             {draft.stops.length === 0 && (
                                 <Button variant="outline" className="w-full lg:hidden" onClick={() => setPanel("places")}>
                                     <MapPinned className="w-4 h-4 mr-2" aria-hidden /> Pick places
@@ -321,6 +352,25 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                                 onRemoveItem={(id) => setStops((stops) => removeItem(stops, id))}
                                 planDragging={active?.type === "idea" || active?.type === "item"}
                             />
+                            <section aria-labelledby="wishes-heading" className="rounded-3xl bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_0_0_1px_rgba(15,23,42,0.06)]">
+                                <h2 id="wishes-heading" className="font-semibold text-slate-900 flex items-center gap-2">
+                                    <MessageSquareText className="w-4 h-4 text-brand-orange" aria-hidden /> Anything else you'd like?
+                                </h2>
+                                <p className="text-xs text-muted-foreground mt-0.5 mb-3 text-pretty">
+                                    Tell us about anything you couldn't add above: a place not in the list, a special stay, a celebration, food needs, or the city you're leaving from.
+                                </p>
+                                <label htmlFor="trip-wishes" className="sr-only">Anything else you'd like</label>
+                                <Textarea
+                                    id="trip-wishes"
+                                    rows={4}
+                                    maxLength={2000}
+                                    value={draft.notes}
+                                    onChange={(e) => update({ notes: e.target.value })}
+                                    placeholder="For example: we'd like a stop in Kasol, a houseboat with a private deck, and it's our anniversary on day 4."
+                                    className="rounded-2xl resize-y"
+                                />
+                                <p className="text-[11px] text-muted-foreground mt-1.5 text-right tabular-nums">{draft.notes.length}/2000</p>
+                            </section>
                         </main>
 
                         <aside className={cn(panel === "summary" ? "block" : "hidden", "lg:block lg:sticky lg:top-24 min-w-0")}>
@@ -335,7 +385,7 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                                 estimate={estimate}
                                 update={update}
                                 toggleExtra={toggleExtra}
-                                onSend={() => (tooLong ? toast.error(`Trips can be up to ${catalogue.maxNights} nights.`) : setSending(true))}
+                                onSend={trySend}
                                 extraDragging={active?.type === "extra"}
                             />
                         </aside>
@@ -356,7 +406,7 @@ function Builder({ catalogue, draft, setDraft }: { catalogue: TripBuilderCatalog
                 low={estimate.low}
                 high={estimate.high}
                 format={(n) => formatPrice(n, catalogue.currency)}
-                onSend={() => (tooLong ? toast.error(`Trips can be up to ${catalogue.maxNights} nights.`) : setSending(true))}
+                onSend={trySend}
             />
 
             <SendTripDialog
@@ -436,7 +486,7 @@ function MobileBar({ panel, setPanel, stops, low, high, format, onSend }: {
         <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center justify-between gap-3 px-4 pt-2.5">
                 <div className="min-w-0">
-                    <p className="text-[11px] text-muted-foreground leading-none">Estimated price</p>
+                    <p className="text-[11px] text-muted-foreground leading-none">Your estimated budget</p>
                     <p className="font-bold tabular-nums text-slate-900 truncate">{stops ? `${format(shownLow)} – ${format(shownHigh)}` : "Add a place"}</p>
                 </div>
                 <Button variant="brand" size="sm" className="shrink-0 rounded-full px-4" disabled={!stops} onClick={onSend}>Send my trip</Button>

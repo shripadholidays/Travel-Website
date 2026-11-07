@@ -1,0 +1,2919 @@
+{
+ "checked": "2026-11-07",
+ "note": "Season months and per person, per night land prices (budget 2-3 star, twin sharing, stay + breakfast + transfers + sightseeing, no flights) gathered from public package listings. Re-check before each season.",
+ "sites": [
+  "Air India",
+  "Air India Express",
+  "Backpackers United",
+  "Bharat Booking",
+  "Cheapflights",
+  "D Pauls",
+  "DP Holidays",
+  "Discover with Dheeraj (Spiti seasons)",
+  "Expedia",
+  "Expedia India",
+  "Flamingo Travels",
+  "Goibibo",
+  "HappyFares",
+  "Happyfares",
+  "Holidify",
+  "IRCTC Tourism",
+  "Indian Holiday",
+  "JustWravel",
+  "Kayak India",
+  "Kesari Tours",
+  "Kiomoi",
+  "MakeMyTrip",
+  "Momondo",
+  "Momondo India",
+  "Musafir",
+  "MyTravelCase",
+  "Outlook Traveller",
+  "Pelago",
+  "Pickyourtrail",
+  "RS Travels",
+  "Rann Utsav official (rannutsav.com)",
+  "SOTC",
+  "Sacred Yatra",
+  "Singapore Airlines",
+  "Skyscanner",
+  "SriLankan Airlines",
+  "Thai Airways",
+  "ThePrint",
+  "Thomas Cook India",
+  "Thrillophilia",
+  "TourTravelWorld",
+  "Travanya",
+  "TravelTriangle",
+  "Trawell",
+  "Tribune India (road closures)",
+  "Trip.com",
+  "TripAdvisor forums",
+  "TripCabinet",
+  "Tripoto",
+  "Veena World",
+  "Visit Dubai (official)",
+  "Wanderon",
+  "Wego",
+  "Yatra",
+  "Yatra (old pages, discarded)",
+  "Zurich Kotak",
+  "andamanislands.com",
+  "boatsnbeds.com (houseboat rates)",
+  "evisas.io"
+ ],
+ "places": {
+  "shimla": {
+   "peak": [
+    4,
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    3,
+    10,
+    11
+   ],
+   "off": [
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    1700,
+    2600
+   ],
+   "peakPrice": [
+    2800,
+    4200
+   ],
+   "hub": "Chandigarh (IXC) airport / Kalka rail",
+   "hubFareFromDelhi": [
+    2800,
+    5500
+   ],
+   "notes": "Holidify Shimla-Manali 5N: budget Rs8.5-11k (~1.7-2.2k/night), 3-star Rs14-16k (~2.8-3.2k/night). Christmas/New Year snow week is the priciest.",
+   "sources": [
+    "https://www.holidify.com/places/shimla/packages.html",
+    "https://www.tourtravelworld.com/packages/5-nights6-days-shimla-manali-tour-package-224571.html",
+    "https://traveltriangle.com/packages/shimla-kullu-manali-rohtang-pass-tour"
+   ]
+  },
+  "manali": {
+   "peak": [
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    1,
+    3,
+    4,
+    10,
+    11
+   ],
+   "off": [
+    2,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    2800
+   ],
+   "peakPrice": [
+    3000,
+    4500
+   ],
+   "hub": "Kullu-Bhuntar (KUU) airport; most travel by Volvo bus from Delhi",
+   "hubFareFromDelhi": [
+    7500,
+    15000
+   ],
+   "notes": "Same Shimla-Manali listings; Manali hotels run ~10% above Shimla in May-June. KUU flights are few (Alliance Air) and pricey; Delhi-Manali Volvo ~Rs1,200-2,000.",
+   "sources": [
+    "https://www.holidify.com/places/shimla/packages.html",
+    "https://www.kayak.co.in/flight-routes/New-Delhi-Indira-Gandhi-Intl-DEL/Kullu-Bhuntar-KUU",
+    "https://www.goibibo.com/flights/delhi-to-kullu-flight-schedule/"
+   ]
+  },
+  "dharamshala": {
+   "peak": [
+    3,
+    4,
+    5,
+    6,
+    10
+   ],
+   "shoulder": [
+    9,
+    11,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1700,
+    2500
+   ],
+   "peakPrice": [
+    2600,
+    3800
+   ],
+   "hub": "Dharamshala-Gaggal (DHM) airport",
+   "hubFareFromDelhi": [
+    4500,
+    9000
+   ],
+   "notes": "Amritsar-Dalhousie-Dharamshala 5N listings Rs11.5k-15.3k (~2.3-3.1k/night), upper end Rs20.4k; 9N Himachal circuits Rs16-24k.",
+   "sources": [
+    "https://www.tripoto.com/himachal-pradesh/tour-packages/dalhousie-dharamshala-tour-package-6-days-and-5-nights-162686799357",
+    "https://www.kiomoi.com/holidays/dharmshala-dalhousie-and-amritsar-family-tour-0668",
+    "https://www.tourtravelworld.com/packages/amritsar-dalhousie-dharamshala5-nights6-days-tour-223806.html",
+    "https://www.holidify.com/places/shimla/packages.html"
+   ]
+  },
+  "dalhousie": {
+   "peak": [
+    4,
+    5,
+    6
+   ],
+   "shoulder": [
+    3,
+    9,
+    10,
+    11,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2400
+   ],
+   "peakPrice": [
+    2500,
+    3700
+   ],
+   "hub": "Pathankot (rail; small IXP airport)",
+   "hubFareFromDelhi": [
+    800,
+    2000
+   ],
+   "notes": "Priced off the same Dalhousie-Dharamshala-Amritsar circuits. Fare is Delhi-Pathankot train (sleeper to 3AC/chair car).",
+   "sources": [
+    "https://www.holidify.com/tour-package/dalhousie-dharamsala-amritsar-tour-package-36438.html",
+    "https://www.veenaworld.com/package/dalhousie-dharamshala-amritsar-tour-package-hpda",
+    "https://wanderon.in/trip/himachal-tour-package-from-amritsar-5n-6d"
+   ]
+  },
+  "spiti": {
+   "peak": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "shoulder": [
+    5,
+    10
+   ],
+   "off": [
+    3,
+    4,
+    11
+   ],
+   "closed": [
+    12,
+    1,
+    2
+   ],
+   "offPrice": [
+    2000,
+    3000
+   ],
+   "peakPrice": [
+    2800,
+    4500
+   ],
+   "hub": "Chandigarh (IXC) or Kullu-Bhuntar, then road via Shimla/Kinnaur or Manali",
+   "hubFareFromDelhi": [
+    2800,
+    5500
+   ],
+   "notes": "6N group tours Rs11.6-18.5k (~1.9-3.1k/night); private-cab 3-star Rs30-40k (~5-6.7k/night, incl. dinner). Kunzum/Manali side shut ~Nov-May; Shimla-Kinnaur side open but most hotels close Dec-Feb.",
+   "sources": [
+    "https://bharatbooking.com/package-details/spiti-valley-group-tour/deluxe",
+    "https://traversindia.vacationlabs.com/tours/trip-to-spiti-valley",
+    "https://traveltriangle.com/packages/6nights-7days-spiti-tour-for-adventure",
+    "https://www.tribuneindia.com/news/himachal/gramphu-losar-stretch-shut-for-winter-as-spiti-braces-for-isolation",
+    "https://discoverwithdheeraj.com/spiti-valley-season-to-travel/"
+   ]
+  },
+  "chandigarh": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    9
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2200
+   ],
+   "peakPrice": [
+    1800,
+    2800
+   ],
+   "hub": "Chandigarh (IXC) airport",
+   "hubFareFromDelhi": [
+    2800,
+    5500
+   ],
+   "notes": "Few standalone packages; estimated from 3-star city hotel tariffs plus a day cab. Mostly a transit stop for Shimla/Manali.",
+   "sources": [
+    "https://www.holidify.com/places/shimla/packages.html",
+    "https://www.booking.com/city/in/chandigarh.html"
+   ]
+  },
+  "amritsar": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    9
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2200
+   ],
+   "peakPrice": [
+    2000,
+    3200
+   ],
+   "hub": "Amritsar (ATQ) airport",
+   "hubFareFromDelhi": [
+    3000,
+    6000
+   ],
+   "notes": "Derived from Amritsar legs in Himachal+Amritsar circuits (~2-3k/night). Shatabdi/Vande Bharat train is a cheap alternative (~Rs800-1,500).",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/5nights-6days-amritsar-dal-housie-dharamshala-tour-228105.html",
+    "https://www.holidify.com/places/shimla/packages.html"
+   ]
+  },
+  "leh": {
+   "peak": [
+    6,
+    7,
+    8
+   ],
+   "shoulder": [
+    5,
+    9,
+    10
+   ],
+   "off": [
+    3,
+    4,
+    11,
+    12
+   ],
+   "closed": [
+    1,
+    2
+   ],
+   "offPrice": [
+    2800,
+    3800
+   ],
+   "peakPrice": [
+    3800,
+    5500
+   ],
+   "hub": "Leh (IXL) airport",
+   "hubFareFromDelhi": [
+    4500,
+    15000
+   ],
+   "notes": "Thrillophilia budget Ladakh: 4N Rs15.5k, 5N Rs18.5-19.7k, 6N Rs19.9k (~3.3-3.9k/night); private 6N Rs30k (~5k/night). Permits extra. Leh reachable by air in Jan-Feb but sightseeing very limited (Chadar trek season only).",
+   "sources": [
+    "https://www.thrillophilia.com/cities/ladakh/tags/budget-tours",
+    "https://www.thrillophilia.com/tours/highlights-of-ladakh",
+    "https://www.holidify.com/tour-package/7-day-leh-ladakh-group-adventure-with-nubra-valley-and-pangong-lake-28546.html",
+    "https://www.kayak.co.in/flight-routes/New-Delhi-Indira-Gandhi-Intl-DEL/Leh-IXL",
+    "https://happyfares.in/blog/delhi-to-leh-flights-guide/"
+   ]
+  },
+  "srinagar": {
+   "peak": [
+    4,
+    5,
+    6
+   ],
+   "shoulder": [
+    3,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    11
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3000
+   ],
+   "peakPrice": [
+    3000,
+    4500
+   ],
+   "hub": "Srinagar (SXR) airport",
+   "hubFareFromDelhi": [
+    3500,
+    9000
+   ],
+   "notes": "Holidify Kashmir 5N: budget+houseboat Rs11.1-16.5k (~2.2-3.3k/night), 3-star+houseboat Rs14-20.5k (~2.8-4.1k/night). TravelTriangle 5N from Rs20-24k.",
+   "sources": [
+    "https://www.holidify.com/packages/kashmir-5-nights-6-days-354.html",
+    "https://traveltriangle.com/packages/5n-6d-kashmir-tour?id=15249",
+    "https://www.kayak.co.in/flight-routes/Delhi-DEL/Srinagar-SXR",
+    "https://flights.airindiaexpress.com/en-in/delhi-to-srinagar-flights"
+   ]
+  },
+  "gulmarg": {
+   "peak": [
+    1,
+    2,
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    3,
+    4,
+    7,
+    8,
+    9,
+    10
+   ],
+   "off": [
+    11
+   ],
+   "closed": [],
+   "offPrice": [
+    2200,
+    3200
+   ],
+   "peakPrice": [
+    3500,
+    5500
+   ],
+   "hub": "Srinagar (SXR) airport",
+   "hubFareFromDelhi": [
+    3500,
+    9000
+   ],
+   "notes": "Gulmarg hotels cost more than Srinagar; ski season (late Dec-Feb) and New Year snowfall packages are the priciest.",
+   "sources": [
+    "https://www.holidify.com/packages/kashmir-5-nights-6-days-354.html",
+    "https://www.holidify.com/places/kashmir/packages.html"
+   ]
+  },
+  "pahalgam": {
+   "peak": [
+    4,
+    5,
+    6
+   ],
+   "shoulder": [
+    3,
+    7,
+    8,
+    9,
+    10
+   ],
+   "off": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    2800
+   ],
+   "peakPrice": [
+    3000,
+    4500
+   ],
+   "hub": "Srinagar (SXR) airport",
+   "hubFareFromDelhi": [
+    3500,
+    9000
+   ],
+   "notes": "From Kashmir circuit listings. Amarnath Yatra (Jul-Aug) fills hotels; winter is quiet and some properties close.",
+   "sources": [
+    "https://www.holidify.com/packages/kashmir-5-nights-6-days-354.html",
+    "https://www.travanya.com/india-tour-packages/kashmir-tour-packages/kashmir-vacation-gulmarg-and-pahalgam-valleys"
+   ]
+  },
+  "katra": {
+   "peak": [
+    3,
+    4,
+    5,
+    6,
+    10
+   ],
+   "shoulder": [
+    9,
+    11,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1400,
+    2200
+   ],
+   "peakPrice": [
+    2000,
+    3500
+   ],
+   "hub": "Jammu (IXJ) airport; Katra has direct Vande Bharat trains",
+   "hubFareFromDelhi": [
+    3000,
+    6500
+   ],
+   "notes": "3N Vaishno Devi packages Rs5-6k budget (~1.7-2k/night) up to Rs13k with private cab (~4.3k). Navratri (Mar-Apr, Oct) and summer holidays are peak.",
+   "sources": [
+    "https://www.tripoto.com/tour-packages/mata-vaishnu-devi-tour-4d-3n-156286858310",
+    "https://www.tourtravelworld.com/packages/vaishno-devi-darshan3n4d-229704.html",
+    "https://blog.irctctourism.com/?p=2021"
+   ]
+  },
+  "delhi": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    9
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    2800
+   ],
+   "peakPrice": [
+    2500,
+    4000
+   ],
+   "hub": "Delhi (DEL) - origin hub",
+   "hubFareFromDelhi": [
+    0,
+    0
+   ],
+   "notes": "Golden Triangle 5N: Tripoto Rs16.8k (~3.4k/night), TravelTriangle 3-star Rs32-34k (~6.4k/night); budget guides Rs12-20k.",
+   "sources": [
+    "https://www.tripoto.com/tour-packages/golden-triangle-tour-5n-6d-156274849881",
+    "https://traveltriangle.com/packages/golden-triangle-5-nights-6-days-tour",
+    "https://www.viacation.com/packages/6-days-golden-triangle-5-nights-6-days"
+   ]
+  },
+  "agra": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    9
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2500
+   ],
+   "peakPrice": [
+    2200,
+    3500
+   ],
+   "hub": "Agra Cantt (rail; Gatimaan/Vande Bharat)",
+   "hubFareFromDelhi": [
+    500,
+    1500
+   ],
+   "notes": "From Golden Triangle and Agra-Mathura listings (Rs6-7.5k for 2N incl. car).",
+   "sources": [
+    "https://rajputanacabs.in/agra/agra-mathura-vrindavan-tour-package/3-days/",
+    "https://tours.sacredyatra.com/?p=7470",
+    "https://traveltriangle.com/packages/golden-triangle-5-nights-6-days-tour"
+   ]
+  },
+  "mathura": {
+   "peak": [
+    3,
+    8,
+    10,
+    11
+   ],
+   "shoulder": [
+    1,
+    2,
+    9,
+    12
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2300
+   ],
+   "peakPrice": [
+    2200,
+    3500
+   ],
+   "hub": "Mathura Junction (rail)",
+   "hubFareFromDelhi": [
+    300,
+    1200
+   ],
+   "notes": "2N Mathura-Vrindavan: Kiomoi Rs4.9k, Tafri Rs6.6k, Sacred Yatra Rs7.5k (~2.4-3.8k/night); TravelTriangle Rs12-15k. Holi (Mar) and Janmashtami (Aug/Sep) spike sharply.",
+   "sources": [
+    "https://traveltriangle.com/packages/2-nights-3-days-mathura-vrindavan-tour",
+    "https://www.kiomoi.com/holidays/mathura-vrindavan-itinerary-0648",
+    "https://tafri-website.vercel.app/mathura-vrindavan-tour-packages"
+   ]
+  },
+  "varanasi": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    2800
+   ],
+   "peakPrice": [
+    2800,
+    4200
+   ],
+   "hub": "Varanasi (VNS) airport",
+   "hubFareFromDelhi": [
+    3500,
+    7000
+   ],
+   "notes": "4N Varanasi-Ayodhya-Prayagraj: Rs12-14k budget (~3-3.5k/night); TravelTriangle 3-star Rs34k (~8.5k, premium). Dev Deepawali (Nov) is the top week.",
+   "sources": [
+    "https://traveltriangle.com/packages/4-nights-5-days-ayodhya-varanasi-prayagraj-tour",
+    "https://bharatbooking.com/package-details/varanasi-ayodhya-prayagraj-tour",
+    "https://musafircab.com/page/4-nights-5-days-ayodhya-varanasi-prayagraj-tour-package"
+   ]
+  },
+  "ayodhya": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    9
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2600
+   ],
+   "peakPrice": [
+    2600,
+    4000
+   ],
+   "hub": "Ayodhya (AYJ) airport / Prayagraj (IXD)",
+   "hubFareFromDelhi": [
+    3500,
+    7500
+   ],
+   "notes": "Same circuit listings. Deepotsav (Oct/Nov), Ram Navami and Prayagraj Magh Mela (Jan-Feb) push rates up; Kumbh years far higher.",
+   "sources": [
+    "https://traveltriangle.com/packages/4-nights-5-days-ayodhya-varanasi-prayagraj-tour",
+    "https://tafri-website.vercel.app/ayodhya-prayagraj-varanasi-tour-package",
+    "https://www.holidify.com/places/ayodhya/packages.html"
+   ]
+  },
+  "rishikesh": {
+   "peak": [
+    3,
+    4,
+    5,
+    6,
+    10
+   ],
+   "shoulder": [
+    2,
+    9,
+    11
+   ],
+   "off": [
+    1,
+    7,
+    8,
+    12
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2500
+   ],
+   "peakPrice": [
+    2400,
+    3800
+   ],
+   "hub": "Dehradun (DED) airport; Haridwar rail",
+   "hubFareFromDelhi": [
+    3000,
+    6500
+   ],
+   "notes": "4N Haridwar-Rishikesh-Mussoorie: Rs10.5-15k (~2.6-3.8k/night); TravelTriangle 3-star Rs36k. Rafting shut Jul-Aug.",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/4-night5-days-haridwar-rishikesh-mussoorie-package-207975.html",
+    "https://triptradition.com/?p=5398",
+    "https://traveltriangle.com/packages/4nights-5days-rishikesh-holiday?id=5886"
+   ]
+  },
+  "haridwar": {
+   "peak": [
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "shoulder": [
+    2,
+    10,
+    11
+   ],
+   "off": [
+    1,
+    8,
+    9,
+    12
+   ],
+   "closed": [],
+   "offPrice": [
+    1400,
+    2200
+   ],
+   "peakPrice": [
+    2000,
+    3200
+   ],
+   "hub": "Haridwar Junction (rail); Dehradun airport",
+   "hubFareFromDelhi": [
+    500,
+    1500
+   ],
+   "notes": "Same Uttarakhand listings, Haridwar hotels slightly cheaper. Char Dham start (Apr-Jun) and Kanwar Yatra (Jul) are busiest.",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/4-nights-haridwar-rishikesh-dehradun-mussoorie-tour-238451.html",
+    "https://www.bizarexpedition.com/pkg-haridwar-rishikesh-dehradun-mussoorie"
+   ]
+  },
+  "nainital": {
+   "peak": [
+    4,
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    3,
+    10,
+    11
+   ],
+   "off": [
+    1,
+    2,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    1700,
+    2600
+   ],
+   "peakPrice": [
+    2800,
+    4200
+   ],
+   "hub": "Kathgodam (rail); Pantnagar (PGH) airport",
+   "hubFareFromDelhi": [
+    500,
+    1600
+   ],
+   "notes": "4N Nainital-Corbett: Rs9.3k budget (~2.3k/night), Rs18.5-19k mid (~4.6k/night).",
+   "sources": [
+    "https://www.holidify.com/packages/nainital-corbett-tour-packages-385.html",
+    "https://www.tourtravelworld.com/packages/jim-corbett-with-nainital-tour-217449.html",
+    "https://thrillophilia.com/tours/delhi-nainital-corbett-tour-package"
+   ]
+  },
+  "almora": {
+   "peak": [
+    4,
+    5,
+    6,
+    10
+   ],
+   "shoulder": [
+    3,
+    9,
+    11,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2400
+   ],
+   "peakPrice": [
+    2400,
+    3600
+   ],
+   "hub": "Kathgodam (rail)",
+   "hubFareFromDelhi": [
+    500,
+    1600
+   ],
+   "notes": "Few direct listings; scaled from Nainital/Kumaon packages. Mostly homestays and small hotels.",
+   "sources": [
+    "https://www.holidify.com/packages/nainital-package-for-5-days-388.html"
+   ]
+  },
+  "corbett": {
+   "peak": [
+    3,
+    4,
+    5,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    6,
+    10,
+    11
+   ],
+   "off": [
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3000
+   ],
+   "peakPrice": [
+    3000,
+    5000
+   ],
+   "hub": "Ramnagar (rail); Pantnagar airport",
+   "hubFareFromDelhi": [
+    400,
+    1500
+   ],
+   "notes": "Resort-style stays cost more; jeep safari usually extra. Dhikala zone open mid-Nov to mid-Jun; only Jhirna/Dhela open in monsoon.",
+   "sources": [
+    "https://www.travanya.com/india-tour-packages/nainital-tour-packages/jim-corbett-wild-retreat",
+    "https://traveltriangle.com:443/uttarakhand-tourism/nainital/places-to-visit/jim-corbett-national-park/entry-fees",
+    "https://veenaworld.com/package/nainital-corbett-tour-package-shut7/i"
+   ]
+  },
+  "jaipur": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2500
+   ],
+   "peakPrice": [
+    2500,
+    4000
+   ],
+   "hub": "Jaipur (JAI) airport",
+   "hubFareFromDelhi": [
+    2500,
+    5000
+   ],
+   "notes": "Rajasthan multi-city: Wanderon 8D Rs29k (~4.1k/night), Thrillophilia Rs19-37k, Holidify 7N 3-star ~$186-297 (~2.2-3.5k/night).",
+   "sources": [
+    "https://www.thrillophilia.com/tours/imperial-rajasthan",
+    "https://wanderon.in/india-trips/rajasthan/rajasthan-budget-tour-packages",
+    "https://www.holidify.com/tour-package/rajasthan-holiday-package-25559.html"
+   ]
+  },
+  "pushkar": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1400,
+    2200
+   ],
+   "peakPrice": [
+    2200,
+    3500
+   ],
+   "hub": "Ajmer Junction (rail); Kishangarh airport",
+   "hubFareFromDelhi": [
+    500,
+    1500
+   ],
+   "notes": "Scaled from Rajasthan circuits. Pushkar Camel Fair week (Oct/Nov) can triple rates.",
+   "sources": [
+    "https://wanderon.in/india-trips/rajasthan/rajasthan-group-tour-packages"
+   ]
+  },
+  "jodhpur": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2400
+   ],
+   "peakPrice": [
+    2400,
+    3800
+   ],
+   "hub": "Jodhpur (JDH) airport",
+   "hubFareFromDelhi": [
+    3500,
+    7000
+   ],
+   "notes": "3N Jodhpur-Jaisalmer with camp: TravelTriangle Rs10k, Tripoto Rs9.5k, TourTravelWorld Rs10-12k (~3.2-4k/night).",
+   "sources": [
+    "https://traveltriangle.com/packages/3nights-4days-rajasthan-vacation",
+    "https://tripoto.com/rajasthan/tour-packages/desert-escapade-jodhpur-jaisalmer-delight-3n-4d-173796961670",
+    "https://www.tourtravelworld.com/packages/jodhpur-jaisalmer-tour-package3-night4-days-229022.html"
+   ]
+  },
+  "jaisalmer": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2400
+   ],
+   "peakPrice": [
+    2800,
+    4500
+   ],
+   "hub": "Jaisalmer (JSA, seasonal flights) / Jaisalmer rail",
+   "hubFareFromDelhi": [
+    4500,
+    9000
+   ],
+   "notes": "Desert camps Rs3-8k pp/night (Thrillophilia) in season and mostly shut Apr-Sep. Desert Festival (Feb) is peak.",
+   "sources": [
+    "https://traveltriangle.com/packages/3nights-4days-rajasthan-vacation",
+    "https://www.thrillophilia.com/tours/imperial-rajasthan",
+    "https://www.holidify.com/places/Jaisalmer/packages.html"
+   ]
+  },
+  "udaipur": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    8,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    2800
+   ],
+   "peakPrice": [
+    2800,
+    4500
+   ],
+   "hub": "Udaipur (UDR) airport",
+   "hubFareFromDelhi": [
+    3500,
+    7000
+   ],
+   "notes": "Udaipur-Mount Abu: Waytoindia 3N 3-star Rs8.3k (~2.8k/night), TravelTriangle 3N Rs11.75k (~3.9k), 4N Rs16-26k (~4-6.6k). Monsoon (Aug-Sep) lake season is a mini-peak.",
+   "sources": [
+    "https://traveltriangle.com/packages/best-selling-3n4d-udaipur-mount-abu",
+    "https://www.waytoindia.com/travel-deals/udaipur-mount-abu-tour.aspx",
+    "https://www.travelride.in/tours/udaipur-and-mount-abu-holiday-package"
+   ]
+  },
+  "mountabu": {
+   "peak": [
+    5,
+    6,
+    10,
+    11,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    3,
+    4,
+    9
+   ],
+   "off": [
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2300
+   ],
+   "peakPrice": [
+    2300,
+    3600
+   ],
+   "hub": "Abu Road (rail); Udaipur airport",
+   "hubFareFromDelhi": [
+    600,
+    1800
+   ],
+   "notes": "Summer (May-Jun) and Diwali are peak, driven by Gujarat weekend traffic.",
+   "sources": [
+    "https://traveltriangle.com/packages/3nights-4days-udaipur-mount-abu-tour",
+    "https://ui-assets-gc.thrillophilia.com/tours/udaipur-mount-abu-tour-package"
+   ]
+  },
+  "kutch": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    10
+   ],
+   "off": [
+    4
+   ],
+   "closed": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "offPrice": [
+    1800,
+    2800
+   ],
+   "peakPrice": [
+    2800,
+    4800
+   ],
+   "hub": "Bhuj (BHJ) airport; Ahmedabad alternative",
+   "hubFareFromDelhi": [
+    4500,
+    9000
+   ],
+   "notes": "Prices are Bhuj 2-3 star hotel plus cab. Rann Utsav tent city (Oct 23 2025-Mar 4 2026) costs ~Rs9-10k pp/night with meals and tours, more on full moon and Dec-Jan. White Rann floods in monsoon and is extremely hot in May-Jun.",
+   "sources": [
+    "https://www.rannutsav.com/package-tour.php",
+    "https://rannutsav.com",
+    "https://www.holidify.com/tour-package/rann-utsav-2-night-tent-city-getaway-fixed-departure-34787.html",
+    "https://veenaworld.com/package/rann-utsav-getaway-tour-package-shgj4/i"
+   ]
+  },
+  "dwarka": {
+   "peak": [
+    8,
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2400
+   ],
+   "peakPrice": [
+    2400,
+    3800
+   ],
+   "hub": "Jamnagar (JGA) or Rajkot Hirasar (HSR) airport",
+   "hubFareFromDelhi": [
+    4500,
+    8500
+   ],
+   "notes": "4N Dwarka-Somnath: Kiomoi Rs12.65k, Holidify Rs13k, TravelTriangle Rs15.5k, Sacred Yatra Rs15.5k (~3.2-3.9k/night incl. long cab drives). Janmashtami (Aug) spikes Dwarka.",
+   "sources": [
+    "https://tours.sacredyatra.com/packages/dwarka-somnath-tour-package-668",
+    "https://traveltriangle.com:443/packages/4nights-5days-dwarka-tour",
+    "https://www.kiomoi.com/holidays/somnath-dwarka-tour-package-0499",
+    "https://bharatbooking.com/package-details/dwarka-tour-package"
+   ]
+  },
+  "somnath": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    8,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "closed": [],
+   "offPrice": [
+    1500,
+    2400
+   ],
+   "peakPrice": [
+    2400,
+    3800
+   ],
+   "hub": "Rajkot Hirasar (HSR) or Diu (DIU) airport; Veraval rail",
+   "hubFareFromDelhi": [
+    4000,
+    8500
+   ],
+   "notes": "Same Dwarka-Somnath listings. Shravan month (Jul-Aug) and Kartik Purnima fair raise demand.",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/dwarka-somnath4-night-tour-package-256431.html",
+    "https://dpauls.com/india-holidays/spiritual-gujarat/dp744"
+   ]
+  },
+  "mumbai": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    3000,
+    4500
+   ],
+   "peakPrice": [
+    4200,
+    6500
+   ],
+   "hub": "Mumbai (BOM)",
+   "hubFareFromDelhi": [
+    3500,
+    8000
+   ],
+   "notes": "City hotels cost more than hill/beach towns. 2N/3D 3-star packages Rs 5,000-10,500 pp (TourTravelWorld, TravelTriangle) = ~2,500-5,250/night; 4-star TT Rs 17,599 for 2N. Monsoon Jun-Sep is cheapest; Ganesh festival (Aug/Sep) busy but not pricier for packages.",
+   "sources": [
+    "https://traveltriangle.com/packages/mumbai-tour-from-bangalore?id=14928",
+    "https://www.tourtravelworld.com/packages/2-nights3-days-mumbai-tour-package-222991.html",
+    "https://traveltriangle.com/packages/mumbai-2n-3d-tour",
+    "https://www.thrillophilia.com/mumbai-city-tour"
+   ]
+  },
+  "lonavala": {
+   "peak": [
+    7,
+    8,
+    9,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    6,
+    10,
+    11
+   ],
+   "off": [
+    3,
+    4,
+    5
+   ],
+   "closed": [],
+   "offPrice": [
+    2200,
+    3500
+   ],
+   "peakPrice": [
+    3500,
+    5500
+   ],
+   "hub": "Pune (PNQ) or Mumbai (BOM); Lonavala railway station",
+   "hubFareFromDelhi": [
+    4000,
+    8000
+   ],
+   "notes": "Unusual: monsoon (Jul-Sep) is the PEAK season here (waterfalls, weekend crowds from Mumbai/Pune). MakeMyTrip 2N Lonavala trip Rs 10,543 pp = ~5,270/night; TravelTriangle 2N 4-star Rs 14,500. Summer Mar-May is cheapest. Weekends cost noticeably more than weekdays.",
+   "sources": [
+    "https://traveltriangle.com/packages/lonavala-khandala-tour-from-mumbai",
+    "https://www.makemytrip.com/holidays-india/maharashtra-tourism.html",
+    "https://traveltriangle.com/tour-packages/lonavala-mahabaleshwar"
+   ]
+  },
+  "mahabaleshwar": {
+   "peak": [
+    4,
+    5,
+    10,
+    11,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    3
+   ],
+   "off": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3200
+   ],
+   "peakPrice": [
+    3500,
+    5500
+   ],
+   "hub": "Pune (PNQ); Satara/Wathar rail",
+   "hubFareFromDelhi": [
+    4000,
+    8000
+   ],
+   "notes": "TravelTriangle 2N 2-star ex-Mumbai Rs 9,000 pp = 4,500/night (includes Mumbai transfers); Holidify 2N ~$105 pp = ~2,200/night. Very heavy monsoon (Jun-Sep): many viewpoints and boating shut, hotels discount heavily. Summer holidays (Apr-May) and Diwali/Christmas are peak.",
+   "sources": [
+    "https://traveltriangle.com/packages/3days-2nights-mahabaleshwar-tour-from-mumbai",
+    "https://www.holidify.com/tour-package/mahabaleshwar-tour-package-27487.html",
+    "https://in.musafir.com/Holidays/scenic_mahabaleshwar.aspx"
+   ]
+  },
+  "shirdi": {
+   "peak": [
+    11,
+    12,
+    1
+   ],
+   "shoulder": [
+    2,
+    3,
+    7,
+    8,
+    9,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    2800
+   ],
+   "peakPrice": [
+    2800,
+    4500
+   ],
+   "hub": "Shirdi airport (SAG, few flights) or Mumbai (BOM); Sainagar Shirdi / Nashik Road rail",
+   "hubFareFromDelhi": [
+    5000,
+    10000
+   ],
+   "notes": "Pilgrim spot, demand fairly even year-round. 2N Shirdi-Shani Shingnapur-Nashik packages Rs 5,120 (Kiomoi), 8,000 (Tafri), 10,500 (TravelTriangle), 10,999 (Sacred Yatra) pp = ~2,500-5,500/night. Guru Purnima (Jul), Ram Navami, Dussehra spike. Watch for Nashik-Trimbakeshwar Kumbh Mela 2027 (approx Jul-Sep 2027) when prices will jump sharply.",
+   "sources": [
+    "https://www.kiomoi.com/holidays/shirdi-nashik-tour-0468",
+    "https://traveltriangle.com/packages/shirdi-trimbakeshwar-shani-shingnapur-2nights-3days-tour",
+    "https://tafri-website.vercel.app/shirdi-nashik-tour-package",
+    "https://tours.sacredyatra.com/?p=6720",
+    "https://www.tripozo.com/holiday/WMR173A/Shirdi-Shani-Shingnapur-With-Nashik"
+   ]
+  },
+  "goa": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    10
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    3000
+   ],
+   "peakPrice": [
+    3500,
+    6500
+   ],
+   "hub": "Goa Dabolim (GOI) or Mopa (GOX); Madgaon/Thivim rail",
+   "hubFareFromDelhi": [
+    3500,
+    10000
+   ],
+   "notes": "3N/4D 3-star packages: Rs 5,500-7,500 budget, 9,000 (TravelTriangle 3-star), 11,999 (Musafir) pp = ~1,800-4,000/night. Christmas-New Year week can be 2x the peak range. Monsoon (Jun-Sep) cheapest; beach shacks and water sports shut. Flights Delhi-Goa ~3,200 in Jun-Aug, 7,000-13,000 at Dec-Jan.",
+   "sources": [
+    "https://www.traveltriangle.com/packages/goa-3-star-tour",
+    "https://in.musafir.com/Holidays/Gorgeous_Goa.aspx",
+    "https://www.holidify.com/tour-package/goa-tour-package-for-3n4d-22700.html",
+    "https://traveltriangle.com/packages/3nights-4days-monsoon-special-goa-tour?id=814",
+    "https://happyfares.in/blog/delhi-to-goa-flights-guide-2026/"
+   ]
+  },
+  "kochi": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3500
+   ],
+   "peakPrice": [
+    3200,
+    5000
+   ],
+   "hub": "Kochi (COK); Ernakulam rail",
+   "hubFareFromDelhi": [
+    6500,
+    13000
+   ],
+   "notes": "Usually sold as the arrival point of Kerala circuits. Derived from Kerala circuit packages (TravelTriangle 2N Kochi+Munnar ~Rs 15,750-17,150; Veena World 6D Kochi-Munnar-Thekkady-Alleppey group tour Rs 49,145). SW monsoon Jun-Aug cheapest (Ayurveda season).",
+   "sources": [
+    "https://traveltriangle.com/packages/3days-2nights-kerala-tour-package-starting-from-inr17150",
+    "https://www.veenaworld.com/package/best-of-kerala-tour-package-klkv",
+    "https://www.expedia.co.in/lp/flights/del/cok/delhi-to-cochin",
+    "https://www.kayak.co.in/flight-routes/New-Delhi-Indira-Gandhi-Intl-DEL/Kochi-COK"
+   ]
+  },
+  "munnar": {
+   "peak": [
+    12,
+    1,
+    4,
+    5
+   ],
+   "shoulder": [
+    2,
+    3,
+    9,
+    10,
+    11
+   ],
+   "off": [
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3500
+   ],
+   "peakPrice": [
+    3500,
+    5500
+   ],
+   "hub": "Kochi (COK), ~4 hrs by road; Aluva/Ernakulam rail",
+   "hubFareFromDelhi": [
+    6500,
+    13000
+   ],
+   "notes": "2N packages Rs 3,499 (TourTravelWorld), 8,690-9,480 (Flamingo), 8,711 pp = ~1,750-4,700/night. 5N Munnar-Thekkady-Alleppey Rs 17,998 (TourTravelWorld) = 3,600/night; TravelTriangle 4N Rs 22,800 = 5,700/night. Peak is both winter holidays and Indian summer holidays (Apr-May). Monsoon brings landslide risk.",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/2-nights3-days-munnar-253854.html",
+    "https://www.flamingotravels.co.in/india-travel-guide/kerala-travel-guide/munnar-travel-guide",
+    "https://www.tourtravelworld.com/packages/munnar-thekkady-alleppey-tour-package5-night6-days-229770.html",
+    "https://traveltriangle.com/packages/5days-4nights-kerala-family-package-mist-inn-resort-starting-from-inr22800?id=61490",
+    "https://www.holidify.com/packages/munnar-thekkady-tour-packages-372.html"
+   ]
+  },
+  "thekkady": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    5,
+    9,
+    10
+   ],
+   "off": [
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    3200
+   ],
+   "peakPrice": [
+    3200,
+    5000
+   ],
+   "hub": "Kochi (COK) or Madurai (IXM), ~4 hrs by road; Kottayam rail",
+   "hubFareFromDelhi": [
+    6500,
+    13000
+   ],
+   "notes": "Rarely sold alone; derived from Munnar-Thekkady-Alleppey circuits (Holidify ~$124-170 pp for 4N; TravelTriangle 5N Rs 31,240-35,500). Periyar boat rides continue in monsoon but are sometimes suspended in heavy rain.",
+   "sources": [
+    "https://www.holidify.com/packages/munnar-thekkady-tour-packages-372.html",
+    "https://traveltriangle.com/tour-packages/munnar-thekkady-alleppey/page/29",
+    "https://www.tourtravelworld.com/packages/5-nights-munnar-thekkady-alleppey-package-238290.html"
+   ]
+  },
+  "alleppey": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    8,
+    9,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "closed": [],
+   "offPrice": [
+    3000,
+    4500
+   ],
+   "peakPrice": [
+    5000,
+    8000
+   ],
+   "hub": "Kochi (COK), ~1.5 hrs; Alappuzha rail",
+   "hubFareFromDelhi": [
+    6500,
+    13000
+   ],
+   "notes": "Priced as one standard/deluxe private houseboat night incl. all meals. Deluxe AC 1-bedroom: Rs 7,000-15,000 per couple/night (guides; Coco Houseboats ~Rs 13,924 for 2); shared boats from ~Rs 5,999 per couple -> ~3,000-7,500 pp. Dec 20-Jan 5 can be up to 2x base. AC often runs only 9pm-6am. Veena World prices an optional houseboat night at ~Rs 8,000 pp. Nehru Trophy boat race (Aug) lifts August.",
+   "sources": [
+    "https://indiamapped.in/alleppey-houseboat-guide-routes-costs/",
+    "https://boatsnbeds.com/alleppey-houseboats/alleppey-houseboat-rates/",
+    "https://www.zotel.ai/hotels/coco-houseboats",
+    "https://www.veenaworld.com/package/munnar-thekkady-alleppey-tour-package-shkl2/i",
+    "https://myhappyjourney.com/community/d/115-how-much-does-a-kerala-houseboat-cost-for-a-couple-or-family-in-2025"
+   ]
+  },
+  "kovalam": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    2200,
+    3500
+   ],
+   "peakPrice": [
+    3500,
+    5500
+   ],
+   "hub": "Thiruvananthapuram (TRV); Varkala Sivagiri rail",
+   "hubFareFromDelhi": [
+    6500,
+    14000
+   ],
+   "notes": "Thrillophilia 'Coastal Wonders of Kerala' 3N Kovalam+Varkala Rs 15,000 pp = 5,000/night; 'Kerala Treasures' 5N Rs 23,000 pp = 4,600/night. Varkala cliff cafes and many guesthouses close in monsoon (Jun-Aug); sea unsafe for swimming.",
+   "sources": [
+    "https://www.thrillophilia.com/tours/coastal-wonders-of-kerala",
+    "https://spicejet.thrillophilia.com/tours/kerala-treasures",
+    "https://www.thrillophilia.com/cities/kovalam/tours"
+   ]
+  },
+  "madurai": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    3000
+   ],
+   "peakPrice": [
+    2800,
+    4500
+   ],
+   "hub": "Madurai (IXM); Madurai Jn rail",
+   "hubFareFromDelhi": [
+    6000,
+    13000
+   ],
+   "notes": "4N Madurai-Rameswaram-Kanyakumari packages: Rs 11,200-11,500 budget (TourTravelWorld), 16,469-18,116 (TravelTriangle) pp = ~2,800-4,500/night. Temple town; summer Apr-Jun very hot. Chithirai festival (Apr/May) brings crowds.",
+   "sources": [
+    "https://traveltriangle.com/packages/4n-5d-rameshwaram-kanyakumari-tour-from-madurai",
+    "https://www.tourtravelworld.com/packages/4-nights5-days-madurai-rameshwaram-kanyakumari-temple-tour-223159.html",
+    "https://www.holidify.com/tour-package/sacred-south-journey--madurai-rameswaram--kanyakumari-27698.html",
+    "https://in.musafir.com/Holidays/Stunning_Tamil_Nadu.aspx"
+   ]
+  },
+  "rameswaram": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    7,
+    8,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6
+   ],
+   "closed": [],
+   "offPrice": [
+    1600,
+    2800
+   ],
+   "peakPrice": [
+    2600,
+    4200
+   ],
+   "hub": "Madurai (IXM), ~4 hrs; Rameswaram rail (new Pamban bridge)",
+   "hubFareFromDelhi": [
+    6000,
+    13000
+   ],
+   "notes": "Same circuit listings as Madurai. Hotels are simpler/cheaper. NE monsoon rain Oct-Dec but pilgrim demand stays high; Aadi/Mahalaya Amavasya (Jul-Sep) spike demand.",
+   "sources": [
+    "https://traveltriangle.com/packages/4nights-5days-rameshwaram-voyage?id=7241",
+    "https://www.tourtravelworld.com/packages/4-nights5-days-madurai-rameshwaram-kanyakumari-temple-tour-223159.html",
+    "https://www.kiomoi.com/holidays/southern-temple-tour-0540"
+   ]
+  },
+  "kanyakumari": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    8,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    3000
+   ],
+   "peakPrice": [
+    2800,
+    4500
+   ],
+   "hub": "Thiruvananthapuram (TRV), ~2.5 hrs; Kanyakumari rail",
+   "hubFareFromDelhi": [
+    6500,
+    14000
+   ],
+   "notes": "Derived from Madurai-Rameswaram-Kanyakumari(-Trivandrum) 4N circuits (Rs 11,200-29,900 pp). Vivekananda Rock ferry can pause in rough seas (monsoon).",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/4-nights5-days-madurai-rameshwaram-kanyakumari-trivandrum-tour-package-222840.html",
+    "https://traveltriangle.com/packages/4n-5d-rameshwaram-kanyakumari-tour-from-madurai",
+    "https://www.southindiatoursandtravels.com/madurai-rameswaram-kanyakumari-tour"
+   ]
+  },
+  "ooty": {
+   "peak": [
+    4,
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    3,
+    9,
+    10,
+    11
+   ],
+   "off": [
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3500
+   ],
+   "peakPrice": [
+    3500,
+    6000
+   ],
+   "hub": "Coimbatore (CJB), ~3 hrs; Mettupalayam/Coimbatore rail",
+   "hubFareFromDelhi": [
+    5500,
+    12000
+   ],
+   "notes": "Peak is Indian summer holidays (Apr-Jun, flower show in May) plus Christmas. 5N Mysore-Coorg-Ooty: Yatra Rs 10,479, TravelTriangle Rs 17,499, DHT Rs 18,990, TourTravelWorld Rs 23,500-26,000 pp = ~2,100-5,200/night.",
+   "sources": [
+    "https://partner-reporting.yatra.com/vacations/tours/ExploreSouthIndia.shtml",
+    "https://traveltriangle.com/packages/coorg-ooty-mysore-tour-from-mumbai",
+    "https://www.dhtholidays.com/package/domestic-packages/ooty-coorg-myosre-tour",
+    "https://www.tourtravelworld.com/packages/5-night6-days-mysore-coorg-ooty-package-239941.html",
+    "https://tripoto.com/south-india/tour-packages/mysore-coorg-ooty-delight-5n-6d-ex-bangalore-173840659140"
+   ]
+  },
+  "coorg": {
+   "peak": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    5,
+    9
+   ],
+   "off": [
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2500,
+    4000
+   ],
+   "peakPrice": [
+    4000,
+    6500
+   ],
+   "hub": "Bengaluru (BLR), ~5-6 hrs; Mangaluru (IXE) ~4 hrs; Mysuru rail",
+   "hubFareFromDelhi": [
+    4500,
+    9000
+   ],
+   "notes": "Coorg stays are mostly homestays/resorts and run pricier than Mysore. 2N packages: Rs 9,499 (ex-Bengaluru), Rs 10,102-16,200 (TravelTriangle) pp = ~4,700-8,000/night; budget circuit share ~2,500-4,000. Heavy monsoon Jun-Aug (cheapest).",
+   "sources": [
+    "https://traveltriangle.com/packages/2nights-3days-coorg-tour",
+    "https://traveltriangle.com/packages/coorg-tour-from-kerala",
+    "https://south-zoom-tourism.lovable.app/tour-packages/coorg-weekend-getaway",
+    "https://holidify.com/tour-package/summer-special-tour-for-5-nights-mysore-coorg-and-ooty-22289.html"
+   ]
+  },
+  "mysore": {
+   "peak": [
+    10,
+    11,
+    12,
+    1
+   ],
+   "shoulder": [
+    2,
+    3,
+    9
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    3000
+   ],
+   "peakPrice": [
+    3000,
+    5000
+   ],
+   "hub": "Bengaluru (BLR), ~3 hrs; Mysuru Jn rail; Mysuru airport (few flights)",
+   "hubFareFromDelhi": [
+    4500,
+    9000
+   ],
+   "notes": "Dasara (Sep/Oct, 10 days) is the sharpest spike - hotels fill and roughly double. Derived from Mysore-Coorg-Ooty circuits (see ooty).",
+   "sources": [
+    "https://partner-reporting.yatra.com/vacations/tours/SouthIndiaSpecial.shtml",
+    "https://in.musafir.com/Holidays/breathtaking-karnataka.aspx",
+    "https://traveltriangle.com/packages/south-india-sightseeing-tour?id=21834"
+   ]
+  },
+  "hampi": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    9,
+    10
+   ],
+   "off": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    1800,
+    3000
+   ],
+   "peakPrice": [
+    3000,
+    4500
+   ],
+   "hub": "Hubballi (HBX) ~3.5 hrs or Bengaluru (BLR); Hosapete rail (Jindal VDY airport has few flights)",
+   "hubFareFromDelhi": [
+    6000,
+    12000
+   ],
+   "notes": "3N Hampi-Badami: Bharat Booking Rs 12,999, Trawell Rs 12,750 pp = ~4,250/night; Backpackers United Rs 4,999 (hostel) = 1,700/night; Veena World Rs 35,000 (premium group). Apr-May extremely hot (40C+), hence off. Hampi Utsav (Jan/Feb). Many Hampi island guesthouses close in monsoon.",
+   "sources": [
+    "https://bharatbooking.com/package-details/hampi-badami-tour",
+    "https://backpackersunited.in/tour/Hampi-Badami-tour-4-days-3-nights",
+    "https://www.veenaworld.com/package/hampi-badami-tour-package-shka32",
+    "https://www.trawell.in/tour-packages/karnataka-for-4-days",
+    "https://www.holidify.com/tour-package/hampi--badami-tour-package-36391.html"
+   ]
+  },
+  "gokarna": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    10
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    2000,
+    3200
+   ],
+   "peakPrice": [
+    3500,
+    5500
+   ],
+   "hub": "Goa (GOI/GOX) ~3 hrs or Mangaluru (IXE); Gokarna Road / Kumta rail",
+   "hubFareFromDelhi": [
+    3500,
+    10000
+   ],
+   "notes": "2N packages: TourTravelWorld Rs 6,999-10,999, Thrillophilia Rs 8,199 (ex-Bengaluru), JustWravel Rs 8,900, TravelTriangle Rs 10,369-11,590 pp = ~3,500-5,800/night. Beach shacks and huts close Jun-Sep and sea is unsafe; town (temple) stays open, so listed as off, not closed. New Year week very expensive.",
+   "sources": [
+    "https://www.thrillophilia.com/gokarna-packages",
+    "https://www.justwravel.com/tour-packages/india/karnataka/2-night-3-days-gokarna-tour-package",
+    "https://www.tourtravelworld.com/packages/2-night3-days-gokarna-package-268231.html",
+    "https://traveltriangle.com/packages/gokarna-tour-from-bangalore?id=43289"
+   ]
+  },
+  "andaman": {
+   "peak": [
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    10
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    3000,
+    4500
+   ],
+   "peakPrice": [
+    4500,
+    7000
+   ],
+   "hub": "Port Blair (IXZ)",
+   "hubFareFromDelhi": [
+    8000,
+    16000
+   ],
+   "notes": "Incl. private ferry Port Blair-Havelock(-Neil) (Makruzz/Nautika/Green Ocean ~Rs 1,000-1,600 pp each way). 5N packages: TravelTriangle budget Rs 8,299-14,000 (low end looks off-season/shared), Pickyourtrail Rs 13,563, Andaman Shore Paradise Rs 20,000-30,000, andamanislands.com Rs 57,950 per couple = ~2,700-6,000 pp/night. Monsoon May-Sep: ferries and scuba often cancelled. Delhi-Port Blair mostly via Chennai/Kolkata; recent fares seen Rs 11,000-16,000.",
+   "sources": [
+    "https://www.andamanshoreparadise.com.jrtechnology.in/andamanessential.html",
+    "https://andamanislands.com/package/port-blair-havelock-neil-island-for-5-nights-6-days",
+    "https://pickyourtrail.com/packages-from-delhi/andaman",
+    "https://kesari.in/India-Tours/Andaman-Tours",
+    "https://traveltriangle.com/blog/5-days-andaman-tour-itinerary-travelogue",
+    "https://flights.airindiaexpress.com/en/flights-to-port-blair"
+   ]
+  },
+  "shillong": {
+   "peak": [
+    3,
+    4,
+    5,
+    10,
+    11,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    9
+   ],
+   "off": [
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2800,
+    3800
+   ],
+   "peakPrice": [
+    3800,
+    5500
+   ],
+   "hub": "Guwahati (GAU), ~3 hrs to Shillong",
+   "hubFareFromDelhi": [
+    5500,
+    9000
+   ],
+   "notes": "Northeast hotels/cabs cost more than the South for the same star level. 5N Meghalaya: Thrillophilia Rs 19,184-22,000, Holidify Rs 24,500 (incl 1N Kaziranga), TravelTriangle Rs 24,550 pp = ~3,800-4,900/night. Monsoon Jun-Aug: Cherrapunji waterfalls at their best but very heavy rain; Dawki boating and some roads shut.",
+   "sources": [
+    "https://www.thrillophilia.com/tours/discovering-meghalaya",
+    "https://thrillophilia.com:443/tours/tour-of-mesmerising-meghalaya",
+    "https://www.holidify.com/package/5-nights-6-days--shillongcherrapunji---kaziranga-tour-package-16789.html",
+    "https://traveltriangle.com/family-packages/shillong",
+    "https://www.kayak.co.in/flight-routes/New-Delhi-Indira-Gandhi-Intl-DEL/Guwahati-Borjhar-GAU"
+   ]
+  },
+  "kaziranga": {
+   "peak": [
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    5,
+    10
+   ],
+   "off": [],
+   "closed": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "offPrice": [
+    3000,
+    4200
+   ],
+   "peakPrice": [
+    4000,
+    6000
+   ],
+   "hub": "Guwahati (GAU) ~4.5 hrs, or Jorhat (JRH) ~2 hrs",
+   "hubFareFromDelhi": [
+    5500,
+    9000
+   ],
+   "notes": "National park shut for monsoon (roughly mid-May to end-Sep). Reopening is staged: 2025 Bagori range opened 26 Sep, Kohora central range mid-Oct, elephant safari from 1 Nov; 2026-27 jeep safaris from 3 Oct. No true 'off' month - offPrice = shoulder pricing (Apr/May/Oct). 5N Shillong+Kaziranga: TourTravelWorld Rs 39,000 pp (7,800/night, higher tier), Thrillophilia Rs 22,000 incl jeep safari. Jeep safari ~Rs 3,000-4,000 per jeep extra unless included.",
+   "sources": [
+    "https://www.outlooktraveller.com/News/kaziranga-national-park-to-reopen-early-for-durga-puja-tourists-breaking-monsoon-closure",
+    "https://theprint.in/india/kaziranga-reopens-for-tourists-after-annual-monsoon-closure/3061035/",
+    "https://www.thrillophilia.com/tours/wildlife-tour-of-meghalaya-with-kaziranga",
+    "https://www.tourtravelworld.com/packages/shillong-and-kaziranga-tour-package-for5-nights-and6-days-267929.html",
+    "https://www.holidify.com/places/KAZIRANGA-NATIONAL-PARK/packages.html?pageNum=0"
+   ]
+  },
+  "darjeeling": {
+   "peak": [
+    3,
+    4,
+    5,
+    10,
+    11
+   ],
+   "shoulder": [
+    6,
+    9,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2500,
+    3500
+   ],
+   "peakPrice": [
+    3800,
+    6000
+   ],
+   "hub": "Bagdogra (IXB) ~3 hrs; New Jalpaiguri (NJP) rail",
+   "hubFareFromDelhi": [
+    4300,
+    8000
+   ],
+   "notes": "5N Darjeeling-Gangtok budget: TourTravelWorld Rs 12,500-15,999, Rs 24,500 (with Kalimpong) pp = ~2,500-4,900/night; Thomas Cook Rs 37,000-40,500 and SOTC Rs 44,100 are mid/upper tier (~7,500-8,800/night). Peak = summer holidays (Apr-Jun) and Durga Puja/Diwali (Oct-Nov). Monsoon landslides on hill roads. Dec-Feb cold and cheap, but clearest Kanchenjunga views.",
+   "sources": [
+    "https://www.tourtravelworld.com/packages/darjeeling-gangtok-tour-117761.html",
+    "https://www.tourtravelworld.com/packages/gangtok-darjeeling5-nights6-days-237498.html",
+    "https://www.thomascook.in/holidays/india-tour-packages/darjeeling-and-gangtok-tour-packages",
+    "https://sotc.in/india-tour-packages/darjeeling-tour-packages/from-mumbai-city",
+    "https://traveltriangle.com/packages/darjeeling-5n-6d-tour?id=15237",
+    "https://flights.airindiaexpress.com/en/delhi-to-bagdogra-flights"
+   ]
+  },
+  "gangtok": {
+   "peak": [
+    3,
+    4,
+    5,
+    6,
+    10,
+    11,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    9
+   ],
+   "off": [
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    2500,
+    3600
+   ],
+   "peakPrice": [
+    4000,
+    6500
+   ],
+   "hub": "Bagdogra (IXB) ~4.5 hrs (Pakyong PYG has very few flights); NJP rail",
+   "hubFareFromDelhi": [
+    4300,
+    8000
+   ],
+   "notes": "Same circuit listings as Darjeeling; Gangtok hotels a bit pricier. Nathula/Tsomgo trips need extra permit + shared cab (~Rs 1,000-1,500 pp); Nathula and North Sikkim (Lachung/Yumthang) roads can close after heavy snow (Jan-Feb) or monsoon landslides (Jul-Aug). Holidify 5N honeymoon ~$164 pp.",
+   "sources": [
+    "https://www.holidify.com/tour-package/5-nights-gangtok-and-darjeeling-honeymoon-package-24177.html",
+    "https://www.flamingotravels.co.in/india-tour-packages/west-bengal-sikkim-holiday-tour-packages/sikkim-delight-with-darjeeling-5nights/f4155",
+    "https://dpauls.com/india-holidays/gangtok-and-darjeeling-delights/dp343",
+    "https://www.thomascook.in/holidays/india-tour-packages/darjeeling-and-gangtok-tour-packages"
+   ]
+  },
+  "bali": {
+   "peak": [
+    6,
+    7,
+    8,
+    12
+   ],
+   "shoulder": [
+    4,
+    5,
+    9,
+    10
+   ],
+   "off": [
+    1,
+    2,
+    3,
+    11
+   ],
+   "closed": [],
+   "offPrice": [
+    4500,
+    6500
+   ],
+   "peakPrice": [
+    6500,
+    9500
+   ],
+   "returnFlightDelhi": [
+    30000,
+    50000
+   ],
+   "returnFlightMumbai": [
+    28000,
+    46000
+   ],
+   "visaINR": [
+    3300,
+    4000
+   ],
+   "notes": "Dry Apr-Oct; Jul-Aug + Christmas/New Year busiest; Jan-Mar wet & cheapest. Listings: TravelTriangle 4N Rs27,999 (~7k/n), Thrillophilia 4N Kuta+Ubud 24.5-32k (6-8k/n), Thrillophilia budget 5N 27.8-45k, Pickyourtrail 5N 37,785. Visa = VoA IDR 500,000 (~Rs2,650) + Bali tourist levy IDR 150,000 (~Rs800). No direct Delhi flight; via SIN/KUL/BKK; IndiGo direct from Mumbai/Bengaluru.",
+   "sources": [
+    "https://www.thrillophilia.com/states/bali-state/tours",
+    "https://www.thrillophilia.com/states/bali-state/tours/4-days-packages",
+    "https://traveltriangle.com/packages/bali-5-days-trip",
+    "https://pickyourtrail.com/packages/bali-land-only-tour",
+    "https://www.makemytrip.com/tripideas/bali/best-time-to-visit",
+    "https://www.holidify.com/places/bali/best-time-to-visit.html",
+    "https://blog.wego.com/bali-tourist-levy/",
+    "https://www.in.cheapflights.com/flights-to-Bali/Delhi/"
+   ]
+  },
+  "bangkok": {
+   "peak": [
+    11,
+    12,
+    1
+   ],
+   "shoulder": [
+    2,
+    3,
+    4,
+    5,
+    10
+   ],
+   "off": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    2500,
+    4000
+   ],
+   "peakPrice": [
+    3800,
+    5500
+   ],
+   "returnFlightDelhi": [
+    18000,
+    32000
+   ],
+   "returnFlightMumbai": [
+    20000,
+    34000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Cheapest destination on the list. Listings (4N land, twin): TravelTriangle Rs9,599 (~2.4k/n), Musafir budget Rs12,500, Tripoto Rs16,500 and Rs21,069 (flights not incl.), Pickyourtrail Rs21,180. Christmas/New Year and Diwali push peak; Songkran (mid-Apr) is a local spike. Indians visa-exempt; stay cut from 60 to 30 days from 15 Sep 2026; TDAC arrival card free.",
+   "sources": [
+    "https://traveltriangle.com/packages/4nights-5days-bangkok-pattaya-thailand-family-tour?id=713&travelmonth=8",
+    "https://in.musafir.com/Holidays/essential-thailand.aspx",
+    "https://www.tripoto.com/thailand/tour-packages/thai-getaway-4-nights-of-exotic-bliss-171673625375",
+    "https://www.tripoto.com/tour-packages/bangkok-and-pattaya-157122824919",
+    "https://pickyourtrail.com/packages-from-chennai/bangkok-pattaya",
+    "https://www.makemytrip.com/tripideas/thailand/best-time-to-visit",
+    "https://www.thaiairways.com/flights/en-in/flights-from-new-delhi-to-bangkok",
+    "https://www.happyfares.in/flights/airline/indigo/delhi-bangkok"
+   ]
+  },
+  "phuket": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    10
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    4000,
+    5500
+   ],
+   "peakPrice": [
+    5500,
+    8000
+   ],
+   "returnFlightDelhi": [
+    24000,
+    45000
+   ],
+   "returnFlightMumbai": [
+    22000,
+    42000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Andaman-coast monsoon May-Oct: rough seas, Phi Phi/James Bond speedboat trips sometimes cancelled, but resorts open and 30-50% cheaper. Listings (5N land): Tripoto Rs23,275 / Rs24,999 (flights not incl., ~4.7-5k/n), Indian Holiday Rs30,500-35,500 (6-7k/n), D Pauls land package; MyTravelCase Rs49,999 is a higher tier. Thai Airways DEL-HKT return ~Rs47k, BOM-HKT ~Rs44k; IndiGo/AirAsia direct budget fares lower.",
+   "sources": [
+    "https://tripoto.com/thailand/tour-packages/asian-wonder-krabi-and-phuket-5-nights-168259577713",
+    "https://www.indianholiday.com/international-tours/highlights-phuket-krabi.html",
+    "https://dpauls.com/international-holidays/asian-wonder-krabi-and-phuket-land-package/lp754",
+    "https://www.mytravelcase.com/tours/5nights-6days-phuket-krabi-luxury-tour-package/",
+    "https://www.holidify.com/places/phuket/best-time-to-visit.html",
+    "https://www.makemytrip.com/tripideas/krabi/best-time-to-visit",
+    "https://www.thomascook.in/holidays/international-tour-packages/krabi-and-phuket-tour-packages"
+   ]
+  },
+  "srilanka": {
+   "peak": [
+    12,
+    1,
+    2,
+    3
+   ],
+   "shoulder": [
+    4,
+    7,
+    8,
+    11
+   ],
+   "off": [
+    5,
+    6,
+    9,
+    10
+   ],
+   "closed": [],
+   "offPrice": [
+    4500,
+    6000
+   ],
+   "peakPrice": [
+    6000,
+    8500
+   ],
+   "returnFlightDelhi": [
+    20000,
+    32000
+   ],
+   "returnFlightMumbai": [
+    18000,
+    32000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "West/south coast best Dec-Mar; SW monsoon May-Sep (east coast good then); Aug Kandy Esala Perahera is a spike. Packages use private car+driver so per-night is higher than Thailand. Listings (5N land): Tripoto Rs23,999, Kiomoi 28,500, Pickyourtrail Rs30,210 / 34,323, Thrillophilia from Rs35,000, Serene Sri Lanka Rs35,999 (twin, min 4 pax). Visa: free for Indians (renewed July 2026, apply online); fallback ETA ~USD 35 if scheme lapses.",
+   "sources": [
+    "https://www.tripoto.com/tour-packages/6-days-in-srilanka",
+    "https://pickyourtrail.com/packages-from-lucknow/sri-lanka",
+    "https://pickyourtrail.com/packages-from-mumbai/sri-lanka",
+    "https://www.thrillophilia.com/countries/srilanka/tours/6-days-packages",
+    "https://www.kiomoi.com/holidays/amazing-sri-lanka-0547",
+    "https://www.veenaworld.com/package/best-of-sri-lanka-tour-package-shsl9/i",
+    "https://www.formulaindia.com/news/sri-lanka-extends-visa-free-access-for-indian-tourists/",
+    "https://www.srilankan.com/en-in/flights-from-delhi",
+    "https://expedia.co.in/lp/flights/del/cmb/delhi-to-colombo"
+   ]
+  },
+  "kathmandu": {
+   "peak": [
+    3,
+    4,
+    10,
+    11
+   ],
+   "shoulder": [
+    2,
+    5,
+    9,
+    12
+   ],
+   "off": [
+    1,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    3000,
+    4200
+   ],
+   "peakPrice": [
+    4000,
+    5500
+   ],
+   "returnFlightDelhi": [
+    10000,
+    18000
+   ],
+   "returnFlightMumbai": [
+    16000,
+    26000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Autumn (Oct-Nov, Dashain/Tihar) and spring (Mar-Apr) best; Indian summer-holiday demand May-Jun; monsoon Jun-Aug cheapest, Jan cold. Listings (5N KTM+Pokhara land): Musafir budget Rs17,330 (~3.5k/n), Musafir 3* Rs22,588 (4 pax) - 30,000 (2 pax), Holidify 3* Rs24,500, TourTravelWorld Rs16.5-20.3k (+5% GST) and Rs28,000 (private car). No visa/passport needed (voter ID OK). Mumbai one-way ~Rs10k.",
+   "sources": [
+    "https://in.musafir.com/Holidays/Beautiful_Nepal.aspx",
+    "https://in.musafir.com/Holidays/Divine_Nepal.aspx",
+    "https://www.holidify.com/package/5-nights-6-days-nepal-tour-itinerary-9255.html",
+    "https://www.tourtravelworld.com/packages/5-nights6-days-kathmandu-pokhara-tour-package-240062.html",
+    "https://www.veenaworld.com/package/kathmandu-pokhara-tour-package-shnp2/i",
+    "https://airindia.com/en-in/book-flights/flights-to-kathmandu",
+    "https://www.skyscanner.co.in/flights/advice/cheap-international-flights"
+   ]
+  },
+  "pokhara": {
+   "peak": [
+    3,
+    4,
+    10,
+    11
+   ],
+   "shoulder": [
+    2,
+    5,
+    9,
+    12
+   ],
+   "off": [
+    1,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    3000,
+    4200
+   ],
+   "peakPrice": [
+    4000,
+    5800
+   ],
+   "returnFlightDelhi": [
+    16000,
+    27000
+   ],
+   "returnFlightMumbai": [
+    22000,
+    34000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Same seasons as Kathmandu; Annapurna views clearest Oct-Nov, monsoon clouds Jun-Aug. Thin data for Pokhara-only: TravelTriangle 2N Rs15,199 and Pelago 2N 3* Rs15,859 both include the KTM-Pokhara transfer (so ~4-5k/n for stay+sightseeing alone); Thrillophilia 3N Pokhara Rs19,899. Flight figures = India-Kathmandu return + ~Rs6-9k Kathmandu-Pokhara domestic return (or ~Rs1,500 tourist bus); Pokhara Intl has almost no India flights.",
+   "sources": [
+    "https://traveltriangle.com/packages/2nights-3days-pokhara-tour",
+    "https://pelago.com/en-IN/activity/pp41p-2-nights-3-days-pokhara-tour-package-with-pick-up-kathmandu",
+    "https://www.thrillophilia.com/countries/nepal/tours/4-days-packages",
+    "https://www.thrillophilia.com/tours/exclusive-nepal-quest--best-of-kathmandu-and-pokhara"
+   ]
+  },
+  "bhutan": {
+   "peak": [
+    3,
+    4,
+    10,
+    11
+   ],
+   "shoulder": [
+    5,
+    9,
+    12
+   ],
+   "off": [
+    1,
+    2,
+    6,
+    7,
+    8
+   ],
+   "closed": [],
+   "offPrice": [
+    5500,
+    7500
+   ],
+   "peakPrice": [
+    7500,
+    10500
+   ],
+   "returnFlightDelhi": [
+    15000,
+    65000
+   ],
+   "returnFlightMumbai": [
+    18000,
+    75000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Prices INCLUDE the Sustainable Development Fee of Rs1,200 per person per night for Indian nationals (children 6-12 Rs600; rate confirmed till 31 Aug 2027), plus private vehicle/guide. 5% GST on package components since Jan 2026 (SDF exempt). Paro Tsechu (Mar/Apr) and Thimphu Tsechu (Sep/Oct) bring festival surcharges. Jun-Aug monsoon: landslides, Paro flight cancellations (avoid Jul if possible). Listings: RS Travels 5-day Rs25-40k, Veena World Rs48,000 (twin, GST incl.), TourTravelWorld 5N ex-Bagdogra 3* Rs44,999, Thrillophilia 7-day Rs39,900-80,000 (SDF extra). Flights: low end = flying to Bagdogra + road via Phuentsholing; high end = direct Druk Air/Bhutan Airlines to Paro (DEL-PBH one-way typically Rs32-40k). No visa; free entry permit with passport/voter ID.",
+   "sources": [
+    "https://www.veenaworld.com/package/bhutan-getaway-tour-package-shbt3/i",
+    "https://www.thrillophilia.com/countries/bhutan/tours/7-days-packages",
+    "https://www.rstravels.co.in/blog/bhutan-tour-packages-from-india-2026-itinerary-cost-permits-included",
+    "https://www.tourtravelworld.com/packages/bhutan5n-bhutan-explorer5-nights06-daysex-bagdogra-269219.html",
+    "https://www.holidify.com/tour-package/famous-bhutan-5-nights-package-22561.html",
+    "https://happyfares.in/blog/bhutan-travel-guide-indians-2026/",
+    "https://www.happyfares.in/flights/delhi-to-paro-cheap-airtickets",
+    "https://www.holidify.com/country/bhutan/best-time-to-visit.html",
+    "https://www.makemytrip.com/tripideas/bhutan/best-time-to-visit"
+   ]
+  },
+  "singapore": {
+   "peak": [
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    1,
+    4,
+    10,
+    11
+   ],
+   "off": [
+    2,
+    3,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    8000,
+    10500
+   ],
+   "peakPrice": [
+    10500,
+    14000
+   ],
+   "returnFlightDelhi": [
+    21000,
+    35000
+   ],
+   "returnFlightMumbai": [
+    20000,
+    33000
+   ],
+   "visaINR": [
+    3000,
+    4200
+   ],
+   "notes": "Weather-neutral year-round; price peaks follow Indian school holidays (May-Jun), Diwali, and Christmas/New Year. Most expensive per night on the list because hotels and attraction tickets (Sentosa, Universal, Gardens) are pricey. Listings (4N land, 3*): Tripoto Rs35,000 (~8.7k/n), TripCabinet Holiday Inn Atrium Rs47,999 (GST, visa extra), TravelTriangle from Rs49,250, Musafir Rs54,999-56,999. Visa: e-visa via authorised agent, govt ~Rs2,100 (SGD 30) + agent fee.",
+   "sources": [
+    "https://www.tripoto.com/singapore/tour-packages/mesmerizing-singapore-156334844036",
+    "https://tripcabinet.com/package/singapore-value-package-4-nights-5-days-city-sentosa",
+    "https://traveltriangle.com/packages/singapore-family-tour?id=63668",
+    "https://in.musafir.com/Holidays/simply-singapore-for-you.aspx",
+    "https://happyfares.in/blog/singapore-visa-for-indians-2026-apply-online-step-by-step/",
+    "https://www.singaporeair.com/en-in/flights-from-delhi-to-singapore",
+    "https://www.zurichkotak.com/knowledge-center/travel-insurance/singapore-trip-cost-from-india"
+   ]
+  },
+  "kualalumpur": {
+   "peak": [
+    5,
+    6,
+    12
+   ],
+   "shoulder": [
+    1,
+    2,
+    7,
+    8
+   ],
+   "off": [
+    3,
+    4,
+    9,
+    10,
+    11
+   ],
+   "closed": [],
+   "offPrice": [
+    3500,
+    5000
+   ],
+   "peakPrice": [
+    4800,
+    6500
+   ],
+   "returnFlightDelhi": [
+    18000,
+    32000
+   ],
+   "returnFlightMumbai": [
+    18000,
+    30000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Hot/humid year-round with inter-monsoon rains Mar-Apr and Oct-Nov; demand peaks follow Indian holidays. Listings (5N KL+Langkawi/Genting land, 3*): TravelTriangle Rs20,000-24,000 (~4-5k/n), Musafir 3* Rs24,999, TourTravelWorld Rs34,833, Holidify Rs37,149 (~7.4k/n). Visa-free 30 days for Indians until 31 Dec 2026 (MDAC arrival card free) - check renewal for 2027; previous eVisa was ~Rs2,500-3,500.",
+   "sources": [
+    "https://traveltriangle.com/packages/malaysia-tour-in-may?id=17414",
+    "https://traveltriangle.com/packages/malaysia-tour-in-monsoon?id=17425",
+    "https://in.musafir.com/Holidays/essential-malaysia.aspx",
+    "https://www.holidify.com/packages/india-malaysia-tour-packages-219.html",
+    "https://www.tourtravelworld.com/packages/langkawi-and-kuala-lumpur5-nights-and6-days-240574.html",
+    "https://www.outlookbusiness.com/news/malaysia-opens-its-doors-with-visa-free-access-for-indians-from-december-1",
+    "https://www.singaporeair.com/en-in/flights-from-delhi-to-kuala-lumpur"
+   ]
+  },
+  "langkawi": {
+   "peak": [
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    5,
+    11
+   ],
+   "off": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "closed": [],
+   "offPrice": [
+    4000,
+    5500
+   ],
+   "peakPrice": [
+    5500,
+    8000
+   ],
+   "returnFlightDelhi": [
+    24000,
+    40000
+   ],
+   "returnFlightMumbai": [
+    24000,
+    38000
+   ],
+   "visaINR": [
+    0,
+    0
+   ],
+   "notes": "Dry Dec-Apr; SW monsoon May-Oct (wettest Sep). Beach resorts cost more than KL city hotels. Listings (3N Langkawi, twin): TravelTriangle Rs20,000-30,000 (3* option Rs25,500 ~8.5k/n incl. visa), TourTravelWorld budget from Rs17,000 (~5.7k/n); Thomas Cook guide estimates Rs35-45k for 3 days (higher tier). Flights = India-KL return + ~Rs5-8k KL-Langkawi domestic return (no direct India flights).",
+   "sources": [
+    "https://traveltriangle.com/packages/3nights-4days-langkawi-tour",
+    "https://traveltriangle.com/packages/3n-4d-langkawi-family-tour",
+    "https://www.tourtravelworld.com/packages/4-days3-nights-langkawi-tour-package-229132.html",
+    "https://www.thomascook.in/holidays/international-tour-packages/langkawi-tour-packages",
+    "https://www.veenaworld.com:443/package/langkawi-escape-tour-package-shmy4/i"
+   ]
+  },
+  "dubai": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    10
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    5000,
+    7000
+   ],
+   "peakPrice": [
+    8000,
+    11500
+   ],
+   "returnFlightDelhi": [
+    18000,
+    32000
+   ],
+   "returnFlightMumbai": [
+    17000,
+    30000
+   ],
+   "visaINR": [
+    6900,
+    10000
+   ],
+   "notes": "Winter Nov-Feb is peak (Dubai Shopping Festival Dec-Jan, New Year); Jun-Aug 40-45C but hotels 40-60% off (Dubai Summer Surprises). Listings (4N land): MakeMyTrip from Rs21,999 (summer low, ~5.5k/n), SOTC from Rs30,400, Musafir 'Winter in Dubai' 3* Rs33,900, Musafir 3* Rs40,999-47,999 (~10-12k/n, incl. desert safari, theme parks). Tourism Dirham (AED 10-15/room/night) usually extra. Visa: 30-day single-entry, govt ~Rs6,900 (AED 252+VAT), agents Rs7,800-10,000; VoA possible for Indians holding valid US/UK/EU visa.",
+   "sources": [
+    "https://www.makemytrip.com/holidays-international/4nights-dubai-vacation-tour-packages.html",
+    "https://www.sotc.in/international-tour-packages/dubai-tour-packages",
+    "https://in.musafir.com/Holidays/magical-dubai.aspx",
+    "https://in.musafir.com/Holidays/simply-dubai.aspx",
+    "https://www.sotc.in/tourism/dubai-tourism/best-time-to-visit-dubai",
+    "https://www.visitdubai.com/en/deals-and-offers/flash-sale",
+    "https://evisas.io/dubai-visa-fees-for-indians",
+    "https://www.airindia.com/en-in/book-flights/delhi-to-dubai-flights",
+    "https://www.skyscanner.co.in/routes/idel/dxb/delhi-to-dubai.html"
+   ]
+  },
+  "abudhabi": {
+   "peak": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "shoulder": [
+    3,
+    4,
+    10
+   ],
+   "off": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "closed": [],
+   "offPrice": [
+    5500,
+    7500
+   ],
+   "peakPrice": [
+    8500,
+    12000
+   ],
+   "returnFlightDelhi": [
+    18000,
+    32000
+   ],
+   "returnFlightMumbai": [
+    17000,
+    30000
+   ],
+   "visaINR": [
+    6900,
+    10000
+   ],
+   "notes": "Same climate as Dubai; F1 Grand Prix (late Nov/early Dec) causes a sharp hotel spike. Thin Abu Dhabi-only data; derived from combo listings: Kiomoi Dubai+Abu Dhabi 5N from Rs49,400 (~9.9k/n), Indian Holiday 3N Dubai+2N AD 3* Rs68,500 (valid to Jul 2026, includes more tours), Musafir 4* Rs54,999. Ferrari World/Yas tickets are costly, which lifts sightseeing cost vs Dubai. Same UAE visa as Dubai; Etihad/IndiGo/Air India Express fly direct to AUH.",
+   "sources": [
+    "https://www.kiomoi.com/holidays/magical-dubai-with-abu-dhabi-0719",
+    "https://www.indianholiday.com/international-tours/majestic-dubai-with-abu-dhabi.html",
+    "https://in.musafir.com/Holidays/dashing-dubai-abu-dhabi.aspx",
+    "https://pickyourtrail.com/itineraries/abu-dhabi-holiday-package-5n",
+    "https://www.tripoto.com/tour-packages/extravagant-abu-dhabi-156509516471",
+    "https://blog.wego.com/cheap-flights-to-new-delhi-from-gulf/"
+   ]
+  }
+ },
+ "flightsFromDelhi": {
+  "Mumbai": [
+   3500,
+   7500
+  ],
+  "Goa": [
+   4500,
+   9000
+  ],
+  "Kochi": [
+   7500,
+   13000
+  ],
+  "Chennai": [
+   5000,
+   9500
+  ],
+  "Bengaluru": [
+   5000,
+   9500
+  ],
+  "Guwahati": [
+   5500,
+   10000
+  ],
+  "Bagdogra": [
+   4300,
+   9000
+  ],
+  "Port Blair": [
+   8000,
+   18000
+  ],
+  "Srinagar": [
+   3500,
+   9000
+  ],
+  "Leh": [
+   4500,
+   15000
+  ],
+  "Jaipur": [
+   2500,
+   5000
+  ],
+  "Ahmedabad": [
+   3500,
+   6500
+  ]
+ }
+}

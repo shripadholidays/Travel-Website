@@ -126,6 +126,7 @@ export const Footer = () => {
                     <div className="flex gap-6">
                         <Link to="/terms" className="hover:text-white">Terms</Link>
                         <Link to="/privacy" className="hover:text-white">Privacy</Link>
+                        <Link to="/photo-credits" className="hover:text-white">Photo credits</Link>
                         <Link to="/contact" className="hover:text-white">Contact</Link>
                     </div>
                 </div>

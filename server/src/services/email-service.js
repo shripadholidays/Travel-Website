@@ -174,7 +174,7 @@ const sendCustomTripEmail = async (trip, { kind, url }) => {
                     <p>${est.nights || 0} nights · ${trip.adults} adult${trip.adults === 1 ? '' : 's'}${trip.children ? ` · ${trip.children} child${trip.children === 1 ? '' : 'ren'}` : ''}${est.hotelLabel ? ` · ${escapeHtml(est.hotelLabel)} hotels` : ''}</p>
                     ${quoted
                         ? `<p style="font-size: 18px;"><strong>Final price: ${escapeHtml(formatMoney(trip.quote, est.currency || 'INR'))}</strong></p>`
-                        : `<p><strong>Estimated price:</strong> ${escapeHtml(formatMoney(est.low, est.currency || 'INR'))} – ${escapeHtml(formatMoney(est.high, est.currency || 'INR'))}</p>`}
+                        : `<p><strong>Your estimated budget:</strong> ${escapeHtml(formatMoney(est.low, est.currency || 'INR'))} – ${escapeHtml(formatMoney(est.high, est.currency || 'INR'))}</p><p style="color: #64748B; font-size: 13px;">Subject to availability, current market prices and the season at each place.</p>`}
                 </div>
                 ${quoted && trip.quoteNote ? `<p style="white-space: pre-wrap;">${escapeHtml(trip.quoteNote)}</p>` : ''}
                 ${url ? `<p style="text-align: center; margin: 32px 0;">

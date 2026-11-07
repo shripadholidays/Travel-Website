@@ -26,6 +26,7 @@ const DestinationDetails = lazy(() => import('@/pages/DestinationDetails').then(
 const BlogDetails = lazy(() => import('@/pages/BlogDetails').then((m) => ({ default: m.BlogDetails })));
 const AboutPage = lazy(() => import('@/pages/About').then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('@/pages/Contact').then((m) => ({ default: m.ContactPage })));
+const PhotoCreditsPage = lazy(() => import('@/pages/PhotoCredits').then((m) => ({ default: m.PhotoCreditsPage })));
 const PrivacyPage = lazy(() => import('@/pages/Privacy').then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('@/pages/Terms').then((m) => ({ default: m.TermsPage })));
 const FAQPage = lazy(() => import('@/pages/FAQ').then((m) => ({ default: m.FAQPage })));
@@ -117,6 +118,7 @@ const router = createBrowserRouter([
                     { path: "contact", element: <ContactPage /> },
                     { path: "build-trip", element: <TripBuilderPage /> },
                     { path: "privacy", element: <PrivacyPage /> },
+                    { path: "photo-credits", element: <PhotoCreditsPage /> },
                     { path: "terms", element: <TermsPage /> },
                     { path: "faq", element: <FAQPage /> },
                     { path: "blog/:slug", element: <BlogDetails /> },

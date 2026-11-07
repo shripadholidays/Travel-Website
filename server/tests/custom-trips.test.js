@@ -112,6 +112,51 @@ describe('POST /api/v1/custom-trips', () => {
     });
 });
 
+describe('regions and seasons', () => {
+    const send = (stops, extra = {}) => request(app).post('/api/v1/custom-trips').send(trip({ stops, ...extra }));
+
+    it('lets places of one region combine, like Shimla, Leh and Srinagar', async () => {
+        const res = await send([{ placeId: 'shimla', nights: 2 }, { placeId: 'leh', nights: 3 }, { placeId: 'srinagar', nights: 2 }]);
+        expect(res.status).toBe(200);
+        expect(res.body.data.trip.estimate.regions).toEqual(['North India & the Himalayas']);
+    });
+
+    it('turns down north + south in a short trip, and prices the travel in a long one', async () => {
+        const short = await send([{ placeId: 'shimla', nights: 3 }, { placeId: 'kanyakumari', nights: 2 }]);
+        expect(short.status).toBe(400);
+        expect(short.body.message).toMatch(/longer than 10 days/);
+        const long = await send([{ placeId: 'shimla', nights: 4 }, { placeId: 'manali', nights: 3 }, { placeId: 'kanyakumari', nights: 3 }]);
+        expect(long.status).toBe(200);
+        expect(long.body.data.trip.estimate.lines.some((l) => /^Travel North India/.test(l.label))).toBe(true);
+    });
+
+    it('turns down a trip across three regions', async () => {
+        const res = await send([{ placeId: 'shimla', nights: 4 }, { placeId: 'kochi', nights: 4 }, { placeId: 'dubai', nights: 4 }]);
+        expect(res.status).toBe(400);
+        expect(res.body.message).toMatch(/3 regions/);
+    });
+
+    it('turns down a stay in a closed month and prices peak and off season', () => {
+        const year = new Date().getUTCFullYear() + 1;
+        expect(() => require('../src/services/trip-builder').normalizeTrip(DEFAULTS, { ...trip(), startDate: `${year}-01-10`, stops: [{ placeId: 'spiti', nights: 3 }] }))
+            .toThrow(/closed/);
+        const dubai = DEFAULTS.places.find((p) => p.id === 'dubai');
+        const july = estimateTrip(DEFAULTS, { stops: [{ placeId: 'dubai', nights: 2 }], hotelClass: 'economy', adults: 1, startDate: `${year}-07-01` });
+        const dec = estimateTrip(DEFAULTS, { stops: [{ placeId: 'dubai', nights: 2 }], hotelClass: 'economy', adults: 1, startDate: `${year}-12-01` });
+        expect(july.lines[0]).toMatchObject({ low: 2 * dubai.offFrom, season: 'off' });
+        expect(dec.lines[0]).toMatchObject({ low: 2 * dubai.peakFrom, season: 'peak' });
+        expect(dec.lines.find((l) => l.label === 'Visa · UAE')).toBeTruthy();
+    });
+
+    it('keeps regions and seasons when the team saves the price list', () => {
+        const tidy = normalizeCatalogue(DEFAULTS);
+        expect(tidy.zones.length).toBe(DEFAULTS.zones.length);
+        expect(tidy.places.find((p) => p.id === 'delhi').zones).toEqual(['north', 'rajasthan', 'ganga']);
+        expect(tidy.places.find((p) => p.id === 'spiti').closedMonths).toEqual([1, 2, 12]);
+        expect(() => normalizeCatalogue({ ...DEFAULTS, places: [{ ...shimla, peakFrom: 9000, peakTo: 100 }] })).toThrow(/peak-season/);
+    });
+});
+
 describe('admin custom trips', () => {
     it('lists trips by status and moves them along with a final price', async () => {
         const { body } = await request(app).post('/api/v1/custom-trips').send(trip());

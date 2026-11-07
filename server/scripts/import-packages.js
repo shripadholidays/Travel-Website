@@ -19,6 +19,8 @@ const { normalizePackageOptions } = require('../src/services/package-options');
 const APPLY = process.argv.includes('--apply');
 const REMOVE_SAMPLES = process.argv.includes('--remove-samples');
 const catalogue = require(path.join(__dirname, 'data', 'packages.json'));
+// Real destination photos for each package, when they have been picked (see apply-trip-images.js)
+const TOUR_IMAGES = (() => { try { return require(path.join(__dirname, 'data', 'trip-images.json')).tours || {}; } catch { return {}; } })();
 
 // The catalogue has no place field; these are the regions each package covers
 const LOCATIONS = {
@@ -103,8 +105,8 @@ function toTour(pkg) {
         categories: pkg.cats.map((c) => catalogue.categories[c] || c),
         emi: pkg.badge || '',
         bestTime: pkg.bestTime || '',
-        imageURL: pkg.img,
-        images: [],
+        imageURL: TOUR_IMAGES[pkg.t]?.[0] || pkg.img,
+        images: (TOUR_IMAGES[pkg.t] || []).slice(1),
         overview: { about: pkg.ov, gallery: [] },
         inclusions: [
             ...pkg.inc.map((title) => ({ title, included: true })),
