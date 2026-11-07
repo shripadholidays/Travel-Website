@@ -4,8 +4,8 @@ import type { Tour } from "@/types";
 /** Used until the admin settings load (and if they have no slides): the trips we actually sell */
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
     {
-        title: "Into the Himalayas", subtitle: "Hills & Mountains",
-        description: "Snow peaks, houseboats on Dal Lake and high mountain passes: Shimla, Manali, Kashmir and Leh.",
+        title: "Into the Hills", subtitle: "Himalayas & Hill Stations",
+        description: "Snow peaks, houseboats on Dal Lake and cool hill towns: Kashmir, Leh, Manali, Darjeeling, Ooty and more.",
         image: "/images/hero/dal-lake.webp", color: "from-emerald-600/80",
         ctaLink: "/tours?category=Hill", ctaLabel: "See mountain trips", bestMonths: [3, 4, 5, 6, 9, 10],
     },
