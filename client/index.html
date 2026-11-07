@@ -8,6 +8,21 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#F97316" />
+  <meta name="color-scheme" content="light dark" />
+
+  <!-- Light/dark before first paint (no white flash). Same key and rules as src/lib/theme.ts -->
+  <script>
+    (function () {
+      try {
+        var c = localStorage.getItem('wz-theme');
+        var dark = c === 'dark' || ((!c || c === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
+        }
+      } catch (e) { }
+    })();
+  </script>
 
   <!-- Defaults only. Each page sets its own title, description, canonical link, social tags and
        structured data: written into the HTML at build time (scripts/prerender.ts) and kept up to
