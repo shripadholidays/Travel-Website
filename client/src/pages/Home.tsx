@@ -26,11 +26,11 @@ export const Home = () => {
             <FeatureGate any>
                 <TravelSearchTabs />
             </FeatureGate>
+            <FeaturedTours />
+            <RecentlyViewedTours />
             <DestinationsGrid />
             <PromotionalCarousel />
             <Collections />
-            <FeaturedTours />
-            <RecentlyViewedTours />
             <PlanTrip />
             <Testimonials />
             <FaqSection />
