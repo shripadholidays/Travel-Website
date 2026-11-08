@@ -14,7 +14,7 @@ export interface HeroSlide {
     ctaLabel: string;
     /** The line under the title */
     description?: string;
-    /** Months (1–12) when these trips are at their best; the slide shows "Best time to go" then */
+    /** Months (1–12) when these trips are at their best; the slide moves nearer the front then */
     bestMonths?: number[];
 }
 

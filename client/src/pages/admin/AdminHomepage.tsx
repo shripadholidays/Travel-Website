@@ -325,7 +325,7 @@ export const AdminHomepage = () => {
                                                     );
                                                 })}
                                             </div>
-                                            <p className="text-xs text-muted-foreground">In these months the slide says "Best time to go". Leave all off for trips that suit any time of year.</p>
+                                            <p className="text-xs text-muted-foreground">In these months the slide moves nearer the front. Leave all off for trips that suit any time of year.</p>
                                         </div>
                                         <div className="space-y-1">
                                             <Label className="text-xs">Gradient Color</Label>

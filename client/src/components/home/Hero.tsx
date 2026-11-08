@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useQueries } from "@tanstack/react-query";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 import { useTours } from "@/hooks/use-tours";
 import { useAuth } from "@/context/AuthContext";
 import { useCurrency } from "@/context/CurrencyContext";
-import { DEFAULT_HERO_SLIDES, inSeason, orderSlides, pickSlide, slideFilter } from "@/lib/hero-slides";
+import { DEFAULT_HERO_SLIDES, orderSlides, pickSlide, slideFilter } from "@/lib/hero-slides";
 import type { PaginatedData, Tour } from "@/types";
 
 /** A slide as shown to this visitor: with a personal note and the cheapest trip it leads to */
@@ -48,7 +48,7 @@ function readPick() {
 
 /**
  * Puts the slide that matches the tours this visitor looked at first ("Picked for you"), then the
- * trips in season this month ("Best time to go"), greets signed-in travellers by name and adds
+ * trips in season this month (no label, just the order), greets signed-in travellers by name and adds
  * the starting price of each slide's trips.
  */
 function usePersonalSlides(base: HeroSlide[]): ShownSlide[] {
@@ -95,14 +95,14 @@ function usePersonalSlides(base: HeroSlide[]): ShownSlide[] {
         const month = new Date().getMonth() + 1;
         return orderSlides(base, picked, month).map(({ slide, picked: isPick }, pos) => {
             const tour = prices[base.indexOf(slide)];
-            const notes = [
-                isPick ? (firstName ? `Picked for you, ${firstName}` : "Picked for you") : pos === 0 && firstName ? `Hi ${firstName}` : "",
-                !isPick && inSeason(slide, month) ? "Best time to go" : "",
-            ].filter(Boolean);
+            // One quiet note, on the first slide only; the season just decides the order
+            const note = isPick
+                ? (firstName ? `Picked for you, ${firstName}` : "Picked for you")
+                : pos === 0 && firstName ? `Hi ${firstName}` : undefined;
             return {
                 ...slide,
                 key: slide._id ?? slide.title,
-                badge: notes.join(" · ") || undefined,
+                badge: note,
                 priceFrom: tour ? formatPrice(tour.price, tour.currency) : undefined,
             };
         });
@@ -123,10 +123,7 @@ export const Hero = () => {
 };
 
 const SlideBadge = ({ text }: { text?: string }) => text ? (
-    <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-black/35 px-3 py-1 text-xs font-medium text-white">
-        <Sparkles className="h-3.5 w-3.5 text-brand-orange" aria-hidden />
-        {text}
-    </span>
+    <p className="mb-3 text-sm text-white/85">{text}</p>
 ) : null;
 
 const PriceFrom = ({ price, className }: { price?: string; className?: string }) => price ? (
