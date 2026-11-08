@@ -12,31 +12,37 @@ export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
     {
         title: "Royal Rajasthan", subtitle: "Forts & Deserts",
         description: "Palaces in Jaipur, lakes in Udaipur and camel rides across the Jaisalmer dunes.",
-        image: "/images/hero/hawa-mahal.webp", color: "from-orange-600/80",
+        image: "/images/hero/hawa-mahal.webp", color: "from-pink-600/80",
         ctaLink: "/tours?place=Rajasthan", ctaLabel: "See Rajasthan trips", bestMonths: [10, 11, 12, 1, 2, 3],
     },
     {
         title: "Sacred Journeys", subtitle: "Pilgrimages",
         description: "Char Dham, Varanasi, Vaishno Devi, Dwarka and more, with stays and travel arranged for you.",
-        image: "/images/hero/varanasi.webp", color: "from-amber-600/80",
+        image: "/images/hero/varanasi.webp", color: "from-orange-600/80",
         ctaLink: "/tours?category=Pilgrimage", ctaLabel: "See pilgrimages", bestMonths: [],
     },
     {
         title: "Backwaters & Beaches", subtitle: "Kerala, Goa & Andaman",
         description: "Houseboats on the Kerala backwaters, tea hills, and quiet beaches in Goa and the Andamans.",
-        image: "/images/hero/alleppey.webp", color: "from-cyan-600/80",
+        image: "/images/hero/alleppey.webp", color: "from-teal-600/80",
         ctaLink: "/tours?category=Beach", ctaLabel: "See beach trips", bestMonths: [10, 11, 12, 1, 2, 3, 4],
+    },
+    {
+        title: "Made for Two", subtitle: "Honeymoons",
+        description: "Shikara rides in Kashmir, lake palaces in Udaipur, and quiet island beaches in the Andamans and Bali.",
+        image: "/images/hero/havelock.webp", color: "from-violet-700/80",
+        ctaLink: "/tours?category=Honeymoon", ctaLabel: "See honeymoon trips", bestMonths: [10, 11, 12, 1, 2, 3],
     },
     {
         title: "Beyond India", subtitle: "Dubai · Bali · Thailand",
         description: "Dubai, Bali, Thailand, Sri Lanka, Nepal and more, planned from India.",
-        image: "/images/hero/dubai-marina.webp", color: "from-blue-500/80",
+        image: "/images/hero/dubai-marina.webp", color: "from-amber-600/80",
         ctaLink: "/tours?category=International", ctaLabel: "See trips abroad", bestMonths: [11, 12, 1, 2, 3],
     },
     {
         title: "Your Trip, Your Way", subtitle: "Build Your Own",
         description: "Pick the places, set the days and watch your estimated budget as you go.",
-        image: "/images/hero/pangong.webp", color: "from-rose-600/80",
+        image: "/images/hero/pangong.webp", color: "from-indigo-700/80",
         ctaLink: "/build-trip", ctaLabel: "Build my trip", bestMonths: [],
     },
 ];

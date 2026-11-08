@@ -36,6 +36,10 @@ const COLOR_OPTIONS = [
     { label: 'Rose',   value: 'from-rose-600/80' },
     { label: 'Amber',  value: 'from-amber-600/80' },
     { label: 'Cyan',   value: 'from-cyan-600/80' },
+    { label: 'Pink',   value: 'from-pink-600/80' },
+    { label: 'Violet', value: 'from-violet-700/80' },
+    { label: 'Teal',   value: 'from-teal-600/80' },
+    { label: 'Indigo', value: 'from-indigo-700/80' },
 ];
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

@@ -317,6 +317,7 @@ const MobileHero = ({ slides }: { slides: ShownSlide[] }) => {
                                 )}
                             />
                         )}
+                        <div className={cn("pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t to-transparent opacity-70", s.color)} />
                     </div>
                 );
             })}
