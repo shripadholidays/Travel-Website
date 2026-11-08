@@ -50,6 +50,14 @@
   /* Smooth Scrolling */
   html {
     scroll-behavior: smooth;
+    /* Keep the scrollbar's space even when a menu locks scrolling, so the navbar and
+       the WhatsApp button don't jump sideways when the currency or account menu opens */
+    scrollbar-gutter: stable;
+  }
+  /* The menus' scroll lock adds a right margin to make up for the hidden scrollbar;
+     with the space kept above, that margin would shift the page instead */
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
   }
 }
 
