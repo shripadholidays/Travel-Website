@@ -26,7 +26,7 @@ export const AboutPage = () => {
     const stats = (about?.stats?.length ?? 0) > 0 ? about!.stats : liveStats(highlights?.stats);
     const values = (about?.values?.length ?? 0) > 0 ? about!.values : FALLBACK_VALUES;
     const ctaHeading = about?.ctaHeading || "Ready to start your journey?";
-    const ctaSubtext = about?.ctaSubtext || "Browse our curated tours or tell us about your dream trip — we'll handle the rest.";
+    const ctaSubtext = about?.ctaSubtext || "Browse our curated tours or tell us about your dream trip, and we'll handle the rest.";
     const ctaBtn1Label = about?.ctaBtn1Label || "Explore Tours";
     const ctaBtn1Link = about?.ctaBtn1Link || "/tours";
     const ctaBtn2Label = about?.ctaBtn2Label || "Plan My Trip";

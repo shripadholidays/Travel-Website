@@ -85,7 +85,7 @@ export function CustomTripDetail({ trip, onClose, askPrice }: Props) {
                     <Fact label="Start" value={trip.startDate ? format(new Date(trip.startDate), "d MMM yyyy") : "Flexible"} />
                     <Fact label="Hotels" value={est?.hotelLabel ?? trip.hotelClass} />
                     <div className="col-span-2 sm:col-span-4">
-                        <Fact label="Builder estimate" value={est ? `${formatPrice(est.low, currency)} – ${formatPrice(est.high, currency)}` : "—"} />
+                        <Fact label="Builder estimate" value={est ? `${formatPrice(est.low, currency)} – ${formatPrice(est.high, currency)}` : "-"} />
                     </div>
                     {trip.extras.length > 0 && (
                         <div className="col-span-2 sm:col-span-4"><Fact label="Extras" value={trip.extras.map((x) => x.label).join(", ")} /></div>

@@ -149,11 +149,11 @@ export const AdminTravelOrders = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <p className="font-medium">{o.user?.displayName ?? '—'}</p>
+                                                <p className="font-medium">{o.user?.displayName ?? '-'}</p>
                                                 <p className="text-xs text-muted-foreground">{o.contact?.email}</p>
                                             </TableCell>
                                             <TableCell className="font-mono text-xs">
-                                                {o.providerRef || '—'}
+                                                {o.providerRef || '-'}
                                                 <span className="block text-muted-foreground font-sans">{o.provider}</span>
                                             </TableCell>
                                             <TableCell className="text-right tabular-nums text-muted-foreground">{usd(o.pricing.supplierAmount)}</TableCell>

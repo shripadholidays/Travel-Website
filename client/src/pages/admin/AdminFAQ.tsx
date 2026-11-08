@@ -65,7 +65,7 @@ export const AdminFAQ = () => {
                         <div>
                             <CardTitle>Questions & Answers</CardTitle>
                             <CardDescription>
-                                Order matters — items are displayed in the order shown here.
+                                Order matters: items are displayed in the order shown here.
                                 The homepage shows the first 5.
                             </CardDescription>
                         </div>

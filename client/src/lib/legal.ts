@@ -5,7 +5,7 @@ export const LEGAL_UPDATED = 'January 2026';
 export const PRIVACY_SECTIONS = [
     {
         title: "1. Information We Collect",
-        body: "We collect information you provide directly — such as your name, email, and booking details — as well as data gathered automatically through your use of our services, including device and usage information.",
+        body: "We collect information you provide directly, such as your name, email, and booking details, as well as data gathered automatically through your use of our services, including device and usage information.",
     },
     {
         title: "2. How We Use Your Information",

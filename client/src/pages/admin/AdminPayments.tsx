@@ -124,8 +124,8 @@ export const AdminPayments = () => {
                                     {payments.map((p) => (
                                         <TableRow key={p._id}>
                                             <TableCell>
-                                                <p className="font-medium text-sm">{p.user?.displayName || '—'}</p>
-                                                <p className="text-xs text-muted-foreground">{p.user?.email || '—'}</p>
+                                                <p className="font-medium text-sm">{p.user?.displayName || '-'}</p>
+                                                <p className="text-xs text-muted-foreground">{p.user?.email || '-'}</p>
                                                 {(p.gatewayPaymentId || p.gatewayOrderId) && <p className="font-mono text-[11px] text-slate-400 truncate max-w-[200px]" title={p.gatewayPaymentId || p.gatewayOrderId}>{p.gatewayPaymentId || p.gatewayOrderId}</p>}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell text-sm">
@@ -138,7 +138,7 @@ export const AdminPayments = () => {
                                                         {p.order.kind === 'flight' ? <Plane className="w-3.5 h-3.5 text-muted-foreground" /> : <BedDouble className="w-3.5 h-3.5 text-muted-foreground" />}
                                                         {p.order.kind} {p.order.providerRef && <span className="font-mono text-xs text-muted-foreground">{p.order.providerRef}</span>}
                                                     </span>
-                                                ) : '—'}
+                                                ) : '-'}
                                             </TableCell>
                                             <TableCell className="text-right font-semibold tabular-nums text-brand-blue">{money(p.amount, p.currency)}</TableCell>
                                             <TableCell><StatusPill tone={STATUS[p.status]?.tone ?? 'slate'}>{STATUS[p.status]?.label ?? p.status}</StatusPill></TableCell>

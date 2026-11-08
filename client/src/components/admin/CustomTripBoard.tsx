@@ -181,7 +181,7 @@ function TripCard({ trip, onOpen, onMove, dragProps, overlay }: {
                 {trip.quote ? (
                     <span className="text-sm font-bold text-slate-900 tabular-nums">{formatPrice(trip.quote, currency)}</span>
                 ) : (
-                    <span className="text-xs text-slate-600 tabular-nums">{est ? `${formatPrice(est.low, currency)}–${formatPrice(est.high, currency)}` : "—"}</span>
+                    <span className="text-xs text-slate-600 tabular-nums">{est ? `${formatPrice(est.low, currency)}–${formatPrice(est.high, currency)}` : "-"}</span>
                 )}
                 <span className="text-[11px] text-slate-400" title={new Date(trip.createdAt).toLocaleString()}>{timeAgo(trip.createdAt)}</span>
             </div>

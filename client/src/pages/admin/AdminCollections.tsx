@@ -238,7 +238,7 @@ export const AdminCollections = () => {
                         </div>
                         <div className="space-y-1.5">
                             <Label>Description *</Label>
-                            <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Sun, sand, and sea — our best beach packages." />
+                            <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Sun, sand, and sea: our best beach packages." />
                         </div>
                         <ImagePicker label="Cover image *" value={form.coverImage} onChange={url => setForm(p => ({ ...p, coverImage: url }))} />
                         <div className="grid grid-cols-2 gap-4">

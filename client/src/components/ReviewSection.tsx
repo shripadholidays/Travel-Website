@@ -183,7 +183,7 @@ export const ReviewSection = ({ tourId }: { tourId: string }) => {
                             id="review-content"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            placeholder="Tell others about your trip — what did you love, what stood out?"
+                            placeholder="Tell others about your trip. What did you love, what stood out?"
                             rows={4}
                             maxLength={1000}
                             className="rounded-xl resize-none"

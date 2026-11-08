@@ -46,7 +46,7 @@
     18999,
     22999
    ],
-   "ov": "A perfect Himachal escape — the colonial charm of Shimla and the snow-capped grandeur of Manali. Mall Road sunsets, apple orchards, Rohtang snow and the ancient Hadimba Temple all in one unforgettable journey.",
+   "ov": "A perfect Himachal escape: the colonial charm of Shimla and the snow-capped grandeur of Manali. Mall Road sunsets, apple orchards, Rohtang snow and the ancient Hadimba Temple all in one unforgettable journey.",
    "it": {
     "5 Nights / 6 Days": [
      {
@@ -72,7 +72,7 @@
      {
       "d": "Day 5",
       "t": "Solang Valley & Rohtang",
-      "p": "Solang Valley — zorbing, paragliding, cable car. Rohtang Pass or Atal Tunnel to Sissu — dramatic glacier views."
+      "p": "Solang Valley: zorbing, paragliding, cable car. Rohtang Pass or Atal Tunnel to Sissu: dramatic glacier views."
      },
      {
       "d": "Day 6",
@@ -94,7 +94,7 @@
      {
       "d": "Day 3",
       "t": "Naldehra & Tattapani",
-      "p": "Naldehra Golf Course (one of India's oldest), Tattapani hot sulphur springs — hidden local gem."
+      "p": "Naldehra Golf Course (one of India's oldest), Tattapani hot sulphur springs: hidden local gem."
      },
      {
       "d": "Day 4",
@@ -109,7 +109,7 @@
      {
       "d": "Day 6",
       "t": "Solang, Rohtang & Sissu",
-      "p": "Solang Valley adventures. Atal Tunnel to Sissu — pristine waterfalls, Lahaul Valley."
+      "p": "Solang Valley adventures. Atal Tunnel to Sissu: pristine waterfalls, Lahaul Valley."
      },
      {
       "d": "Day 7",
@@ -173,13 +173,13 @@
     22999,
     27999
    ],
-   "ov": "Begin in Chandigarh — Le Corbusier's planned masterpiece — then ascend through colonial Shimla to snow-capped Manali. Three contrasting worlds in one grand Himachal journey.",
+   "ov": "Begin in Chandigarh, Le Corbusier's planned masterpiece, then ascend through colonial Shimla to snow-capped Manali. Three contrasting worlds in one grand Himachal journey.",
    "it": {
     "6 Nights / 7 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Chandigarh",
-      "p": "Rock Garden, Sukhna Lake, Rose Garden — largest rose garden in Asia."
+      "p": "Rock Garden, Sukhna Lake, Rose Garden: largest rose garden in Asia."
      },
      {
       "d": "Day 2",
@@ -315,7 +315,7 @@
     "5 Nights / 6 Days": [
      {
       "d": "Day 1",
-      "t": "Arrival Leh — Rest",
+      "t": "Arrive in Leh and rest",
       "p": "Arrive Leh (3500m). REST is essential. Short market walk only. Acclimatise."
      },
      {
@@ -326,7 +326,7 @@
      {
       "d": "Day 3",
       "t": "Pangong Lake",
-      "p": "Chang La Pass (5360m). Pangong Tso — lake changes blue to green to red all day. Overnight camps."
+      "p": "Chang La Pass (5360m). Pangong Tso: lake changes blue to green to red all day. Overnight camps."
      },
      {
       "d": "Day 4",
@@ -347,7 +347,7 @@
     "6 Nights / 7 Days": [
      {
       "d": "Day 1",
-      "t": "Arrival — Rest",
+      "t": "Arrival and rest",
       "p": "Leh acclimatisation. Short walk only."
      },
      {
@@ -362,7 +362,7 @@
      },
      {
       "d": "Day 4",
-      "t": "Pangong — Hemis",
+      "t": "Pangong to Hemis",
       "p": "Sunrise at lake. Hemis and Thiksey monasteries. Return Leh."
      },
      {
@@ -373,7 +373,7 @@
      {
       "d": "Day 6",
       "t": "Nubra Offbeat",
-      "p": "Sumur Monastery, Panamik hot springs, Samstanling Monastery — hidden gems."
+      "p": "Sumur Monastery, Panamik hot springs, Samstanling Monastery: hidden gems."
      },
      {
       "d": "Day 7",
@@ -384,7 +384,7 @@
     "7 Nights / 8 Days": [
      {
       "d": "Day 1",
-      "t": "Arrival — Rest",
+      "t": "Arrival and rest",
       "p": "Full rest day."
      },
      {
@@ -395,7 +395,7 @@
      {
       "d": "Day 3",
       "t": "Monasteries",
-      "p": "Spituk, Alchi (1000-year-old murals), Likir — rarely visited, deeply spiritual."
+      "p": "Spituk, Alchi (1000-year-old murals), Likir: rarely visited, deeply spiritual."
      },
      {
       "d": "Day 4",
@@ -405,7 +405,7 @@
      {
       "d": "Day 5",
       "t": "Tso Moriri",
-      "p": "Remote Tso Moriri Lake — higher and more isolated than Pangong, very few tourists. Overnight Korzok."
+      "p": "Remote Tso Moriri Lake: higher and more isolated than Pangong, very few tourists. Overnight Korzok."
      },
      {
       "d": "Day 6",
@@ -427,7 +427,7 @@
    "inc": [
     "Hotel/camp accommodation",
     "Daily breakfast & dinner",
-    "Private SUV/Innova — essential for roads",
+    "Private SUV/Innova: essential for roads",
     "All monastery entry fees",
     "Inner Line Permits",
     "Experienced Ladakhi driver-guide",
@@ -465,7 +465,7 @@
   },
   {
    "id": "kashmir",
-   "t": "Kashmir — Paradise on Earth",
+   "t": "Kashmir: Paradise on Earth",
    "badge": "Premium",
    "img": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1200&q=80",
    "cats": [
@@ -481,23 +481,23 @@
     24999,
     29999
    ],
-   "ov": "Heritage houseboat on Dal Lake, snow-capped peaks, wildflower meadows of Pahalgam, Asia's highest gondola at Gulmarg. Kashmir is not a destination — it is a feeling.",
+   "ov": "Heritage houseboat on Dal Lake, snow-capped peaks, wildflower meadows of Pahalgam, Asia's highest gondola at Gulmarg. Kashmir is not a destination: it is a feeling.",
    "it": {
     "5 Nights / 6 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Srinagar",
-      "p": "Airport pickup. Shikara ride on Dal Lake — sunset among lotus gardens. Heritage houseboat check-in. Traditional Wazwan dinner."
+      "p": "Airport pickup. Shikara ride on Dal Lake: sunset among lotus gardens. Heritage houseboat check-in. Traditional Wazwan dinner."
      },
      {
       "d": "Day 2",
       "t": "Srinagar Sightseeing",
-      "p": "Shalimar Bagh, Nishat Bagh, Chashme Shahi Mughal Gardens. Hazratbal Shrine. Kashmiri market — pashmina, saffron, walnuts."
+      "p": "Shalimar Bagh, Nishat Bagh, Chashme Shahi Mughal Gardens. Hazratbal Shrine. Kashmiri market: pashmina, saffron, walnuts."
      },
      {
       "d": "Day 3",
       "t": "Gulmarg",
-      "p": "Gondola cable car to Apharwat Peak (3980m) — Asia's highest. Snow activities. World-class ski resort."
+      "p": "Gondola cable car to Apharwat Peak (3980m): Asia's highest. Snow activities. World-class ski resort."
      },
      {
       "d": "Day 4",
@@ -544,7 +544,7 @@
      {
       "d": "Day 6",
       "t": "Doodhpathri",
-      "p": "Valley of Milk — pristine meadow, rarely visited by tourists. Yusmarg pine forests and Nilnag Lake — local secrets."
+      "p": "Valley of Milk: pristine meadow, rarely visited by tourists. Yusmarg pine forests and Nilnag Lake: local secrets."
      },
      {
       "d": "Day 7",
@@ -621,7 +621,7 @@
      {
       "d": "Day 2",
       "t": "Vaishno Devi Yatra",
-      "p": "Drive to Katra. Trek 14km to Mata Vaishno Devi — helicopter option available. Sacred cave shrine darshan. Return Katra."
+      "p": "Drive to Katra. Trek 14km to Mata Vaishno Devi: helicopter option available. Sacred cave shrine darshan. Return Katra."
      },
      {
       "d": "Day 3",
@@ -668,7 +668,7 @@
      {
       "d": "Day 3",
       "t": "Patnitop & Srinagar",
-      "p": "Patnitop hill station (2024m) — meadows, pine forests, beautiful. Continue Srinagar."
+      "p": "Patnitop hill station (2024m): meadows, pine forests, beautiful. Continue Srinagar."
      },
      {
       "d": "Day 4",
@@ -693,7 +693,7 @@
      {
       "d": "Day 8",
       "t": "Doodhpathri",
-      "p": "Valley of Milk — hidden local gem."
+      "p": "Valley of Milk: hidden local gem."
      },
      {
       "d": "Day 9",
@@ -763,7 +763,7 @@
      {
       "d": "Day 1",
       "t": "Arrival Dharamshala",
-      "p": "Check-in. Evening McLeod Ganj — Tibetan restaurants, incense, prayer flags."
+      "p": "Check-in. Evening McLeod Ganj: Tibetan restaurants, incense, prayer flags."
      },
      {
       "d": "Day 2",
@@ -778,7 +778,7 @@
      {
       "d": "Day 4",
       "t": "Khajjiar",
-      "p": "Khajjiar — perfect circular meadow with lake, surrounded by cedar forests. Horse riding. Khajji Nag Temple."
+      "p": "Khajjiar: perfect circular meadow with lake, surrounded by cedar forests. Horse riding. Khajji Nag Temple."
      },
      {
       "d": "Day 5",
@@ -805,7 +805,7 @@
      {
       "d": "Day 3",
       "t": "Triund Trek",
-      "p": "Trek to Triund (2827m) — panoramic Dhauladhar views. Most beloved short trek in Himachal."
+      "p": "Trek to Triund (2827m): panoramic Dhauladhar views. Most beloved short trek in Himachal."
      },
      {
       "d": "Day 4",
@@ -815,7 +815,7 @@
      {
       "d": "Day 5",
       "t": "Khajjiar & Kalatop",
-      "p": "Mini Switzerland Khajjiar, Kalatop Wildlife Sanctuary trek — deodar forests."
+      "p": "Mini Switzerland Khajjiar, Kalatop Wildlife Sanctuary trek: deodar forests."
      },
      {
       "d": "Day 6",
@@ -882,18 +882,18 @@
     23999,
     28999
    ],
-   "ov": "From the golden glow of Harmandir Sahib at dawn and Wagah Border at dusk to the Tibetan spirit of McLeod Ganj and Khajjiar's European meadows — North India at its finest.",
+   "ov": "From the golden glow of Harmandir Sahib at dawn and Wagah Border at dusk to the Tibetan spirit of McLeod Ganj and Khajjiar's European meadows: North India at its finest.",
    "it": {
     "6 Nights / 7 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Amritsar",
-      "p": "Check-in. Golden Temple evening — golden reflection on sacred pool. Palki Sahib ceremony."
+      "p": "Check-in. Golden Temple evening: golden reflection on sacred pool. Palki Sahib ceremony."
      },
      {
       "d": "Day 2",
       "t": "Amritsar",
-      "p": "Golden Temple morning. Jallianwala Bagh. Wagah Border ceremony — spine-chilling patriotism."
+      "p": "Golden Temple morning. Jallianwala Bagh. Wagah Border ceremony: spine-chilling patriotism."
      },
      {
       "d": "Day 3",
@@ -940,7 +940,7 @@
      {
       "d": "Day 4",
       "t": "Drive to Dharamshala",
-      "p": "Anandpur Sahib en route — birthplace of the Khalsa."
+      "p": "Anandpur Sahib en route: birthplace of the Khalsa."
      },
      {
       "d": "Day 5",
@@ -1031,13 +1031,13 @@
      },
      {
       "d": "Day 3",
-      "t": "Agra — Taj Mahal",
+      "t": "Agra: Taj Mahal",
       "p": "Taj Mahal at sunrise. Agra Fort. Baby Taj (Itimad-ud-Daulah)."
      },
      {
       "d": "Day 4",
       "t": "Mathura & Vrindavan",
-      "p": "Krishna Janmabhoomi, Dwarkadhish Temple. Vrindavan — Banke Bihari, ISKCON, Prem Mandir."
+      "p": "Krishna Janmabhoomi, Dwarkadhish Temple. Vrindavan: Banke Bihari, ISKCON, Prem Mandir."
      },
      {
       "d": "Day 5",
@@ -1079,7 +1079,7 @@
      {
       "d": "Day 6",
       "t": "Braj Mandal",
-      "p": "Govardhan Hill, Radha Kund, Barsana (Lathmar Holi famous), Nandgaon — rarely visited sacred sites."
+      "p": "Govardhan Hill, Radha Kund, Barsana (Lathmar Holi famous), Nandgaon: rarely visited sacred sites."
      },
      {
       "d": "Day 7",
@@ -1148,7 +1148,7 @@
      {
       "d": "Day 1",
       "t": "Arrival Haridwar",
-      "p": "Check-in. Evening Ganga Aarti at Har Ki Pauri — thousands of diyas floating on the holy Ganga. Most photographed religious ceremony in India."
+      "p": "Check-in. Evening Ganga Aarti at Har Ki Pauri: thousands of diyas floating on the holy Ganga. Most photographed religious ceremony in India."
      },
      {
       "d": "Day 2",
@@ -1158,7 +1158,7 @@
      {
       "d": "Day 3",
       "t": "Rishikesh Adventure",
-      "p": "White water rafting on the Ganga (Grade 3). Optional bungee jumping at Jumpin Heights (83m — India's highest). Evening yoga at Parmarth Niketan."
+      "p": "White water rafting on the Ganga (Grade 3). Optional bungee jumping at Jumpin Heights (83m: India's highest). Evening yoga at Parmarth Niketan."
      },
      {
       "d": "Day 4",
@@ -1190,12 +1190,12 @@
      {
       "d": "Day 4",
       "t": "Rishikesh Adventure",
-      "p": "Ganga rafting, bungee, Neer Garh Waterfall trek — hidden gem."
+      "p": "Ganga rafting, bungee, Neer Garh Waterfall trek: hidden gem."
      },
      {
       "d": "Day 5",
       "t": "Mussoorie",
-      "p": "Gun Hill, Kempty Falls, Bhatta Falls — little-known local gem."
+      "p": "Gun Hill, Kempty Falls, Bhatta Falls: little-known local gem."
      },
      {
       "d": "Day 6",
@@ -1243,7 +1243,7 @@
   },
   {
    "id": "char_dham",
-   "t": "Char Dham Yatra — Complete Pilgrimage",
+   "t": "Char Dham Yatra: Complete Pilgrimage",
    "badge": "Spiritual",
    "img": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=1200&q=80",
    "cats": [
@@ -1256,7 +1256,7 @@
    "base": [
     42999
    ],
-   "ov": "The most sacred Hindu pilgrimage — Yamunotri, Gangotri, Kedarnath (helicopter option available) and Badrinath. A deeply transformative journey through the divine Himalayas.",
+   "ov": "The most sacred Hindu pilgrimage: Yamunotri, Gangotri, Kedarnath (helicopter option available) and Badrinath. A deeply transformative journey through the divine Himalayas.",
    "it": {
     "13 Nights / 14 Days": [
      {
@@ -1272,7 +1272,7 @@
      {
       "d": "Day 3",
       "t": "Yamunotri Dham",
-      "p": "Trek 6km to Yamunotri — source of Yamuna. Sacred kund bath. Return Barkot."
+      "p": "Trek 6km to Yamunotri: source of Yamuna. Sacred kund bath. Return Barkot."
      },
      {
       "d": "Day 4",
@@ -1282,7 +1282,7 @@
      {
       "d": "Day 5",
       "t": "Gangotri Dham",
-      "p": "Gangotri Temple — origin of River Ganga. Take Ganga jal."
+      "p": "Gangotri Temple: origin of River Ganga. Take Ganga jal."
      },
      {
       "d": "Day 6",
@@ -1292,17 +1292,17 @@
      {
       "d": "Day 7",
       "t": "Kedarnath",
-      "p": "Drive to Gaurikund. Trek 16km or helicopter to Kedarnath (3583m) — 12th Jyotirlinga. Overnight at Kedarnath."
+      "p": "Drive to Gaurikund. Trek 16km or helicopter to Kedarnath (3583m): 12th Jyotirlinga. Overnight at Kedarnath."
      },
      {
       "d": "Day 8",
       "t": "Kedarnath to Guptkashi",
-      "p": "5am morning puja — most powerful. Trek/helicopter down. Drive Guptkashi."
+      "p": "5am morning puja: most powerful. Trek/helicopter down. Drive Guptkashi."
      },
      {
       "d": "Day 9",
       "t": "Drive to Badrinath",
-      "p": "Via Joshimath, Vishnu Prayag. Arrive Badrinath — Lord Vishnu's abode."
+      "p": "Via Joshimath, Vishnu Prayag. Arrive Badrinath: Lord Vishnu's abode."
      },
      {
       "d": "Day 10",
@@ -1317,7 +1317,7 @@
      {
       "d": "Day 12",
       "t": "Drive to Rishikesh",
-      "p": "Devprayag — where Ganga is born. Triveni Ghat Aarti."
+      "p": "Devprayag: where Ganga is born. Triveni Ghat Aarti."
      },
      {
       "d": "Day 13",
@@ -1402,7 +1402,7 @@
      {
       "d": "Day 3",
       "t": "Almora",
-      "p": "Kasar Devi Temple (cosmic energy point). Chitai Golu Devta Temple (thousands of bells). Old bazaar — Almora biscuits, copper crafts."
+      "p": "Kasar Devi Temple (cosmic energy point). Chitai Golu Devta Temple (thousands of bells). Old bazaar: Almora biscuits, copper crafts."
      },
      {
       "d": "Day 4",
@@ -1429,7 +1429,7 @@
      {
       "d": "Day 3",
       "t": "Mukteshwar",
-      "p": "Mukteshwar at 2286m — Shiva temple, Chauli Ki Jali cliff viewpoint. Truly offbeat."
+      "p": "Mukteshwar at 2286m: Shiva temple, Chauli Ki Jali cliff viewpoint. Truly offbeat."
      },
      {
       "d": "Day 4",
@@ -1500,7 +1500,7 @@
    "base": [
     21999
    ],
-   "ov": "Kumaon's hill towns combined with India's oldest national park — Jim Corbett. Naini Lake boat rides and tiger safaris in one perfect circuit.",
+   "ov": "Kumaon's hill towns combined with India's oldest national park: Jim Corbett. Naini Lake boat rides and tiger safaris in one perfect circuit.",
    "it": {
     "5 Nights / 6 Days": [
      {
@@ -1521,7 +1521,7 @@
      {
       "d": "Day 4",
       "t": "Jim Corbett Safaris",
-      "p": "Early morning jeep safari — core zone, best tiger sightings. Evening safari different zone."
+      "p": "Early morning jeep safari: core zone, best tiger sightings. Evening safari different zone."
      },
      {
       "d": "Day 5",
@@ -1595,7 +1595,7 @@
      {
       "d": "Day 1",
       "t": "Arrival Jaipur",
-      "p": "Check-in. Evening Johari Bazaar — gems, jewellery, textiles."
+      "p": "Check-in. Evening Johari Bazaar: gems, jewellery, textiles."
      },
      {
       "d": "Day 2",
@@ -1610,7 +1610,7 @@
      {
       "d": "Day 4",
       "t": "Pushkar",
-      "p": "Savitri Temple ropeway. Pushkar bazaar — silver jewellery, Rajasthani crafts."
+      "p": "Savitri Temple ropeway. Pushkar bazaar: silver jewellery, Rajasthani crafts."
      },
      {
       "d": "Day 5",
@@ -1681,7 +1681,7 @@
     },
     "luxury": {
      "name": "Rambagh Palace Jaipur",
-     "feat": "Former Maharaja's palace — finest in Rajasthan",
+     "feat": "Former Maharaja's palace: finest in Rajasthan",
      "addPP": 20000
     }
    }
@@ -1704,7 +1704,7 @@
     16999,
     19999
    ],
-   "ov": "Royal Rajasthan combined with the most revered temples of Shekawati region — Salasar Balaji and Khatu Shyam Ji.",
+   "ov": "Royal Rajasthan combined with the most revered temples of Shekawati region: Salasar Balaji and Khatu Shyam Ji.",
    "it": {
     "5 Nights / 6 Days": [
      {
@@ -1725,12 +1725,12 @@
      {
       "d": "Day 4",
       "t": "Salasar Balaji",
-      "p": "Salasar Balaji Temple — one of the most miraculous Hanuman temples in India."
+      "p": "Salasar Balaji Temple: one of the most miraculous Hanuman temples in India."
      },
      {
       "d": "Day 5",
       "t": "Khatu Shyam Ji",
-      "p": "Shyam Temple — Lord Krishna's devotional form. Return Jaipur."
+      "p": "Shyam Temple: Lord Krishna's devotional form. Return Jaipur."
      },
      {
       "d": "Day 6",
@@ -1828,7 +1828,7 @@
     19999,
     23999
    ],
-   "ov": "The most complete Rajasthan pilgrimage circuit — adding the powerful Mehandipur Balaji, known for removing negative energies.",
+   "ov": "The most complete Rajasthan pilgrimage circuit: adding the powerful Mehandipur Balaji, known for removing negative energies.",
    "it": {
     "6 Nights / 7 Days": [
      {
@@ -1946,7 +1946,7 @@
   },
   {
    "id": "jodhpur_jaisalmer",
-   "t": "Jodhpur & Jaisalmer — Royal Desert",
+   "t": "Jodhpur & Jaisalmer: Royal Desert",
    "badge": "Desert Royal",
    "img": "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200&q=80",
    "cats": [
@@ -1962,7 +1962,7 @@
     16999,
     20999
    ],
-   "ov": "The Blue City and the Golden City — Mehrangarh fort rising 400 feet from bare rock and a medieval fort in golden sand dunes. Camel safari under the Milky Way.",
+   "ov": "The Blue City and the Golden City: Mehrangarh fort rising 400 feet from bare rock and a medieval fort in golden sand dunes. Camel safari under the Milky Way.",
    "it": {
     "4 Nights / 5 Days": [
      {
@@ -1978,12 +1978,12 @@
      {
       "d": "Day 3",
       "t": "Drive to Jaisalmer",
-      "p": "Via Osian ancient Jain temples. Arrive Jaisalmer — the Golden City."
+      "p": "Via Osian ancient Jain temples. Arrive Jaisalmer: the Golden City."
      },
      {
       "d": "Day 4",
       "t": "Jaisalmer Fort & Dunes",
-      "p": "Jaisalmer Fort (living fort), Patwon Ki Haveli, Nathmal Ki Haveli. Sam Sand Dunes — camel safari at sunset, folk music, overnight desert camp."
+      "p": "Jaisalmer Fort (living fort), Patwon Ki Haveli, Nathmal Ki Haveli. Sam Sand Dunes: camel safari at sunset, folk music, overnight desert camp."
      },
      {
       "d": "Day 5",
@@ -2005,7 +2005,7 @@
      {
       "d": "Day 3",
       "t": "Bishnoi Village Safari",
-      "p": "Bishnoi village — black buck, chinkara, peacocks. Community that gave lives for trees. Potters, weavers. Genuinely offbeat."
+      "p": "Bishnoi village: black buck, chinkara, peacocks. Community that gave lives for trees. Potters, weavers. Genuinely offbeat."
      },
      {
       "d": "Day 4",
@@ -2085,7 +2085,7 @@
      {
       "d": "Day 1",
       "t": "Arrival Udaipur",
-      "p": "Check-in. Evening Lake Pichola boat ride — Lake Palace glowing at sunset. Rooftop restaurant dinner."
+      "p": "Check-in. Evening Lake Pichola boat ride: Lake Palace glowing at sunset. Rooftop restaurant dinner."
      },
      {
       "d": "Day 2",
@@ -2095,7 +2095,7 @@
      {
       "d": "Day 3",
       "t": "Drive to Mount Abu",
-      "p": "Arrive Mount Abu — Rajasthan's only hill station. Nakki Lake boat ride. Sunset Point."
+      "p": "Arrive Mount Abu: Rajasthan's only hill station. Nakki Lake boat ride. Sunset Point."
      },
      {
       "d": "Day 4",
@@ -2122,7 +2122,7 @@
      {
       "d": "Day 3",
       "t": "Around Udaipur",
-      "p": "Ranakpur Jain Temple (1444 unique pillars), Kumbhalgarh Fort (wall longer than Great Wall — UNESCO), Nathdwara Shrinathji."
+      "p": "Ranakpur Jain Temple (1444 unique pillars), Kumbhalgarh Fort (wall longer than Great Wall: UNESCO), Nathdwara Shrinathji."
      },
      {
       "d": "Day 4",
@@ -2171,7 +2171,7 @@
     },
     "luxury": {
      "name": "Taj Lake Palace Udaipur",
-     "feat": "Floating palace on the lake — world iconic",
+     "feat": "Floating palace on the lake: world iconic",
      "addPP": 20000
     }
    }
@@ -2194,7 +2194,7 @@
     17999,
     21999
    ],
-   "ov": "The sacred heart of Mewar — Shrinathji, Eklingi Mahadev of Mewar Maharajas, the giant Charbhuja and the heroic Chittorgarh Fort.",
+   "ov": "The sacred heart of Mewar: Shrinathji, Eklingi Mahadev of Mewar Maharajas, the giant Charbhuja and the heroic Chittorgarh Fort.",
    "it": {
     "5 Nights / 6 Days": [
      {
@@ -2210,7 +2210,7 @@
      {
       "d": "Day 3",
       "t": "Nathdwara & Eklingi",
-      "p": "Shrinathji Temple (one of India's richest). Eklingi Mahadev — tutelary deity of Mewar Maharajas since 8th century."
+      "p": "Shrinathji Temple (one of India's richest). Eklingi Mahadev: tutelary deity of Mewar Maharajas since 8th century."
      },
      {
       "d": "Day 4",
@@ -2242,7 +2242,7 @@
      {
       "d": "Day 3",
       "t": "Ranakpur",
-      "p": "Ranakpur Jain Temple — 1444 unique pillars."
+      "p": "Ranakpur Jain Temple: 1444 unique pillars."
      },
      {
       "d": "Day 4",
@@ -2302,7 +2302,7 @@
   },
   {
    "id": "kutch",
-   "t": "Kutch — Rann of Kutch",
+   "t": "Kutch: Rann of Kutch",
    "badge": "Unique Landscape",
    "img": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
    "cats": [
@@ -2318,7 +2318,7 @@
     12999,
     15999
    ],
-   "ov": "India's most surreal landscape — 7500 sq km white salt desert under an endless sky. Full moon nights at the Rann are ethereal. Ancient crafts and 5000-year-old Harappan sites.",
+   "ov": "India's most surreal landscape: 7500 sq km white salt desert under an endless sky. Full moon nights at the Rann are ethereal. Ancient crafts and 5000-year-old Harappan sites.",
    "it": {
     "3 Nights / 4 Days": [
      {
@@ -2329,12 +2329,12 @@
      {
       "d": "Day 2",
       "t": "White Rann",
-      "p": "Kalo Dungar (highest point, panoramic). Dholavira UNESCO (5000-year-old Harappan city). Sunset at White Rann — otherworldly."
+      "p": "Kalo Dungar (highest point, panoramic). Dholavira UNESCO (5000-year-old Harappan city). Sunset at White Rann: otherworldly."
      },
      {
       "d": "Day 3",
       "t": "Craft Villages",
-      "p": "Nirona (Rogan art — only family in world), Bhujodi (Kutchi weavers), Hodka (mud architecture). 500+ year traditions."
+      "p": "Nirona (Rogan art: only family in world), Bhujodi (Kutchi weavers), Hodka (mud architecture). 500+ year traditions."
      },
      {
       "d": "Day 4",
@@ -2356,12 +2356,12 @@
      {
       "d": "Day 3",
       "t": "Wild Ass Sanctuary",
-      "p": "Little Rann — Indian Wild Ass Sanctuary, flamingos, migratory birds. Rare wildlife experience."
+      "p": "Little Rann: Indian Wild Ass Sanctuary, flamingos, migratory birds. Rare wildlife experience."
      },
      {
       "d": "Day 4",
       "t": "Mandvi Beach",
-      "p": "Bhujodi weavers, Nirona artists. Mandvi Beach — 400-year-old wooden shipbuilding still active. Vijay Vilas Palace."
+      "p": "Bhujodi weavers, Nirona artists. Mandvi Beach: 400-year-old wooden shipbuilding still active. Vijay Vilas Palace."
      },
      {
       "d": "Day 5",
@@ -2401,7 +2401,7 @@
     },
     "luxury": {
      "name": "Rann Utsav Premium Swiss Tents",
-     "feat": "Government premium tent city — largest tented accommodation India",
+     "feat": "Government premium tent city: largest tented accommodation India",
      "addPP": 12000
     }
    }
@@ -2423,28 +2423,28 @@
     14999,
     17999
    ],
-   "ov": "Four of Gujarat's most sacred sites — Dwarka (one of four Hindu dhams), Bet Dwarka island, Somnath (first Jyotirlinga) and Dev. A profoundly spiritual pilgrimage.",
+   "ov": "Four of Gujarat's most sacred sites: Dwarka (one of four Hindu dhams), Bet Dwarka island, Somnath (first Jyotirlinga) and Dev. A profoundly spiritual pilgrimage.",
    "it": {
     "4 Nights / 5 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Dwarka",
-      "p": "Check-in. Dwarkadhish Temple — one of four Hindu dhams. Sunset aarti on Gomti River."
+      "p": "Check-in. Dwarkadhish Temple: one of four Hindu dhams. Sunset aarti on Gomti River."
      },
      {
       "d": "Day 2",
       "t": "Dwarka & Bet Dwarka",
-      "p": "Dwarkadhish morning darshan. Rukmini Temple. Nageshwar Jyotirlinga. Ferry to Bet Dwarka island — Krishna's actual residence."
+      "p": "Dwarkadhish morning darshan. Rukmini Temple. Nageshwar Jyotirlinga. Ferry to Bet Dwarka island: Krishna's actual residence."
      },
      {
       "d": "Day 3",
       "t": "Drive to Somnath",
-      "p": "Coastal drive. Somnath Temple — first Jyotirlinga on Arabian Sea. Sound & Light show evening."
+      "p": "Coastal drive. Somnath Temple: first Jyotirlinga on Arabian Sea. Sound & Light show evening."
      },
      {
       "d": "Day 4",
       "t": "Dev Temple",
-      "p": "Dev — ancient Surya temple. Triveni Sangam. Local beaches."
+      "p": "Dev: ancient Surya temple. Triveni Sangam. Local beaches."
      },
      {
       "d": "Day 5",
@@ -2476,7 +2476,7 @@
      {
       "d": "Day 5",
       "t": "Dev & Gir",
-      "p": "Dev Surya Temple. Gir National Park — last Asiatic lions (jeep safari)."
+      "p": "Dev Surya Temple. Gir National Park: last Asiatic lions (jeep safari)."
      },
      {
       "d": "Day 6",
@@ -2538,13 +2538,13 @@
     14999,
     18999
    ],
-   "ov": "India's most vibrant metropolis and the lush Western Ghats. Gateway of India, Elephanta Caves, Marine Drive — then misty Lonavala and Khandala with dramatic Bhor Ghat views.",
+   "ov": "India's most vibrant metropolis and the lush Western Ghats. Gateway of India, Elephanta Caves, Marine Drive: then misty Lonavala and Khandala with dramatic Bhor Ghat views.",
    "it": {
     "5 Nights / 6 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Mumbai",
-      "p": "Marine Drive evening — Queen's Necklace. Chowpatty bhelpuri. Gateway of India sunset."
+      "p": "Marine Drive evening: Queen's Necklace. Chowpatty bhelpuri. Gateway of India sunset."
      },
      {
       "d": "Day 2",
@@ -2591,7 +2591,7 @@
      {
       "d": "Day 4",
       "t": "Film City & Kanheri",
-      "p": "Film City Studios (Bollywood). Sanjay Gandhi National Park — leopards and ancient Buddhist caves inside Mumbai!"
+      "p": "Film City Studios (Bollywood). Sanjay Gandhi National Park: leopards and ancient Buddhist caves inside Mumbai!"
      },
      {
       "d": "Day 5",
@@ -2640,7 +2640,7 @@
     },
     "luxury": {
      "name": "Taj Mahal Palace Mumbai",
-     "feat": "One of world's most iconic hotels — Gateway of India view",
+     "feat": "One of world's most iconic hotels: Gateway of India view",
      "addPP": 22000
     }
    }
@@ -2663,13 +2663,13 @@
     8999,
     12999
    ],
-   "ov": "Maharashtra's highest hill station at 1372m — strawberry fields, 30 viewpoints, Panchganga temple where five rivers originate. Fresh air and crisp Sahyadri mornings.",
+   "ov": "Maharashtra's highest hill station at 1372m: strawberry fields, 30 viewpoints, Panchganga temple where five rivers originate. Fresh air and crisp Sahyadri mornings.",
    "it": {
     "2 Nights / 3 Days": [
      {
       "d": "Day 1",
       "t": "Arrival",
-      "p": "Arthur's Seat (dramatic viewpoint, 600m cliff). Mahabaleshwar market — strawberry fudge, mulberry wine."
+      "p": "Arthur's Seat (dramatic viewpoint, 600m cliff). Mahabaleshwar market: strawberry fudge, mulberry wine."
      },
      {
       "d": "Day 2",
@@ -2696,7 +2696,7 @@
      {
       "d": "Day 3",
       "t": "Pratapgarh Fort",
-      "p": "Pratapgarh Fort (Shivaji defeated Afzal Khan — 1659). Panchganga Temple. Lingmala Falls."
+      "p": "Pratapgarh Fort (Shivaji defeated Afzal Khan: 1659). Panchganga Temple. Lingmala Falls."
      },
      {
       "d": "Day 4",
@@ -2769,22 +2769,22 @@
      {
       "d": "Day 2",
       "t": "Trimbakeshwar",
-      "p": "Trimbakeshwar Jyotirlinga — source of Godavari. Brahmagiri Hill trek. Anjneri Hill (Hanuman birthplace)."
+      "p": "Trimbakeshwar Jyotirlinga: source of Godavari. Brahmagiri Hill trek. Anjneri Hill (Hanuman birthplace)."
      },
      {
       "d": "Day 3",
       "t": "Shani Shingnapur & Shirdi",
-      "p": "Shani Shingnapur (no doors — divine protection). Shirdi Sai Baba Samadhi Mandir — 70,000 devotees daily."
+      "p": "Shani Shingnapur (no doors: divine protection). Shirdi Sai Baba Samadhi Mandir: 70,000 devotees daily."
      },
      {
       "d": "Day 4",
       "t": "Ajanta Caves",
-      "p": "Ajanta UNESCO — 30 Buddhist caves, 2000-year-old murals. Lost 1200 years, rediscovered 1819."
+      "p": "Ajanta UNESCO: 30 Buddhist caves, 2000-year-old murals. Lost 1200 years, rediscovered 1819."
      },
      {
       "d": "Day 5",
       "t": "Ellora Caves",
-      "p": "Ellora UNESCO — Hindu Buddhist Jain. Kailasa Temple carved from single rock — more extraordinary than the Parthenon."
+      "p": "Ellora UNESCO: Hindu Buddhist Jain. Kailasa Temple carved from single rock: more extraordinary than the Parthenon."
      },
      {
       "d": "Day 6",
@@ -2816,12 +2816,12 @@
      {
       "d": "Day 5",
       "t": "Ajanta Caves",
-      "p": "Full day — Buddhist art."
+      "p": "Full day: Buddhist art."
      },
      {
       "d": "Day 6",
       "t": "Ellora Caves",
-      "p": "Full day — Kailasa Temple."
+      "p": "Full day: Kailasa Temple."
      },
      {
       "d": "Day 7",
@@ -2883,13 +2883,13 @@
     9999,
     12999
    ],
-   "ov": "India's favourite coastal paradise — golden beaches, Portuguese churches, vibrant fish markets, water sports and legendary sunsets.",
+   "ov": "India's favourite coastal paradise: golden beaches, Portuguese churches, vibrant fish markets, water sports and legendary sunsets.",
    "it": {
     "3 Nights / 4 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Goa",
-      "p": "Beach resort check-in. Calangute or Baga Beach. Sunset cocktails. Shack dinner — fresh seafood."
+      "p": "Beach resort check-in. Calangute or Baga Beach. Sunset cocktails. Shack dinner: fresh seafood."
      },
      {
       "d": "Day 2",
@@ -2899,7 +2899,7 @@
      {
       "d": "Day 3",
       "t": "South Goa & Heritage",
-      "p": "Old Goa — Basilica of Bom Jesus (UNESCO), Se Cathedral. Miramar. Panaji city walk."
+      "p": "Old Goa: Basilica of Bom Jesus (UNESCO), Se Cathedral. Miramar. Panaji city walk."
      },
      {
       "d": "Day 4",
@@ -2974,7 +2974,7 @@
   },
   {
    "id": "kerala_complete",
-   "t": "Kerala Complete — God's Own Country",
+   "t": "Kerala Complete: God's Own Country",
    "badge": "Bestseller",
    "img": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
    "cats": [
@@ -3007,7 +3007,7 @@
      {
       "d": "Day 3",
       "t": "Thekkady",
-      "p": "Periyar Lake boat safari — elephants, gaur, wild boar. Spice garden tour. Kathakali show at night."
+      "p": "Periyar Lake boat safari: elephants, gaur, wild boar. Spice garden tour. Kathakali show at night."
      },
      {
       "d": "Day 4",
@@ -3044,7 +3044,7 @@
      {
       "d": "Day 3",
       "t": "Munnar Offbeat",
-      "p": "Top Station (highest in Kerala). Lockhart Gap. Nyayamakad Waterfalls — hidden gem."
+      "p": "Top Station (highest in Kerala). Lockhart Gap. Nyayamakad Waterfalls: hidden gem."
      },
      {
       "d": "Day 4",
@@ -3064,7 +3064,7 @@
      {
       "d": "Day 7",
       "t": "Kanyakumari",
-      "p": "Southernmost tip of India — three seas. Vivekananda Rock Memorial. Thiruvalluvar Statue. Unique sunset and sunrise."
+      "p": "Southernmost tip of India: three seas. Vivekananda Rock Memorial. Thiruvalluvar Statue. Unique sunset and sunrise."
      },
      {
       "d": "Day 8",
@@ -3113,7 +3113,7 @@
   },
   {
    "id": "kerala_extended",
-   "t": "Kerala Extended — The Complete Circuit",
+   "t": "Kerala Extended: The Complete Circuit",
    "badge": "Most Complete",
    "img": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80",
    "cats": [
@@ -3146,7 +3146,7 @@
      {
       "d": "Day 3",
       "t": "Guruvayur & Athirappilly",
-      "p": "Guruvayur Temple (5000 years old, 80,000 devotees daily). Athirappilly Waterfalls — Kerala's Niagara, 80m wide."
+      "p": "Guruvayur Temple (5000 years old, 80,000 devotees daily). Athirappilly Waterfalls: Kerala's Niagara, 80m wide."
      },
      {
       "d": "Day 4",
@@ -3171,7 +3171,7 @@
      {
       "d": "Day 8",
       "t": "Trivandrum & Kanyakumari",
-      "p": "Padmanabhaswamy Temple. Drive Kanyakumari — three seas, Vivekananda Rock."
+      "p": "Padmanabhaswamy Temple. Drive Kanyakumari: three seas, Vivekananda Rock."
      },
      {
       "d": "Day 9",
@@ -3295,17 +3295,17 @@
      {
       "d": "Day 1",
       "t": "Arrival Rameswaram",
-      "p": "Ramanathaswamy Temple — 1212 pillars corridor, 22 sacred wells. Agnitheertham beach bath."
+      "p": "Ramanathaswamy Temple: 1212 pillars corridor, 22 sacred wells. Agnitheertham beach bath."
      },
      {
       "d": "Day 2",
       "t": "Rameswaram",
-      "p": "Pamban Bridge. Dhanushkodi ghost town — Ram Setu visible. Drive to Kanyakumari."
+      "p": "Pamban Bridge. Dhanushkodi ghost town: Ram Setu visible. Drive to Kanyakumari."
      },
      {
       "d": "Day 3",
       "t": "Kanyakumari",
-      "p": "Sunrise — sun rising from sea (unique to Kanyakumari). Vivekananda Rock boat. Thiruvalluvar Statue. Three sea confluence."
+      "p": "Sunrise: sun rising from sea (unique to Kanyakumari). Vivekananda Rock boat. Thiruvalluvar Statue. Three sea confluence."
      },
      {
       "d": "Day 4",
@@ -3347,7 +3347,7 @@
      {
       "d": "Day 5",
       "t": "Madurai",
-      "p": "Meenakshi Amman Temple — 14 towers, 33,000 sculptures. Evening ceremony."
+      "p": "Meenakshi Amman Temple: 14 towers, 33,000 sculptures. Evening ceremony."
      },
      {
       "d": "Day 6",
@@ -3420,22 +3420,22 @@
      {
       "d": "Day 1",
       "t": "Arrival Varanasi",
-      "p": "Check-in. Evening Ganga Aarti at Dashashwamedh Ghat — most spectacular religious ceremony in India. Boat ride as diyas float downstream."
+      "p": "Check-in. Evening Ganga Aarti at Dashashwamedh Ghat: most spectacular religious ceremony in India. Boat ride as diyas float downstream."
      },
      {
       "d": "Day 2",
       "t": "Varanasi",
-      "p": "Sunrise boat ride on Ganga — ghats waking up, cremations, bathers, sadhus. Kashi Vishwanath Temple (12 Jyotirlinga). Gyanvapi, Annapurna Temple. Old city walk through narrow lanes."
+      "p": "Sunrise boat ride on Ganga: ghats waking up, cremations, bathers, sadhus. Kashi Vishwanath Temple (12 Jyotirlinga). Gyanvapi, Annapurna Temple. Old city walk through narrow lanes."
      },
      {
       "d": "Day 3",
       "t": "Sarnath & Prayagraj",
-      "p": "Sarnath — where Buddha gave first sermon. Dhamek Stupa (5th century). Museum. Drive to Prayagraj. Triveni Sangam — confluence of Ganga, Yamuna and Saraswati. Boat ride at sangam."
+      "p": "Sarnath: where Buddha gave first sermon. Dhamek Stupa (5th century). Museum. Drive to Prayagraj. Triveni Sangam: confluence of Ganga, Yamuna and Saraswati. Boat ride at sangam."
      },
      {
       "d": "Day 4",
       "t": "Ayodhya",
-      "p": "Ayodhya — birthplace of Lord Ram. Ram Mandir — newly completed, magnificent. Hanuman Garhi. Kanak Bhawan. Saryu River ghat aarti."
+      "p": "Ayodhya: birthplace of Lord Ram. Ram Mandir: newly completed, magnificent. Hanuman Garhi. Kanak Bhawan. Saryu River ghat aarti."
      },
      {
       "d": "Day 5",
@@ -3506,7 +3506,7 @@
     },
     "luxury": {
      "name": "BrijRama Palace Varanasi",
-     "feat": "17th century palace on Ganga ghat — unique",
+     "feat": "17th century palace on Ganga ghat: unique",
      "addPP": 15000
     }
    }
@@ -3529,33 +3529,33 @@
     26999,
     32999
    ],
-   "ov": "India's most pristine beaches — turquoise water so clear you can see the coral from the surface. World-class snorkelling, bioluminescent beaches, jungle-covered hills rising from the sea. The Andamans are India's best kept secret.",
+   "ov": "India's most pristine beaches: turquoise water so clear you can see the coral from the surface. World-class snorkelling, bioluminescent beaches, jungle-covered hills rising from the sea. The Andamans are India's best kept secret.",
    "it": {
     "5 Nights / 6 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Port Blair",
-      "p": "Arrive Port Blair. Check-in. Cellular Jail (National Memorial — harrowing British prison for freedom fighters). Light & Sound show at Cellular Jail at night."
+      "p": "Arrive Port Blair. Check-in. Cellular Jail (National Memorial: harrowing British prison for freedom fighters). Light & Sound show at Cellular Jail at night."
      },
      {
       "d": "Day 2",
       "t": "Port Blair & Ross Island",
-      "p": "Corbyn's Cove Beach. Ferry to Ross Island (former British HQ, now taken over by deer and peacocks — jungle through old buildings). North Bay Island — glass-bottom boat ride."
+      "p": "Corbyn's Cove Beach. Ferry to Ross Island (former British HQ, now taken over by deer and peacocks: jungle through old buildings). North Bay Island: glass-bottom boat ride."
      },
      {
       "d": "Day 3",
       "t": "Havelock Island",
-      "p": "Ferry to Havelock. Check-in. Radhanagar Beach — Asia's finest beach (TIME magazine). Sunset at the beach."
+      "p": "Ferry to Havelock. Check-in. Radhanagar Beach: Asia's finest beach (TIME magazine). Sunset at the beach."
      },
      {
       "d": "Day 4",
-      "t": "Havelock — Elephanta Beach",
-      "p": "Elephanta Beach (boat ride) — best snorkelling in India. Coral gardens, clownfish, sea turtles. Afternoon at leisure on Havelock."
+      "t": "Havelock: Elephanta Beach",
+      "p": "Elephanta Beach (boat ride): best snorkelling in India. Coral gardens, clownfish, sea turtles. Afternoon at leisure on Havelock."
      },
      {
       "d": "Day 5",
       "t": "Neil Island",
-      "p": "Ferry to Neil Island. Natural Bridge (coral formation). Bharatpur Beach, Laxmanpur Beach, Sitapur Beach — different character each. Pristine and crowd-free."
+      "p": "Ferry to Neil Island. Natural Bridge (coral formation). Bharatpur Beach, Laxmanpur Beach, Sitapur Beach: different character each. Pristine and crowd-free."
      },
      {
       "d": "Day 6",
@@ -3577,7 +3577,7 @@
      {
       "d": "Day 3",
       "t": "Baratang Island",
-      "p": "Baratang — limestone caves through mangrove creek (boat safari through dense jungle), mud volcanoes. Totally offbeat and extraordinary."
+      "p": "Baratang: limestone caves through mangrove creek (boat safari through dense jungle), mud volcanoes. Totally offbeat and extraordinary."
      },
      {
       "d": "Day 4",
@@ -3641,7 +3641,7 @@
   },
   {
    "id": "spiti_valley",
-   "t": "Spiti Valley — Land of Lamas",
+   "t": "Spiti Valley: Land of Lamas",
    "badge": "Offbeat Adventure",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -3657,7 +3657,7 @@
     29999,
     35999
    ],
-   "ov": "The cold desert of Himachal Pradesh — raw, dramatic, barely touched by tourism. Ancient monasteries clinging to cliffs at 4000m, a village that has never lost a war, and roads that make Ladakh look easy. Spiti is for the truly adventurous.",
+   "ov": "The cold desert of Himachal Pradesh: raw, dramatic, barely touched by tourism. Ancient monasteries clinging to cliffs at 4000m, a village that has never lost a war, and roads that make Ladakh look easy. Spiti is for the truly adventurous.",
    "it": {
     "6 Nights / 7 Days": [
      {
@@ -3673,7 +3673,7 @@
      {
       "d": "Day 3",
       "t": "Narkanda to Kaza",
-      "p": "Long mountain drive via Kinnaur Valley — carved road over the Sutlej River with sheer drops. Sangla Valley. Arrive Kaza (3800m)."
+      "p": "Long mountain drive via Kinnaur Valley: carved road over the Sutlej River with sheer drops. Sangla Valley. Arrive Kaza (3800m)."
      },
      {
       "d": "Day 4",
@@ -3683,7 +3683,7 @@
      {
       "d": "Day 5",
       "t": "Chandratal Lake",
-      "p": "Drive to Chandratal — Moon Lake (4300m). Perfect blue circle in the mountains. Overnight camp at Chandratal."
+      "p": "Drive to Chandratal: Moon Lake (4300m). Perfect blue circle in the mountains. Overnight camp at Chandratal."
      },
      {
       "d": "Day 6",
@@ -3705,12 +3705,12 @@
      {
       "d": "Day 2",
       "t": "Shimla to Sangla",
-      "p": "Kinnaur Valley. Sangla Valley — stunning green valley."
+      "p": "Kinnaur Valley. Sangla Valley: stunning green valley."
      },
      {
       "d": "Day 3",
       "t": "Chitkul",
-      "p": "Chitkul — last inhabited village before Tibet border. Chitkul is the end of the world road. Baspa River."
+      "p": "Chitkul: last inhabited village before Tibet border. Chitkul is the end of the world road. Baspa River."
      },
      {
       "d": "Day 4",
@@ -3725,7 +3725,7 @@
      {
       "d": "Day 6",
       "t": "Dhankar & Pin Valley",
-      "p": "Dhankar Monastery (perched on cliff 4000m). Pin Valley National Park — snow leopard habitat. Mud village — ancient fort."
+      "p": "Dhankar Monastery (perched on cliff 4000m). Pin Valley National Park: snow leopard habitat. Mud village: ancient fort."
      },
      {
       "d": "Day 7",
@@ -3742,7 +3742,7 @@
    "inc": [
     "Hotel + camp accommodation",
     "Daily breakfast & dinner",
-    "Private SUV — essential for roads",
+    "Private SUV: essential for roads",
     "All monastery entries",
     "Experienced mountain driver-guide",
     "Emergency kit"
@@ -3777,7 +3777,7 @@
   },
   {
    "id": "northeast_meghalaya",
-   "t": "Meghalaya & Assam — Northeast Magic",
+   "t": "Meghalaya & Assam: Northeast Magic",
    "badge": "Trending Now",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -3805,27 +3805,27 @@
      {
       "d": "Day 2",
       "t": "Kaziranga National Park",
-      "p": "Drive to Kaziranga. Afternoon jeep safari — one-horned rhino (largest population in world), elephants, water buffalo, tigers (rare). Overnight near park."
+      "p": "Drive to Kaziranga. Afternoon jeep safari: one-horned rhino (largest population in world), elephants, water buffalo, tigers (rare). Overnight near park."
      },
      {
       "d": "Day 3",
       "t": "Kaziranga Morning Safari",
-      "p": "Elephant safari at sunrise — best for rhino sightings. Drive to Shillong."
+      "p": "Elephant safari at sunrise: best for rhino sightings. Drive to Shillong."
      },
      {
       "d": "Day 4",
-      "t": "Shillong — Scotland of the East",
-      "p": "Shillong — most beautiful hill town in Northeast. Ward's Lake, Don Bosco Museum (best museum on Northeast India). Umiam Lake."
+      "t": "Shillong: Scotland of the East",
+      "p": "Shillong: most beautiful hill town in Northeast. Ward's Lake, Don Bosco Museum (best museum on Northeast India). Umiam Lake."
      },
      {
       "d": "Day 5",
       "t": "Cherrapunji",
-      "p": "Cherrapunji — wettest place on Earth. Nohkalikai Falls (India's tallest plunge waterfall — 340m). Seven Sisters Falls. Mawsmai Caves. Living root bridges at Nongriat (2.5km trek)."
+      "p": "Cherrapunji: wettest place on Earth. Nohkalikai Falls (India's tallest plunge waterfall: 340m). Seven Sisters Falls. Mawsmai Caves. Living root bridges at Nongriat (2.5km trek)."
      },
      {
       "d": "Day 6",
       "t": "Mawlynnong & Departure",
-      "p": "Mawlynnong — cleanest village in Asia. Living single root bridge. Dawki — crystal clear Umngot river. Return Guwahati airport."
+      "p": "Mawlynnong: cleanest village in Asia. Living single root bridge. Dawki: crystal clear Umngot river. Return Guwahati airport."
      }
     ],
     "6 Nights / 7 Days": [
@@ -3837,7 +3837,7 @@
      {
       "d": "Day 2",
       "t": "Kaziranga",
-      "p": "Jeep safari — rhinos, elephants."
+      "p": "Jeep safari: rhinos, elephants."
      },
      {
       "d": "Day 3",
@@ -3931,7 +3931,7 @@
      {
       "d": "Day 2",
       "t": "Tiger Hill Sunrise & Darjeeling",
-      "p": "Tiger Hill (4am drive) — Kanchenjunga (world's 3rd highest peak) bathed in golden sunrise. Batasia Loop. Padmaja Naidu Zoo (red pandas!). Happy Valley Tea Estate."
+      "p": "Tiger Hill (4am drive): Kanchenjunga (world's 3rd highest peak) bathed in golden sunrise. Batasia Loop. Padmaja Naidu Zoo (red pandas!). Happy Valley Tea Estate."
      },
      {
       "d": "Day 3",
@@ -3941,17 +3941,17 @@
      {
       "d": "Day 4",
       "t": "Tsomgo Lake & Baba Mandir",
-      "p": "Tsomgo (Changu) Lake (3753m) — frozen in winter, blooms in summer. Baba Harbhajan Singh Mandir — sacred army post."
+      "p": "Tsomgo (Changu) Lake (3753m): frozen in winter, blooms in summer. Baba Harbhajan Singh Mandir: sacred army post."
      },
      {
       "d": "Day 5",
-      "t": "North Sikkim — Lachen",
+      "t": "North Sikkim: Lachen",
       "p": "Drive to North Sikkim. Lachen village. Mountain drives. Overnight Lachen."
      },
      {
       "d": "Day 6",
       "t": "Gurudongmar Lake & Departure",
-      "p": "Gurudongmar Lake (5183m) — one of world's highest lakes, sacred to Sikhs and Buddhists. Return to Bagdogra airport."
+      "p": "Gurudongmar Lake (5183m): one of world's highest lakes, sacred to Sikhs and Buddhists. Return to Bagdogra airport."
      }
     ],
     "6 Nights / 7 Days": [
@@ -3968,7 +3968,7 @@
      {
       "d": "Day 3",
       "t": "Darjeeling Offbeat",
-      "p": "Sandakphu trek option or Mirik Lake (1495m — orange orchards, Himalayan views). Ghoom Monastery (oldest in Darjeeling)."
+      "p": "Sandakphu trek option or Mirik Lake (1495m: orange orchards, Himalayan views). Ghoom Monastery (oldest in Darjeeling)."
      },
      {
       "d": "Day 4",
@@ -4068,12 +4068,12 @@
      {
       "d": "Day 4",
       "t": "Coorg Sightseeing",
-      "p": "Abbey Falls. Nagarhole National Park jeep safari — tigers, elephants, leopards. Omkareshwara Temple (unique blend of Islamic and Gothic architecture). Coorg coffee plantation tour."
+      "p": "Abbey Falls. Nagarhole National Park jeep safari: tigers, elephants, leopards. Omkareshwara Temple (unique blend of Islamic and Gothic architecture). Coorg coffee plantation tour."
      },
      {
       "d": "Day 5",
       "t": "Drive to Mysore",
-      "p": "Drive to Mysore. Mysore Palace evening — illuminated by 97,000 bulbs on Sundays. St Philomena's Church."
+      "p": "Drive to Mysore. Mysore Palace evening: illuminated by 97,000 bulbs on Sundays. St Philomena's Church."
      },
      {
       "d": "Day 6",
@@ -4105,7 +4105,7 @@
      {
       "d": "Day 5",
       "t": "Coorg Offbeat",
-      "p": "Iruppu Falls (sacred waterfall), Brahmagiri Hills trek, Talacauvery (Cauvery source — sacred). Local village."
+      "p": "Iruppu Falls (sacred waterfall), Brahmagiri Hills trek, Talacauvery (Cauvery source: sacred). Local village."
      },
      {
       "d": "Day 6",
@@ -4173,13 +4173,13 @@
     14999,
     18999
    ],
-   "ov": "The ruins of Vijayanagara — the greatest Hindu empire — scattered across a surreal boulder landscape. Ancient cave temples carved 1500 years ago and a pristine hippie beach on the Arabian Sea. Karnataka's ultimate heritage and adventure circuit.",
+   "ov": "The ruins of Vijayanagara, the greatest Hindu empire, scattered across a surreal boulder landscape. Ancient cave temples carved 1500 years ago and a pristine hippie beach on the Arabian Sea. Karnataka's ultimate heritage and adventure circuit.",
    "it": {
     "4 Nights / 5 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Hampi",
-      "p": "Arrive Hampi (UNESCO). Check-in. Virupaksha Temple (still functioning after 1336 AD). Sunset on Hemakuta Hill — temples silhouetted against orange sky."
+      "p": "Arrive Hampi (UNESCO). Check-in. Virupaksha Temple (still functioning after 1336 AD). Sunset on Hemakuta Hill: temples silhouetted against orange sky."
      },
      {
       "d": "Day 2",
@@ -4189,12 +4189,12 @@
      {
       "d": "Day 3",
       "t": "Badami & Pattadakal",
-      "p": "Drive to Badami (100km). Badami Cave Temples (6th century, carved into red sandstone cliff). Agastya Lake. Pattadakal (UNESCO — Chalukya temples, 8th century)."
+      "p": "Drive to Badami (100km). Badami Cave Temples (6th century, carved into red sandstone cliff). Agastya Lake. Pattadakal (UNESCO: Chalukya temples, 8th century)."
      },
      {
       "d": "Day 4",
       "t": "Drive to Gokarna",
-      "p": "Drive to Gokarna (3 hours). Mahabaleshwar Temple. Gokarna Beach — sacred town with pristine beaches (Om Beach, Half Moon Beach, Paradise Beach)."
+      "p": "Drive to Gokarna (3 hours). Mahabaleshwar Temple. Gokarna Beach: sacred town with pristine beaches (Om Beach, Half Moon Beach, Paradise Beach)."
      },
      {
       "d": "Day 5",
@@ -4216,12 +4216,12 @@
      {
       "d": "Day 3",
       "t": "Hampi Offbeat",
-      "p": "Anegundi (across river — older than Hampi, Kishkindha from Ramayana). Coracle boat ride. Matanga Hill sunrise."
+      "p": "Anegundi (across river: older than Hampi, Kishkindha from Ramayana). Coracle boat ride. Matanga Hill sunrise."
      },
      {
       "d": "Day 4",
       "t": "Badami & Aihole",
-      "p": "Badami caves. Aihole — cradle of Indian temple architecture, 125 temples, 600 AD."
+      "p": "Badami caves. Aihole: cradle of Indian temple architecture, 125 temples, 600 AD."
      },
      {
       "d": "Day 5",
@@ -4299,18 +4299,18 @@
      },
      {
       "d": "Day 2",
-      "t": "Ubud — Cultural Heart",
+      "t": "Ubud: Cultural Heart",
       "p": "Tegalalang Rice Terraces (sunrise). Sacred Monkey Forest. Ubud Palace. Kecak fire dance at sunset."
      },
      {
       "d": "Day 3",
       "t": "Volcano & Temples",
-      "p": "Sunrise trek on Mount Batur (1717m) — active volcano. Tirta Empul temple (royal bathing pools). Tanah Lot temple at sunset over the sea."
+      "p": "Sunrise trek on Mount Batur (1717m): active volcano. Tirta Empul temple (royal bathing pools). Tanah Lot temple at sunset over the sea."
      },
      {
       "d": "Day 4",
       "t": "Water Sports & Islands",
-      "p": "Nusa Penida snorkelling — Manta Point (giant mantas), Crystal Bay. Afternoon water sports at Tanjung Benoa."
+      "p": "Nusa Penida snorkelling: Manta Point (giant mantas), Crystal Bay. Afternoon water sports at Tanjung Benoa."
      },
      {
       "d": "Day 5",
@@ -4342,12 +4342,12 @@
      {
       "d": "Day 4",
       "t": "Nusa Penida",
-      "p": "Full day boat tour — Kelingking Beach (T-Rex cliff), Angel's Billabong, Broken Beach, Crystal Bay snorkelling."
+      "p": "Full day boat tour: Kelingking Beach (T-Rex cliff), Angel's Billabong, Broken Beach, Crystal Bay snorkelling."
      },
      {
       "d": "Day 5",
       "t": "Jatiluwih & Lovina",
-      "p": "Jatiluwih rice terraces (UNESCO — more dramatic than Tegalalang). Lovina dolphin watching at sunrise — wild spinner dolphins."
+      "p": "Jatiluwih rice terraces (UNESCO: more dramatic than Tegalalang). Lovina dolphin watching at sunrise: wild spinner dolphins."
      },
      {
       "d": "Day 6",
@@ -4435,7 +4435,7 @@
      {
       "d": "Day 3",
       "t": "Chiang Mai",
-      "p": "Morning flight. Doi Suthep Temple (golden spire above the clouds). Thai cooking class. Elephant Nature Park (ethical sanctuary — bathe and feed rescued elephants)."
+      "p": "Morning flight. Doi Suthep Temple (golden spire above the clouds). Thai cooking class. Elephant Nature Park (ethical sanctuary: bathe and feed rescued elephants)."
      },
      {
       "d": "Day 4",
@@ -4445,7 +4445,7 @@
      {
       "d": "Day 5",
       "t": "Phi Phi Islands",
-      "p": "Full day boat tour — Maya Bay (The Beach filming location), Monkey Beach, Pileh Lagoon, Phi Phi Le, snorkelling."
+      "p": "Full day boat tour: Maya Bay (The Beach filming location), Monkey Beach, Pileh Lagoon, Phi Phi Le, snorkelling."
      },
      {
       "d": "Day 6",
@@ -4532,7 +4532,7 @@
   },
   {
    "id": "sri_lanka",
-   "t": "Sri Lanka — Pearl of the Indian Ocean",
+   "t": "Sri Lanka: Pearl of the Indian Ocean",
    "badge": "Teardrop Isle",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -4556,27 +4556,27 @@
      {
       "d": "Day 1",
       "t": "Arrival Colombo",
-      "p": "Arrive Colombo. Transfer to Kandy (4 hours). Check-in. Evening Temple of the Tooth (Dalada Maligawa) — Buddha's tooth relic, one of Buddhism's most sacred sites. Cultural show."
+      "p": "Arrive Colombo. Transfer to Kandy (4 hours). Check-in. Evening Temple of the Tooth (Dalada Maligawa): Buddha's tooth relic, one of Buddhism's most sacred sites. Cultural show."
      },
      {
       "d": "Day 2",
       "t": "Kandy & Sigiriya",
-      "p": "Kandy Lake. Royal Botanical Gardens Peradeniya. Drive to Sigiriya. Pidurangala Rock (better view than Sigiriya). Dambulla Cave Temples (UNESCO — 5 caves, 157 Buddha statues)."
+      "p": "Kandy Lake. Royal Botanical Gardens Peradeniya. Drive to Sigiriya. Pidurangala Rock (better view than Sigiriya). Dambulla Cave Temples (UNESCO: 5 caves, 157 Buddha statues)."
      },
      {
       "d": "Day 3",
       "t": "Sigiriya Rock",
-      "p": "Sigiriya — Lion Rock (UNESCO). Ancient palace and gardens atop a 200m vertical rock. Hiriwadunna village bullock cart ride and boat."
+      "p": "Sigiriya: Lion Rock (UNESCO). Ancient palace and gardens atop a 200m vertical rock. Hiriwadunna village bullock cart ride and boat."
      },
      {
       "d": "Day 4",
-      "t": "Nuwara Eliya — Tea Country",
-      "p": "Drive through tea estates. Nuwara Eliya — Little England. Tea factory tour and tasting. Gregory Lake. Hakgala Botanical Garden."
+      "t": "Nuwara Eliya: Tea Country",
+      "p": "Drive through tea estates. Nuwara Eliya: Little England. Tea factory tour and tasting. Gregory Lake. Hakgala Botanical Garden."
      },
      {
       "d": "Day 5",
       "t": "Galle & Beach",
-      "p": "Drive to Galle Fort (UNESCO — Dutch colonial fort). Sunset on the ramparts. Unawatuna Beach — one of Asia's best."
+      "p": "Drive to Galle Fort (UNESCO: Dutch colonial fort). Sunset on the ramparts. Unawatuna Beach: one of Asia's best."
      },
      {
       "d": "Day 6",
@@ -4603,7 +4603,7 @@
      {
       "d": "Day 4",
       "t": "Minneriya Safari",
-      "p": "Minneriya National Park — The Gathering (July-Oct, 400+ elephants). Or Udawalawe (year-round elephants)."
+      "p": "Minneriya National Park: The Gathering (July-Oct, 400+ elephants). Or Udawalawe (year-round elephants)."
      },
      {
       "d": "Day 5",
@@ -4663,7 +4663,7 @@
   },
   {
    "id": "nepal",
-   "t": "Nepal — Himalayas & Spirituality",
+   "t": "Nepal: Himalayas & Spirituality",
    "badge": "Everest Country",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -4691,7 +4691,7 @@
      {
       "d": "Day 2",
       "t": "Kathmandu Valley",
-      "p": "Swayambhunath Monkey Temple (UNESCO). Patan Durbar Square (UNESCO — medieval palace). Bhaktapur Durbar Square (UNESCO — best preserved medieval city). Kumari (Living Goddess) darshan."
+      "p": "Swayambhunath Monkey Temple (UNESCO). Patan Durbar Square (UNESCO: medieval palace). Bhaktapur Durbar Square (UNESCO: best preserved medieval city). Kumari (Living Goddess) darshan."
      },
      {
       "d": "Day 3",
@@ -4701,12 +4701,12 @@
      {
       "d": "Day 4",
       "t": "Sarangkot Sunrise",
-      "p": "4am drive to Sarangkot — Annapurna, Machhapuchhre (Fishtail) and Dhaulagiri in golden dawn light. Paragliding option (world-class). Davis Falls, Gupteshwor Cave."
+      "p": "4am drive to Sarangkot: Annapurna, Machhapuchhre (Fishtail) and Dhaulagiri in golden dawn light. Paragliding option (world-class). Davis Falls, Gupteshwor Cave."
      },
      {
       "d": "Day 5",
       "t": "Chitwan National Park",
-      "p": "Drive to Chitwan. Jeep safari — one-horned rhinos, tigers, gharial crocodiles. Evening tharu cultural show."
+      "p": "Drive to Chitwan. Jeep safari: one-horned rhinos, tigers, gharial crocodiles. Evening tharu cultural show."
      },
      {
       "d": "Day 6",
@@ -4728,7 +4728,7 @@
      {
       "d": "Day 3",
       "t": "Nagarkot Sunrise",
-      "p": "Drive to Nagarkot (2195m) — 360° Himalayan sunrise including Everest on clear days. Changu Narayan Temple (UNESCO, 1700 years old)."
+      "p": "Drive to Nagarkot (2195m): 360° Himalayan sunrise including Everest on clear days. Changu Narayan Temple (UNESCO, 1700 years old)."
      },
      {
       "d": "Day 4",
@@ -4793,7 +4793,7 @@
   },
   {
    "id": "bhutan",
-   "t": "Bhutan — Last Shangri-La",
+   "t": "Bhutan: Last Shangri-La",
    "badge": "Happiness Kingdom",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -4816,7 +4816,7 @@
      {
       "d": "Day 1",
       "t": "Arrival Paro",
-      "p": "Arrive Paro — dramatic Himalayan landing (only 8 trained pilots allowed to land here). Transfer to Thimphu. Check-in. Folk Heritage Museum. Takin Preserve."
+      "p": "Arrive Paro: dramatic Himalayan landing (only 8 trained pilots allowed to land here). Transfer to Thimphu. Check-in. Folk Heritage Museum. Takin Preserve."
      },
      {
       "d": "Day 2",
@@ -4831,12 +4831,12 @@
      {
       "d": "Day 4",
       "t": "Punakha & Paro",
-      "p": "Chimi Lhakhang (fertility temple — pilgrims from all over Asia). Drive back to Paro. Rinpung Dzong. Paro town walk."
+      "p": "Chimi Lhakhang (fertility temple: pilgrims from all over Asia). Drive back to Paro. Rinpung Dzong. Paro town walk."
      },
      {
       "d": "Day 5",
       "t": "Tiger's Nest Monastery",
-      "p": "Paro Taktsang (Tiger's Nest) — Bhutan's most iconic image. 3-hour trek to the monastery clinging to a 900m cliff. Guru Rinpoche meditated here. Life-changing experience."
+      "p": "Paro Taktsang (Tiger's Nest): Bhutan's most iconic image. 3-hour trek to the monastery clinging to a 900m cliff. Guru Rinpoche meditated here. Life-changing experience."
      },
      {
       "d": "Day 6",
@@ -4868,7 +4868,7 @@
      {
       "d": "Day 5",
       "t": "Bumthang",
-      "p": "Bumthang — Bhutan's cultural heartland. Jakar Dzong. Jambay Lhakhang (7th century temple). Kurje Lhakhang."
+      "p": "Bumthang: Bhutan's cultural heartland. Jakar Dzong. Jambay Lhakhang (7th century temple). Kurje Lhakhang."
      },
      {
       "d": "Day 6",
@@ -4883,7 +4883,7 @@
     ]
    },
    "inc": [
-    "Bhutan Tourism levy ($100/day — mandatory, includes hotel, meals, guide)",
+    "Bhutan Tourism levy ($100/day: mandatory, includes hotel, meals, guide)",
     "All hotel accommodation",
     "All meals (breakfast, lunch, dinner)",
     "Licensed Bhutanese guide",
@@ -4915,14 +4915,14 @@
     },
     "luxury": {
      "name": "Amankora Circuit (5 lodges)",
-     "feat": "Aman's legendary Bhutan circuit — world's finest",
+     "feat": "Aman's legendary Bhutan circuit: world's finest",
      "addPP": 40000
     }
    }
   },
   {
    "id": "singapore",
-   "t": "Singapore — City of the Future",
+   "t": "Singapore: City of the Future",
    "badge": "Lion City",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -4938,18 +4938,18 @@
     38999,
     46999
    ],
-   "ov": "One of the world's great cities — impeccably clean, impossibly efficient and endlessly fascinating. Marina Bay Sands, Gardens by the Bay, Sentosa Island and the world's finest street food.",
+   "ov": "One of the world's great cities: impeccably clean, impossibly efficient and endlessly fascinating. Marina Bay Sands, Gardens by the Bay, Sentosa Island and the world's finest street food.",
    "it": {
     "4 Nights / 5 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Singapore",
-      "p": "Arrive Singapore. MRT from airport (world's best metro). Check-in. Evening Marina Bay — the light show, Supertrees at Gardens by the Bay."
+      "p": "Arrive Singapore. MRT from airport (world's best metro). Check-in. Evening Marina Bay: the light show, Supertrees at Gardens by the Bay."
      },
      {
       "d": "Day 2",
       "t": "Iconic Singapore",
-      "p": "Marina Bay Sands observation deck. Gardens by the Bay — Cloud Forest and Flower Dome. Merlion Park. Singapore River walk. Satay by the Bay dinner."
+      "p": "Marina Bay Sands observation deck. Gardens by the Bay: Cloud Forest and Flower Dome. Merlion Park. Singapore River walk. Satay by the Bay dinner."
      },
      {
       "d": "Day 3",
@@ -4959,12 +4959,12 @@
      {
       "d": "Day 4",
       "t": "Culture & Heritage",
-      "p": "Chinatown — Buddha Tooth Relic Temple. Little India — Mustafa Centre. Arab Street — Sultan Mosque. Hawker Centre — best Singapore food tour (Lau Pa Sat or Newton)."
+      "p": "Chinatown: Buddha Tooth Relic Temple. Little India: Mustafa Centre. Arab Street: Sultan Mosque. Hawker Centre: best Singapore food tour (Lau Pa Sat or Newton)."
      },
      {
       "d": "Day 5",
       "t": "Departure",
-      "p": "Singapore Changi Airport (world's best airport — see Jewel waterfall)."
+      "p": "Singapore Changi Airport (world's best airport: see Jewel waterfall)."
      }
     ],
     "5 Nights / 6 Days": [
@@ -4991,12 +4991,12 @@
      {
       "d": "Day 5",
       "t": "Day Trip Batam/Johor",
-      "p": "Short ferry to Batam Indonesia or drive to Johor Bahru Malaysia — shopping and local food."
+      "p": "Short ferry to Batam Indonesia or drive to Johor Bahru Malaysia: shopping and local food."
      },
      {
       "d": "Day 6",
       "t": "Departure",
-      "p": "Changi Airport — see Jewel."
+      "p": "Changi Airport: see Jewel."
      }
     ]
    },
@@ -5032,14 +5032,14 @@
     },
     "luxury": {
      "name": "Marina Bay Sands",
-     "feat": "Infinity pool on 57th floor — world famous",
+     "feat": "Infinity pool on 57th floor: world famous",
      "addPP": 25000
     }
    }
   },
   {
    "id": "malaysia",
-   "t": "Malaysia — Truly Asia",
+   "t": "Malaysia: Truly Asia",
    "badge": "Diverse Beauty",
    "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
    "cats": [
@@ -5056,13 +5056,13 @@
     32999,
     39999
    ],
-   "ov": "Kuala Lumpur's iconic twin towers, Penang's UNESCO heritage streets and award-winning street food, Langkawi's duty-free island paradise — Malaysia offers extraordinary diversity in one destination.",
+   "ov": "Kuala Lumpur's iconic twin towers, Penang's UNESCO heritage streets and award-winning street food, Langkawi's duty-free island paradise: Malaysia offers extraordinary diversity in one destination.",
    "it": {
     "5 Nights / 6 Days": [
      {
       "d": "Day 1",
       "t": "Arrival Kuala Lumpur",
-      "p": "Arrive KL. Check-in. Petronas Twin Towers at night — world's tallest twin towers with sky bridge."
+      "p": "Arrive KL. Check-in. Petronas Twin Towers at night: world's tallest twin towers with sky bridge."
      },
      {
       "d": "Day 2",
@@ -5072,12 +5072,12 @@
      {
       "d": "Day 3",
       "t": "Penang",
-      "p": "Short flight to Penang. Georgetown UNESCO — street art murals, Cheong Fatt Tze Mansion (Blue Mansion), heritage temples. Penang Hill. Kek Lok Si Temple."
+      "p": "Short flight to Penang. Georgetown UNESCO: street art murals, Cheong Fatt Tze Mansion (Blue Mansion), heritage temples. Penang Hill. Kek Lok Si Temple."
      },
      {
       "d": "Day 4",
       "t": "Penang Food Paradise",
-      "p": "Penang street food tour — voted world's best street food. Char Kway Teow, Laksa, Nasi Kandar, Cendol. Clan Jetties. Gurney Drive hawker."
+      "p": "Penang street food tour: voted world's best street food. Char Kway Teow, Laksa, Nasi Kandar, Cendol. Clan Jetties. Gurney Drive hawker."
      },
      {
       "d": "Day 5",
@@ -5104,7 +5104,7 @@
      {
       "d": "Day 3",
       "t": "Cameron Highlands",
-      "p": "Cameron Highlands — English hill station at 1500m. Tea plantation. Strawberry farm. Mossy forest. Rose garden."
+      "p": "Cameron Highlands: English hill station at 1500m. Tea plantation. Strawberry farm. Mossy forest. Rose garden."
      },
      {
       "d": "Day 4",
@@ -5190,17 +5190,17 @@
      {
       "d": "Day 1",
       "t": "Arrival Dubai",
-      "p": "Arrive Dubai. Check-in. Evening Dubai Frame (picture frame building, old and new Dubai view). Gold Souk and Spice Souk in Deira — alive at night."
+      "p": "Arrive Dubai. Check-in. Evening Dubai Frame (picture frame building, old and new Dubai view). Gold Souk and Spice Souk in Deira: alive at night."
      },
      {
       "d": "Day 2",
       "t": "Dubai Icons",
-      "p": "Burj Khalifa observation deck (124th floor — tallest building on Earth). Dubai Mall (world's largest mall — indoor ski slope, aquarium). Dubai Fountain show. Dubai Creek Dhow cruise dinner."
+      "p": "Burj Khalifa observation deck (124th floor: tallest building on Earth). Dubai Mall (world's largest mall: indoor ski slope, aquarium). Dubai Fountain show. Dubai Creek Dhow cruise dinner."
      },
      {
       "d": "Day 3",
       "t": "Desert Safari",
-      "p": "Morning Palm Jumeirah, Burj Al Arab photo stop. Afternoon: Desert Safari — dune bashing (exciting 4×4 drive over dunes), camel ride, sunset in the desert, BBQ dinner under stars, belly dance and tanoura show."
+      "p": "Morning Palm Jumeirah, Burj Al Arab photo stop. Afternoon: Desert Safari: dune bashing (exciting 4×4 drive over dunes), camel ride, sunset in the desert, BBQ dinner under stars, belly dance and tanoura show."
      },
      {
       "d": "Day 4",
@@ -5280,7 +5280,7 @@
     },
     "luxury": {
      "name": "Burj Al Arab",
-     "feat": "World's most iconic hotel — 7-star, butler, helicopter arrival",
+     "feat": "World's most iconic hotel: 7-star, butler, helicopter arrival",
      "addPP": 40000
     }
    }

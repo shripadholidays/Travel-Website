@@ -111,7 +111,7 @@ export const TourCard = ({ tour, className }: { tour: Tour, className?: string }
                                 <span className="text-muted-foreground">{reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}</span>
                             </>
                         ) : (
-                            <span className="text-xs font-bold uppercase tracking-wider text-brand-orange bg-brand-orange/10 px-2 py-0.5 rounded-full">New — no reviews yet</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-brand-orange bg-brand-orange/10 px-2 py-0.5 rounded-full">New, no reviews yet</span>
                         )}
                     </div>
 

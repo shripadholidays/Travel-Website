@@ -22,7 +22,7 @@ export type ParseResult = { ok: true; rows: Record<string, unknown>[] } | { ok: 
 
 export function parseRaw(raw: string): ParseResult {
     const trimmed = raw.trim();
-    if (!trimmed) return { ok: false, error: 'Nothing to parse — paste some JSON or CSV content.' };
+    if (!trimmed) return { ok: false, error: 'Nothing to parse. Paste some JSON or CSV content.' };
 
     // Try JSON first
     if (trimmed.startsWith('[') || trimmed.startsWith('{')) {

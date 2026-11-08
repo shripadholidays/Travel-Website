@@ -21,9 +21,9 @@ export const AdminDashboard = () => {
 
     // Only the numbers this role works with
     const statCards = [
-        can("finance.view") && { label: `Revenue (${stats?.revenueCurrency ?? "base currency"})`, value: stats?.totalRevenue !== undefined ? money(stats.totalRevenue, stats.revenueCurrency) : "—", icon: DollarSign, to: "/admin/payments" },
-        can("bookings.manage") && { label: "Bookings", value: stats?.totalBookings?.toString() ?? "—", icon: Calendar, to: "/admin/bookings" },
-        { label: "Live tours", value: stats?.totalTours?.toString() ?? "—", icon: Map, to: can("catalog.manage") ? "/admin/tours?status=active" : undefined },
+        can("finance.view") && { label: `Revenue (${stats?.revenueCurrency ?? "base currency"})`, value: stats?.totalRevenue !== undefined ? money(stats.totalRevenue, stats.revenueCurrency) : "-", icon: DollarSign, to: "/admin/payments" },
+        can("bookings.manage") && { label: "Bookings", value: stats?.totalBookings?.toString() ?? "-", icon: Calendar, to: "/admin/bookings" },
+        { label: "Live tours", value: stats?.totalTours?.toString() ?? "-", icon: Map, to: can("catalog.manage") ? "/admin/tours?status=active" : undefined },
         stats?.totalUsers !== undefined && { label: "Registered users", value: stats.totalUsers.toString(), icon: Users, to: can("users.manage") ? "/admin/users" : undefined },
         stats?.totalReviews !== undefined && { label: "Reviews", value: stats.totalReviews.toString(), icon: MessageSquare, to: "/admin/reviews" },
     ].filter(Boolean).slice(0, 4) as { label: string; value: string; icon: typeof Map; to?: string }[];

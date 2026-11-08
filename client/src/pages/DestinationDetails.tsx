@@ -292,7 +292,7 @@ export const DestinationDetails = () => {
                             Ready to explore {shortName}?
                         </h2>
                         <p className="text-white/70 max-w-xl mx-auto mb-8">
-                            Tell us your dates and interests — our travel specialists will craft the perfect itinerary just for you.
+                            Tell us your dates and interests, and our travel specialists will craft the perfect itinerary just for you.
                         </p>
                         <Button variant="brand" size="lg" asChild>
                             <Link to={askLink}>Start Planning</Link>

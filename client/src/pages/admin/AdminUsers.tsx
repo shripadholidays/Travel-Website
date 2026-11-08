@@ -197,7 +197,7 @@ export const AdminUsers = () => {
                                                 <TableCell className="hidden md:table-cell text-muted-foreground whitespace-nowrap">{format(new Date(u.createdAt), "d MMM yyyy")}</TableCell>
                                                 <TableCell className="text-right">
                                                     {isMe ? (
-                                                        <span className="text-xs text-muted-foreground">—</span>
+                                                        <span className="text-xs text-muted-foreground">-</span>
                                                     ) : (
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>

@@ -158,9 +158,9 @@ export function TourImportDialog({ open, onOpenChange }: { open: boolean; onOpen
                                                     const missing = [!t.title && "title", !t.location && "location", !(Number(t.price) > 0) && "price", !t.imageURL && "image", !t.overview?.about && "about"].filter(Boolean);
                                                     return (
                                                         <tr key={i}>
-                                                            <td className="px-3 py-1.5 font-medium">{t.title || "—"}</td>
-                                                            <td className="px-3 py-1.5">{t.location || "—"}</td>
-                                                            <td className="px-3 py-1.5 tabular-nums">{Number(t.price) > 0 ? money(Number(t.price), t.currency || base) : "—"}</td>
+                                                            <td className="px-3 py-1.5 font-medium">{t.title || "-"}</td>
+                                                            <td className="px-3 py-1.5">{t.location || "-"}</td>
+                                                            <td className="px-3 py-1.5 tabular-nums">{Number(t.price) > 0 ? money(Number(t.price), t.currency || base) : "-"}</td>
                                                             <td className="px-3 py-1.5 tabular-nums">{t.duration?.days}</td>
                                                             <td className="px-3 py-1.5">{t.status === "active" ? "Live" : t.status === "inactive" ? "Hidden" : "Draft"}</td>
                                                             <td className="px-3 py-1.5 text-xs">

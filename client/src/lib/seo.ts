@@ -80,7 +80,7 @@ export function headTags(meta: PageMeta): HeadTag[] {
     const description = summarize(meta.description || DEFAULT_DESCRIPTION, 160);
     const canonical = meta.noIndex ? undefined : canonicalUrl(meta.path);
     const image = meta.image ? absoluteUrl(meta.image) : DEFAULT_OG_IMAGE;
-    const imageAlt = meta.image ? meta.imageAlt || meta.title : `${SITE_NAME} — curated tours and travel`;
+    const imageAlt = meta.image ? meta.imageAlt || meta.title : `${SITE_NAME}: curated tours and travel`;
     const tag = (t: HeadTag['tag'], key: HeadTag['key'], keyValue: string, value?: string): HeadTag =>
         ({ tag: t, key, keyValue, attr: t === 'link' ? 'href' : 'content', value });
 

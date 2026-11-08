@@ -426,7 +426,7 @@ export const BookingPage = () => {
                                 exit={{ opacity: 0, x: -20 }}
                             >
                                 <h2 className="text-2xl font-bold font-display mb-1 text-brand-blue">Review &amp; Pay</h2>
-                                <p className="text-sm text-muted-foreground mb-6">Confirm your details — your price summary is on the right.</p>
+                                <p className="text-sm text-muted-foreground mb-6">Confirm your details. Your price summary is on the right.</p>
 
                                 <div className="bg-slate-50 rounded-2xl p-5 mb-6">
                                     <h3 className="font-bold mb-4">Traveller</h3>

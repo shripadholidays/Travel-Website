@@ -46,7 +46,7 @@ export const ForgotPasswordPage = () => {
                     </Link>
                     <h1 className="text-3xl font-display font-bold">Forgot password?</h1>
                     <p className="text-muted-foreground mt-2">
-                        No worries — enter your email and we'll send you a reset link.
+                        No worries. Enter your email and we'll send you a reset link.
                     </p>
                 </div>
 
