@@ -5,18 +5,64 @@ import { cn } from '@/lib/utils';
 // Pages with their own bar fixed to the bottom on phones: the button sits above it there
 const HAS_BOTTOM_BAR = [/^\/tour\//, /^\/build-trip/];
 
+// What the visitor is looking at, so the team knows the context before replying
+const PAGE_KINDS: [RegExp, string][] = [
+    [/^\/tour\//, 'Tour'],
+    [/^\/destinations\/./, 'Destination'],
+    [/^\/collections\/./, 'Collection'],
+    [/^\/build-trip/, 'Trip builder'],
+    [/^\/blog\/./, 'Article'],
+];
+
+/** "Kerala Backwaters | Plan Your Tours" → "Kerala Backwaters" */
+function pageName(): string {
+    const name = config.app.name;
+    return document.title.split(' | ').filter((part) => part && part !== name)[0] || '';
+}
+
+/**
+ * The text that opens in WhatsApp. *Stars* are bold in WhatsApp.
+ *
+ * *Trip enquiry: Plan Your Tours*
+ *
+ * Hi! I would like to know more about your tours.
+ *
+ * *Tour:* Kerala Backwaters
+ * *Link:* https://planyourtours.com/tour/…
+ *
+ * *My details*
+ * Name:
+ * Travel dates:
+ * Number of travellers:
+ * Departure city:
+ */
+export function buildWhatsAppMessage(pathname: string): string {
+    const kind = PAGE_KINDS.find(([re]) => re.test(pathname))?.[1];
+    const name = typeof document === 'undefined' ? '' : pageName();
+    const link = typeof window === 'undefined' ? '' : window.location.href.split('#')[0];
+
+    const lines = [`*Trip enquiry: ${config.app.name}*`, '', config.whatsapp.message, ''];
+    if (kind && name) lines.push(`*${kind}:* ${name}`);
+    if (kind && link) lines.push(`*Link:* ${link}`, '');
+    lines.push('*My details*', 'Name: ', 'Travel dates: ', 'Number of travellers: ', 'Departure city: ');
+    return lines.join('\n');
+}
+
+const waLink = (number: string, text: string) => `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+
 /** Round WhatsApp chat button, bottom right of every public page. Number lives in config.whatsapp. */
 export function WhatsAppButton() {
     const { pathname } = useLocation();
-    const { number, message } = config.whatsapp;
+    const { number } = config.whatsapp;
     if (!number) return null;
 
-    const href = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
     const lifted = HAS_BOTTOM_BAR.some((re) => re.test(pathname));
 
     return (
         <a
-            href={href}
+            href={waLink(number, buildWhatsAppMessage(pathname))}
+            // The page title loads after the page, so build the message again at the moment of the click
+            onClick={(e) => { e.currentTarget.href = waLink(number, buildWhatsAppMessage(pathname)); }}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chat with us on WhatsApp"
