@@ -48,8 +48,8 @@ export const config = {
         } satisfies Record<Currency, number>,
     },
 
-    /** Google sign-in (blank = the Google button is hidden) */
-    googleClientId: read('GOOGLE_OAUTH_CLIENT_ID') || '',
+    /** Google sign-in (blank = the Google button is hidden). The client ID is public, so the server's GOOGLE_CLIENT_ID works too. */
+    googleClientId: read('GOOGLE_OAUTH_CLIENT_ID') || read('GOOGLE_CLIENT_ID') || '',
 
     query: {
         staleTimeMs: Number(read('QUERY_STALE_MS')) || 5 * 60_000,
