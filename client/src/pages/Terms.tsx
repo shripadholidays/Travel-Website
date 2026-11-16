@@ -7,7 +7,7 @@ export const TermsPage = () => {
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
                 title="Terms of Service"
-                description="The terms for using Wandeazy and booking tours, including payments, cancellations and refunds, and your responsibilities as a traveller."
+                description="The terms for using Plan Your Tours and booking tours, including payments, cancellations and refunds, and your responsibilities as a traveller."
             />
             <Container className="max-w-3xl">
                 <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">Terms of Service</h1>

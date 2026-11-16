@@ -2,7 +2,7 @@ services:
   # ---- API server ----
   server:
     build: ./server
-    container_name: wandeazy-server
+    container_name: planyourtours-server
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -45,7 +45,7 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
         VITE_GOOGLE_OAUTH_CLIENT_ID: ${VITE_GOOGLE_OAUTH_CLIENT_ID:-}
-    container_name: wandeazy-client
+    container_name: planyourtours-client
     restart: unless-stopped
     depends_on:
       - server

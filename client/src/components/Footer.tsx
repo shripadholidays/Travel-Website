@@ -13,8 +13,8 @@ import { useSubscribeNewsletter } from '@/hooks/use-contact';
 
 // Address and phone have no stand-ins: a made-up number is worse than none.
 const FALLBACK = {
-    companyName: 'Wandeazy',
-    contactEmail: 'hello@wandeazy.com',
+    companyName: 'Plan Your Tours',
+    contactEmail: 'hello@planyourtours.com',
 };
 
 export const Footer = () => {

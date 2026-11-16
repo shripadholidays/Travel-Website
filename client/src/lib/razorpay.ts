@@ -78,7 +78,7 @@ export async function payWithRazorpay(checkout: RazorpayCheckout): Promise<Razor
             order_id: checkout.orderId,
             amount: checkout.amount,
             currency: checkout.currency,
-            name: checkout.name || 'Wandeazy',
+            name: checkout.name || 'Plan Your Tours',
             description: checkout.description,
             prefill: checkout.prefill,
             theme: { color: '#F97316' },

@@ -159,12 +159,12 @@ export const Navbar = () => {
 
             <nav aria-label="Main" className={cn(navClasses, "relative")}>
                 <div className={containerClasses}>
-                    <div className="flex items-center gap-4 xl:gap-8 min-w-0">
+                    <div className="flex items-center gap-4 xl:gap-6 min-w-0">
                         <Logo light={!isScrolled && isTransparentHeader} className="scale-90 md:scale-100" />
 
                         {/* Desktop Menu */}
                         <div className={cn(
-                            "hidden lg:flex items-center gap-0.5 xl:gap-1 rounded-full p-1 transition-all duration-300",
+                            "hidden xl:flex items-center gap-0.5 xl:gap-1 rounded-full p-1 transition-all duration-300",
                             isOverlay
                                 ? "bg-white/10 backdrop-blur-md border border-white/25 shadow-lg shadow-black/10"
                                 : "bg-transparent border border-transparent"
@@ -198,7 +198,7 @@ export const Navbar = () => {
 
                         {/* Right Actions */}
                         <div className={cn(
-                            "hidden lg:flex items-center gap-1.5 xl:gap-2",
+                            "hidden xl:flex items-center gap-1.5 xl:gap-2",
                             isOverlay && "[&_button]:[text-shadow:0_1px_2px_rgba(0,0,0,0.35)]"
                         )}>
                             {/* Trip builder: always on offer, whatever links the admin sets */}
@@ -319,7 +319,7 @@ export const Navbar = () => {
                             aria-expanded={isMobileMenuOpen}
                             aria-controls="mobile-menu"
                             className={cn(
-                                "lg:hidden p-2 rounded-full transition-colors",
+                                "xl:hidden p-2 rounded-full transition-colors",
                                 isOverlay ? "hover:bg-white/15" : "hover:bg-slate-100"
                             )}
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -337,7 +337,7 @@ export const Navbar = () => {
                             initial={{ opacity: 0, y: -20, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            className="absolute top-full mt-2 left-4 right-4 max-h-[calc(100dvh-6rem)] overflow-y-auto bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/20 lg:hidden"
+                            className="absolute top-full mt-2 left-4 right-4 max-h-[calc(100dvh-6rem)] overflow-y-auto bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/20 xl:hidden"
                         >
                             <div className="p-5 flex flex-col gap-1">
                                 {/* User header */}

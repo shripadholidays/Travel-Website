@@ -191,7 +191,7 @@ const MessageBox = ({ greetings }: { greetings: string[] }) => {
             <div className="bg-slate-50 border-b border-slate-100 p-6 pt-12 flex items-center gap-3 shrink-0">
                 <div className="w-10 h-10 rounded-full bg-brand-orange flex items-center justify-center text-white font-bold shadow-md" aria-hidden>W</div>
                 <div>
-                    <h3 className="font-bold text-sm text-slate-900">Wandeazy Travel Team</h3>
+                    <h3 className="font-bold text-sm text-slate-900">Plan Your Tours Team</h3>
                     <span className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
                         <Mail className="w-3 h-3" /> Replies by email within 24 hours
                     </span>

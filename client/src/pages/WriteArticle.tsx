@@ -128,7 +128,7 @@ export const WriteArticle = () => {
                         </div>
                         <h1 className="text-3xl font-display font-bold text-brand-blue mb-3">Unlock Article Writing</h1>
                         <p className="text-muted-foreground mb-10 max-w-md mx-auto">
-                            Contribute to the Wandeazy community by sharing your travel stories. Complete the requirements below to unlock the writer feature.
+                            Contribute to the Plan Your Tours community by sharing your travel stories. Complete the requirements below to unlock the writer feature.
                         </p>
 
                         <div className="space-y-5 text-left max-w-sm mx-auto mb-10">
@@ -195,7 +195,7 @@ export const WriteArticle = () => {
                                         {(completedBookings ?? 0) >= 1 ? "Done!" : "0 / 1"}
                                     </span>
                                 </div>
-                                <p className="text-xs text-muted-foreground">Book and complete any tour through Wandeazy.</p>
+                                <p className="text-xs text-muted-foreground">Book and complete any tour through Plan Your Tours.</p>
                             </div>
                         </div>
 

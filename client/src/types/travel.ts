@@ -1,5 +1,5 @@
 // === Flights & Hotels (public shapes returned by /flights, /hotels, /travel-orders) ===
-// All prices are USD (site base currency) and already include WandEazy's markup.
+// All prices are USD (site base currency) and already include our markup.
 import type { PaymentCheckout } from '@/lib/checkout';
 
 export type TravelKind = 'flight' | 'hotel';

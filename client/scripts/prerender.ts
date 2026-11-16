@@ -181,9 +181,9 @@ async function main() {
     pages.push({
         path: '/',
         title: 'Curated Tours & Holiday Packages',
-        description: 'Browse curated tours and holiday packages to destinations worldwide with Wandeazy. Compare day-by-day itineraries and inclusions, then book online securely.',
+        description: 'Browse curated tours and holiday packages to destinations worldwide with Plan Your Tours. Compare day-by-day itineraries and inclusions, then book online securely.',
         jsonLd: graph(websiteJsonLd()),
-        body: `<h1>Wandeazy: curated tours and holiday packages worldwide</h1>`
+        body: `<h1>Plan Your Tours: curated tours and holiday packages worldwide</h1>`
             + para('Browse curated tours and holiday packages, compare day-by-day itineraries and inclusions, then book online securely.')
             + section('Destinations', list(destinations.map((d) => link(destinationPath(d), d.name))))
             + section('Collections', list(collections.map((c) => link(collectionPath(c), c.name))))
@@ -194,7 +194,7 @@ async function main() {
     pages.push({
         path: '/tours',
         title: 'All Tours & Holiday Packages',
-        description: 'Compare every Wandeazy tour by destination, price, duration, travel style and traveller rating, then book online.',
+        description: 'Compare every tour by destination, price, duration, travel style and traveller rating, then book online.',
         jsonLd: tours.length ? graph(itemListJsonLd(tours.map((t) => ({ name: t.title, path: tourPath(t) })))) : undefined,
         body: `<h1>Find your next adventure</h1>${list(tours.map(tourLine))}`,
     });
@@ -231,7 +231,7 @@ async function main() {
     pages.push({
         path: '/destinations',
         title: 'Travel Destinations Worldwide',
-        description: 'Explore Wandeazy travel destinations around the world, each with its highlights, best time to visit and the tours you can book there.',
+        description: 'Explore travel destinations around the world, each with its highlights, best time to visit and the tours you can book there.',
         jsonLd: destinations.length ? graph(itemListJsonLd(destinations.map((d) => ({ name: d.name, path: destinationPath(d) })))) : undefined,
         body: `<h1>Explore the World</h1>${para('From iconic landmarks to hidden gems, discover the destinations that inspire wanderlust.')}`
             + list(destinations.map((d) => `${link(destinationPath(d), d.name)}${d.continent ? ` — ${esc(d.continent)}` : ''}`)),
@@ -261,7 +261,7 @@ async function main() {
     pages.push({
         path: '/collections',
         title: 'Tour Collections by Travel Style',
-        description: 'Hand-picked Wandeazy tour collections grouped by travel style, such as beach getaways, adventure and trekking, culture, luxury and honeymoons.',
+        description: 'Hand-picked tour collections grouped by travel style, such as beach getaways, adventure and trekking, culture, luxury and honeymoons.',
         jsonLd: collections.length ? graph(itemListJsonLd(collections.map((c) => ({ name: c.name, path: collectionPath(c) })))) : undefined,
         body: `<h1>Our Collections</h1>${list(collections.map((c) => `${link(collectionPath(c), c.name)}${c.description ? ` — ${esc(summarize(c.description, 140))}` : ''}`))}`,
     });
@@ -272,7 +272,7 @@ async function main() {
         pages.push({
             path: collectionPath(c),
             title: `${c.name} Tours`,
-            description: summarize(c.description || `${c.name}: a hand-picked collection of Wandeazy tours.`),
+            description: summarize(c.description || `${c.name}: a hand-picked collection of our tours.`),
             image: c.coverImage,
             imageAlt: c.name,
             jsonLd: graph(collectionJsonLd({ ...c, tours: cTours }), breadcrumbJsonLd([{ name: 'Collections', path: '/collections' }, { name: c.name, path: collectionPath(c) }])),
@@ -283,7 +283,7 @@ async function main() {
     pages.push({
         path: '/blog',
         title: 'Travel Magazine: Guides & Tips',
-        description: 'Travel guides, packing lists, budget tips and food ideas from the Wandeazy travel magazine, written to help you plan your next trip.',
+        description: 'Travel guides, packing lists, budget tips and food ideas from the Plan Your Tours travel magazine, written to help you plan your next trip.',
         jsonLd: posts.length ? graph(itemListJsonLd(posts.map((p) => ({ name: p.title, path: articlePath(p) })))) : undefined,
         body: `<h1>Travel Magazine</h1>${para('Stories, tips, and guides to inspire your next adventure.')}`
             + list(posts.map((p) => `${link(articlePath(p), p.title)}${p.excerpt ? ` — ${esc(summarize(p.excerpt, 160))}` : ''}`)),
@@ -312,8 +312,8 @@ async function main() {
     pages.push({
         path: '/about',
         title: 'About Us',
-        description: 'Who Wandeazy is, how we put together our tours and what you can expect when you book a trip with us.',
-        body: `<h1>${esc(about.heroHeadline || 'About Wandeazy')}</h1>${para(about.heroSubtext)}`
+        description: 'Who we are, how we put together our tours and what you can expect when you book a trip with us.',
+        body: `<h1>${esc(about.heroHeadline || 'About Plan Your Tours')}</h1>${para(about.heroSubtext)}`
             + section('Our Story', para(about.storyParagraph1) + para(about.storyParagraph2))
             + section('What we stand for', (about.values ?? []).map((v) => `<h3>${esc(v.title)}</h3>${para(v.description)}`).join('')),
     });
@@ -321,7 +321,7 @@ async function main() {
     pages.push({
         path: '/contact',
         title: 'Contact Us',
-        description: 'Ask about a booking or plan a custom trip with Wandeazy. Send a message or email us and a travel specialist replies within 24 hours.',
+        description: 'Ask about a booking or plan a custom trip with Plan Your Tours. Send a message or email us and a travel specialist replies within 24 hours.',
         body: `<h1>How can we help?</h1>${para('Plan a trip, ask about a booking or send us a question. A travel specialist replies within 24 hours.')}`
             + list([
                 ...(settings.contactEmail ? [`Email: ${link(`mailto:${settings.contactEmail}`, settings.contactEmail)}`] : []),
@@ -348,14 +348,14 @@ async function main() {
     pages.push({
         path: '/faq',
         title: 'Frequently Asked Questions',
-        description: 'How to book a Wandeazy tour, free cancellation up to 24 hours before departure, accepted payments, what tour prices include, travel insurance and custom itineraries.',
+        description: 'How to book a tour with Plan Your Tours, free cancellation up to 24 hours before departure, accepted payments, what tour prices include, travel insurance and custom itineraries.',
         jsonLd: graph(faqJsonLd(faqs)),
         body: `<h1>Frequently Asked Questions</h1>${para('Everything you need to know before you travel.')}${faqHtml.replace(/<h3>/g, '<h2>').replace(/<\/h3>/g, '</h2>')}`,
     });
 
     for (const [p, title, description, sections] of [
-        ['/privacy', 'Privacy Policy', 'How Wandeazy collects, uses, shares and protects your personal information when you browse, sign up or book a tour.', PRIVACY_SECTIONS],
-        ['/terms', 'Terms of Service', 'The terms for using Wandeazy and booking tours, including payments, cancellations and refunds, and your responsibilities as a traveller.', TERMS_SECTIONS],
+        ['/privacy', 'Privacy Policy', 'How Plan Your Tours collects, uses, shares and protects your personal information when you browse, sign up or book a tour.', PRIVACY_SECTIONS],
+        ['/terms', 'Terms of Service', 'The terms for using Plan Your Tours and booking tours, including payments, cancellations and refunds, and your responsibilities as a traveller.', TERMS_SECTIONS],
     ] as const) {
         pages.push({
             path: p, title, description,
@@ -366,14 +366,14 @@ async function main() {
     if (settings.features?.flights) {
         pages.push({
             path: '/flights', title: 'Flights',
-            description: 'Search and book flights across India and around the world, linked to your Wandeazy trip.',
-            body: `<h1>Flights</h1>${para('Every airline in one search. Line your flights up with your Wandeazy tour.')}`,
+            description: 'Search and book flights across India and around the world, linked to your trip.',
+            body: `<h1>Flights</h1>${para('Every airline in one search. Line your flights up with your tour.')}`,
         });
     }
     if (settings.features?.hotels) {
         pages.push({
             path: '/hotels', title: 'Hotels',
-            description: 'Hand-picked hotels across India and the world, right next to your Wandeazy tour.',
+            description: 'Hand-picked hotels across India and the world, right next to your tour.',
             body: `<h1>Hotels</h1>${para('From palace havelis to beachfront villas, find a stay right next to your tour.')}`,
         });
     }

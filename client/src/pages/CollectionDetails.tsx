@@ -38,7 +38,7 @@ export const CollectionDetails = () => {
         <div className="bg-background min-h-screen pb-24">
             <PageTitle
                 title={`${collection.name} Tours`}
-                description={summarize(collection.description || `${collection.name}: a hand-picked collection of Wandeazy tours.`)}
+                description={summarize(collection.description || `${collection.name}: a hand-picked collection of our tours.`)}
                 image={collection.coverImage}
                 imageAlt={collection.name}
                 noIndex={collection.isActive === false}

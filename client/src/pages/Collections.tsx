@@ -25,7 +25,7 @@ export const CollectionsPage = () => {
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
                 title="Tour Collections by Travel Style"
-                description="Hand-picked Wandeazy tour collections grouped by travel style, such as beach getaways, adventure and trekking, culture, luxury and honeymoons."
+                description="Hand-picked tour collections grouped by travel style, such as beach getaways, adventure and trekking, culture, luxury and honeymoons."
                 jsonLd={collections.length > 0 ? graph(itemListJsonLd(collections.map((c) => ({ name: c.name, path: collectionPath(c) })))) : undefined}
             />
             <Container>

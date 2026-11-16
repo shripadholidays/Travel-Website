@@ -27,7 +27,7 @@ export const BlogPage = () => {
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
                 title="Travel Magazine: Guides & Tips"
-                description="Travel guides, packing lists, budget tips and food ideas from the Wandeazy travel magazine, written to help you plan your next trip."
+                description="Travel guides, packing lists, budget tips and food ideas from the Plan Your Tours travel magazine, written to help you plan your next trip."
                 jsonLd={blogs.length > 0 ? graph(itemListJsonLd(blogs.map((b) => ({ name: b.title, path: articlePath(b) })))) : undefined}
             />
             <Container>

@@ -195,7 +195,7 @@ export const AdminLayout = () => {
         </div>
     );
 
-    // Tab title from the section being worked on ("Bookings · Admin | Wandeazy")
+    // Tab title from the section being worked on ("Bookings · Admin | Plan Your Tours")
     const path = location.pathname;
     const section = path.startsWith('/admin/tours/')
         ? (path.endsWith('/new') ? 'New Tour' : 'Tour Editor')

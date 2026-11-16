@@ -19,7 +19,7 @@ export const FAQPage = () => {
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
                 title="Frequently Asked Questions"
-                description="How to book a Wandeazy tour, free cancellation up to 24 hours before departure, accepted payments, what tour prices include, travel insurance and custom itineraries."
+                description="How to book a tour with Plan Your Tours, free cancellation up to 24 hours before departure, accepted payments, what tour prices include, travel insurance and custom itineraries."
                 jsonLd={graph(faqJsonLd(items))}
             />
             <Container className="max-w-3xl">

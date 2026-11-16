@@ -1,4 +1,4 @@
-# Wandeazy — Run with Docker
+# Plan Your Tours — Run with Docker
 
 This runs the **entire stack** (frontend + API + database) with one command. No need to install Node or a database locally — just Docker.
 

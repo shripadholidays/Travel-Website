@@ -70,7 +70,7 @@ export function TourImportDialog({ open, onOpenChange }: { open: boolean; onOpen
         const url = URL.createObjectURL(new Blob([TEMPLATE], { type: "text/csv;charset=utf-8" }));
         const a = document.createElement("a");
         a.href = url;
-        a.download = "wandeazy-tours-template.csv";
+        a.download = "planyourtours-tours-template.csv";
         a.click();
         URL.revokeObjectURL(url);
     };

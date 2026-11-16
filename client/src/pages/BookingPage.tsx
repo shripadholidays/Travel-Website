@@ -485,7 +485,7 @@ export const BookingPage = () => {
                                     <CheckCircle2 className="w-12 h-12" />
                                 </div>
                                 <h2 className="text-3xl font-bold font-display mb-4">You're Booked!</h2>
-                                <p className="text-muted-foreground mb-2 text-lg">Your Wandeazy journey begins now.</p>
+                                <p className="text-muted-foreground mb-2 text-lg">Your journey begins now.</p>
                                 <p className="text-muted-foreground mb-8">
                                     We'll email your confirmation to {contactInfo.email}.
                                     {confirmed && <> Total charged: <span className="font-semibold text-brand-blue">{formatMoney(confirmed.totalAmount, confirmed.currency)}</span>.</>}

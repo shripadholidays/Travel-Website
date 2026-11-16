@@ -1,4 +1,4 @@
-# Wandeazy API server
+# Plan Your Tours API server
 FROM node:22-alpine
 
 WORKDIR /app

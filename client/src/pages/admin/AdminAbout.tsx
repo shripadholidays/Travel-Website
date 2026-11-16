@@ -132,7 +132,7 @@ export const AdminAbout = () => {
                     <div className="space-y-1.5">
                         <Label>Subtext</Label>
                         <Textarea value={heroSubtext} onChange={e => setHeroSubtext(e.target.value)} rows={2}
-                            placeholder="Wandeazy was born from a simple belief…" />
+                            placeholder="Plan Your Tours was born from a simple belief…" />
                     </div>
                 </CardContent>
             </Card>

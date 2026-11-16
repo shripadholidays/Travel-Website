@@ -37,12 +37,12 @@ function downloadCalendarFile(booking: Booking, tour: Tour | null) {
     const day = (d: Date) => format(d, "yyyyMMdd");
     const text = (s: string) => s.replace(/[\\,;]/g, (c) => `\\${c}`).replace(/\n/g, "\\n");
     const ics = [
-        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Wandeazy//Booking//EN", "BEGIN:VEVENT",
-        `UID:${booking._id}@wandeazy`,
+        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//PlanYourTours//Booking//EN", "BEGIN:VEVENT",
+        `UID:${booking._id}@planyourtours.com`,
         `DTSTAMP:${format(new Date(), "yyyyMMdd'T'HHmmss")}`,
         `DTSTART;VALUE=DATE:${day(start)}`,
         `DTEND;VALUE=DATE:${day(end)}`,
-        `SUMMARY:${text(tour?.title ?? "Wandeazy trip")}`,
+        `SUMMARY:${text(tour?.title ?? "Your trip")}`,
         `LOCATION:${text(tour?.location ?? "")}`,
         `DESCRIPTION:${text(`Booking ${bookingReference(booking._id)} · ${booking.numberOfTravelers} traveller(s)`)}`,
         "END:VEVENT", "END:VCALENDAR",
@@ -50,7 +50,7 @@ function downloadCalendarFile(booking: Booking, tour: Tour | null) {
     const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `wandeazy-${bookingReference(booking._id)}.ics`;
+    a.download = `planyourtours-${bookingReference(booking._id)}.ics`;
     a.click();
     URL.revokeObjectURL(url);
 }

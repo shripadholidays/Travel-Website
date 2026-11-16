@@ -18,10 +18,10 @@ export const Home = () => {
         <div className="bg-background min-h-screen">
             <PageTitle
                 title="Curated Tours & Holiday Packages"
-                description="Browse curated tours and holiday packages to destinations worldwide with Wandeazy. Compare day-by-day itineraries and inclusions, then book online securely."
+                description="Browse curated tours and holiday packages to destinations worldwide with Plan Your Tours. Compare day-by-day itineraries and inclusions, then book online securely."
                 jsonLd={graph(websiteJsonLd())}
             />
-            <h1 className="sr-only">Wandeazy: curated tours and holiday packages worldwide</h1>
+            <h1 className="sr-only">Plan Your Tours: curated tours and holiday packages worldwide</h1>
             <Hero />
             <FeatureGate any>
                 <TravelSearchTabs />

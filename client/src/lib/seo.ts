@@ -8,7 +8,7 @@ import type { BlogPost, Collection, Destination, Tour } from '@/types';
 export const SITE_NAME = config.app.name;
 export const SITE_URL = config.site.url;
 export const DEFAULT_DESCRIPTION =
-    'Browse and book curated tours to destinations worldwide with Wandeazy: day-by-day itineraries, clear inclusions and secure online booking.';
+    'Browse and book curated tours to destinations worldwide with Plan Your Tours: day-by-day itineraries, clear inclusions and secure online booking.';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const LOGO_URL = `${SITE_URL}/logo-512.png`;
 export const ORG_ID = `${SITE_URL}/#organization`;

@@ -102,7 +102,7 @@ export const ContactPage = () => {
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
                 title="Contact Us"
-                description="Ask about a booking or plan a custom trip with Wandeazy. Send a message or email us and a travel specialist replies within 24 hours."
+                description="Ask about a booking or plan a custom trip with Plan Your Tours. Send a message or email us and a travel specialist replies within 24 hours."
             />
             <Container>
                 <div className="text-center max-w-2xl mx-auto mb-12">
@@ -128,8 +128,8 @@ export const ContactPage = () => {
                         <ContactItem
                             icon={Mail}
                             label="Email us"
-                            value={settings?.contactEmail || 'hello@wandeazy.com'}
-                            href={`mailto:${settings?.contactEmail || 'hello@wandeazy.com'}`}
+                            value={settings?.contactEmail || 'hello@planyourtours.com'}
+                            href={`mailto:${settings?.contactEmail || 'hello@planyourtours.com'}`}
                         />
                         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-muted-foreground">
                             Looking for answers right away? The <Link to="/faq" className="text-brand-orange font-medium hover:underline">FAQ</Link> covers

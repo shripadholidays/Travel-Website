@@ -1,4 +1,4 @@
--- WandEazy schema, first version (moved from MongoDB to Turso / libSQL).
+-- Plan Your Tours schema, first version (moved from MongoDB to Turso / libSQL).
 -- Ids are 24-character hex strings (the same shape as the old MongoDB ids).
 -- Dates are ISO-8601 UTC text, booleans are 0/1, lists and nested objects are JSON text.
 -- References are plain id columns: the app keeps them consistent (tours with bookings are

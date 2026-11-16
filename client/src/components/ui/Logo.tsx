@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { config } from "@/config";
 
 export const Logo = ({ className, light = false }: { className?: string; light?: boolean }) => {
     return (
         <Link to="/" className={cn("flex items-center gap-2 group", className)}>
-            {/* Thrillophilia-style Hot Air Balloon Icon */}
+            {/* Hot air balloon mark */}
             <div className="relative w-9 h-9 flex items-center justify-center">
                 <svg
                     viewBox="0 0 32 32"
@@ -31,10 +32,10 @@ export const Logo = ({ className, light = false }: { className?: string; light?:
 
             {/* Clean, Bold Brand Text */}
             <span className={cn(
-                "font-sans font-extrabold text-2xl tracking-normal",
+                "font-sans font-extrabold text-xl sm:text-2xl xl:text-xl tracking-normal whitespace-nowrap",
                 light ? "text-white" : "text-brand-blue"
             )}>
-                Wandeazy
+                {config.app.logoText}
             </span>
         </Link>
     );

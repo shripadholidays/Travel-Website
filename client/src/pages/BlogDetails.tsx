@@ -48,7 +48,7 @@ export const BlogDetails = () => {
     }
 
     const author = typeof blog.author === "object" ? blog.author : null;
-    const authorName = author?.displayName ?? "Wandeazy";
+    const authorName = author?.displayName ?? "Plan Your Tours";
     const dateStr = format(new Date(blog.publishedAt || blog.createdAt), "MMMM dd, yyyy");
     const wordCount = blog.content ? blog.content.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length : 0;
     const readingTime = Math.max(1, Math.ceil(wordCount / 200));

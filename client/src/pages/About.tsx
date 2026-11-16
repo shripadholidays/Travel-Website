@@ -19,8 +19,8 @@ export const AboutPage = () => {
 
     const heroImage = about?.heroImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80";
     const heroHeadline = about?.heroHeadline || "We turn wanderlust into unforgettable journeys";
-    const heroSubtext = about?.heroSubtext || "Wandeazy was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.";
-    const storyParagraph1 = about?.storyParagraph1 || "Wandeazy puts together tours to destinations around the world and lets you book them online in a few steps, with secure payment and free cancellation up to 24 hours before departure.";
+    const heroSubtext = about?.heroSubtext || "Plan Your Tours was born from a simple belief: extraordinary travel should be effortless, personal, and within reach for everyone.";
+    const storyParagraph1 = about?.storyParagraph1 || "Plan Your Tours puts together tours to destinations around the world and lets you book them online in a few steps, with secure payment and free cancellation up to 24 hours before departure.";
     const storyParagraph2 = about?.storyParagraph2 || "Every tour page shows the day-by-day itinerary and exactly what is and isn't included, so you know what you are booking. Want something different? Tell us and we'll plan a custom trip with you.";
     // Admin-written stats win; otherwise real numbers, never made-up ones
     const stats = (about?.stats?.length ?? 0) > 0 ? about!.stats : liveStats(highlights?.stats);
@@ -36,7 +36,7 @@ export const AboutPage = () => {
         <div className="bg-background min-h-screen">
             <PageTitle
                 title="About Us"
-                description="Who Wandeazy is, how we put together our tours and what you can expect when you book a trip with us."
+                description="Who we are, how we put together our tours and what you can expect when you book a trip with us."
             />
 
             {/* Hero */}

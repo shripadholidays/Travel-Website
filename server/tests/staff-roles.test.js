@@ -76,7 +76,7 @@ describe('role-based access', () => {
         expect(faqs.status).toBe(200);
         const company = await request(app).put('/api/v1/admin/settings').set(as(editor)).send({ companyName: 'Hijack' });
         expect(company.status).toBe(403);
-        expect((await request(app).put('/api/v1/admin/settings').set(as(admin)).send({ companyName: 'Wandeazy' })).status).toBe(200);
+        expect((await request(app).put('/api/v1/admin/settings').set(as(admin)).send({ companyName: 'Plan Your Tours' })).status).toBe(200);
     });
 });
 

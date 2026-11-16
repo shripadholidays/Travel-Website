@@ -36,7 +36,7 @@ export const PRIVACY_SECTIONS = [
 export const TERMS_SECTIONS = [
     {
         title: "1. Acceptance of Terms",
-        body: "By accessing or using Wandeazy, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.",
+        body: "By accessing or using Plan Your Tours, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.",
     },
     {
         title: "2. Bookings & Payments",
@@ -52,11 +52,11 @@ export const TERMS_SECTIONS = [
     },
     {
         title: "5. Limitation of Liability",
-        body: "Wandeazy acts as an intermediary between you and travel operators. We are not liable for acts, errors, or omissions of third-party providers beyond our reasonable control.",
+        body: "Plan Your Tours acts as an intermediary between you and travel operators. We are not liable for acts, errors, or omissions of third-party providers beyond our reasonable control.",
     },
     {
         title: "6. Intellectual Property",
-        body: "All content on this platform, including text, images, and branding, is the property of Wandeazy or its licensors and may not be reproduced without permission.",
+        body: "All content on this platform, including text, images, and branding, is the property of Plan Your Tours or its licensors and may not be reproduced without permission.",
     },
     {
         title: "7. Changes to Terms",

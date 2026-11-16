@@ -231,7 +231,7 @@ export const AdminInquiries = () => {
                             </div>
                             <div className="flex gap-2 pt-2">
                                 <Button size="sm" variant="outline" asChild>
-                                    <a href={`mailto:${selected.email}?subject=${encodeURIComponent(`Re: ${selected.context || 'Your Wandeazy inquiry'}`)}`}>
+                                    <a href={`mailto:${selected.email}?subject=${encodeURIComponent(`Re: ${selected.context || 'Your Plan Your Tours inquiry'}`)}`}>
                                         <Mail className="w-3.5 h-3.5 mr-1.5" /> Reply via Email
                                     </a>
                                 </Button>

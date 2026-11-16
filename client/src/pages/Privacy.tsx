@@ -7,7 +7,7 @@ export const PrivacyPage = () => {
         <div className="bg-background min-h-screen pt-24 pb-16">
             <PageTitle
                 title="Privacy Policy"
-                description="How Wandeazy collects, uses, shares and protects your personal information when you browse, sign up or book a tour."
+                description="How Plan Your Tours collects, uses, shares and protects your personal information when you browse, sign up or book a tour."
             />
             <Container className="max-w-3xl">
                 <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">Privacy Policy</h1>

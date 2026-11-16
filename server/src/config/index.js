@@ -73,9 +73,9 @@ const config = {
         secure:      true,
         user:        'resend',
         apiKey:      e.RESEND_API_KEY,
-        fromName:    e.EMAIL_FROM_NAME       || 'Wandeazy',
+        fromName:    e.EMAIL_FROM_NAME       || 'Plan Your Tours',
         // Must be on the domain verified in Resend
-        fromAddress: e.EMAIL_FROM_ADDRESS    || 'noreply@wandeazy.com',
+        fromAddress: e.EMAIL_FROM_ADDRESS    || 'noreply@planyourtours.com',
         // Where customer replies go (a real inbox). Blank = replies go to the from address.
         replyTo:     e.EMAIL_REPLY_TO        || '',
         brandColor:  e.EMAIL_BRAND_COLOR     || '#0F172A',
@@ -91,7 +91,7 @@ const config = {
         keySecret:     e.RAZORPAY_KEY_SECRET      || '',
         webhookSecret: e.RAZORPAY_WEBHOOK_SECRET  || '',
         // Shown at the top of the Razorpay payment window
-        brandName:     e.RAZORPAY_BRAND_NAME      || 'Wandeazy',
+        brandName:     e.RAZORPAY_BRAND_NAME      || 'Plan Your Tours',
     },
 
     // Stripe (Developers → API keys / Webhooks). The publishable key reaches the browser through the API.
@@ -141,7 +141,7 @@ const config = {
 
     mock: {
         userId:      e.MOCK_USER_ID           || 'mock-user-id',
-        email:       e.MOCK_USER_EMAIL        || 'test@wandeazy.com',
+        email:       e.MOCK_USER_EMAIL        || 'test@planyourtours.com',
         displayName: e.MOCK_USER_DISPLAY_NAME || 'Test User',
         googleId:    e.MOCK_GOOGLE_ID         || 'mock-google-id',
     },

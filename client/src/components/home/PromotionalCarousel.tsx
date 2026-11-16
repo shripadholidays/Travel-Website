@@ -108,7 +108,7 @@ export const PromotionalCarousel = () => {
                                     <div className="relative lg:col-span-5 flex flex-col justify-center p-8 md:p-12 lg:p-16 text-left">
                                         <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-700 delay-200">
                                             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-sm font-medium text-white w-fit">
-                                                <span className="font-bold tracking-wider uppercase opacity-60">Wandeazy</span>
+                                                <span className="font-bold tracking-wider uppercase opacity-60">Plan Your Tours</span>
                                                 <span className="opacity-40">×</span>
                                                 <span className={cn("font-bold tracking-wide", slide.accentColor)}>{slide.partner}</span>
                                             </div>

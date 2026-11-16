@@ -41,7 +41,7 @@ describe('site rebuild hook', () => {
         await request(app).post('/api/v1/tours').set('Cookie', cookie).send(newTour).expect(200);
         await request(app).post('/api/v1/destinations').set('Cookie', cookie)
             .send({ name: 'Kerala', slug: 'kerala', country: 'India', continent: 'Asia', description: 'Backwaters', coverImage: 'c' }).expect(200);
-        await request(app).put('/api/v1/admin/settings').set('Cookie', cookie).send({ footer: { copyrightText: '© Wandeazy' } }).expect(200);
+        await request(app).put('/api/v1/admin/settings').set('Cookie', cookie).send({ footer: { copyrightText: '© Plan Your Tours' } }).expect(200);
         await wait(700);
         expect(axios.post).toHaveBeenCalledTimes(1);
     });

@@ -122,7 +122,7 @@ export const RegisterPage = () => {
                 >
                     <div className="text-center lg:text-left">
                         <h2 className="text-3xl font-display font-bold tracking-tight">Create an account</h2>
-                        <p className="text-muted-foreground mt-2">Start your travel journey with Wandeazy</p>
+                        <p className="text-muted-foreground mt-2">Start your travel journey with Plan Your Tours</p>
                     </div>
 
                     {error && (

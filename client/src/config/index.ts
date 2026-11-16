@@ -17,8 +17,8 @@ export const config = {
     },
 
     app: {
-        name:      read('APP_NAME')     || 'Wandeazy',
-        logoText:  read('LOGO_TEXT')    || 'Wandeazy',
+        name:      read('APP_NAME')     || 'Plan Your Tours',
+        logoText:  read('LOGO_TEXT')    || 'Plan Your Tours',
     },
 
     /** WhatsApp chat button (bottom right of public pages): number with country code, digits only */
@@ -29,7 +29,7 @@ export const config = {
 
     /** Public address of the site, used for canonical links, the sitemap and structured data (no trailing slash) */
     site: {
-        url:       (read('SITE_URL')    || 'https://wandeazy.com').replace(/\/+$/, ''),
+        url:       (read('SITE_URL')    || 'https://planyourtours.com').replace(/\/+$/, ''),
     },
 
     auth: {

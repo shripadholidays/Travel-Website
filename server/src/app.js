@@ -112,7 +112,7 @@ if (config.mock.enabled) app.use(mockAuth);
 
 // --- ROUTES ---
 app.get('/', (req, res) => {
-    ResponseHandler.success(res, null, 'Wandeazy backend is up and running!');
+    ResponseHandler.success(res, null, 'Plan Your Tours backend is up and running!');
 });
 
 app.get('/health', async (req, res) => {

@@ -38,7 +38,7 @@ export const DestinationsPage = () => {
         <div className="pt-24 pb-12 bg-background min-h-screen">
             <PageTitle
                 title="Travel Destinations Worldwide"
-                description="Explore Wandeazy travel destinations around the world, each with its highlights, best time to visit and the tours you can book there."
+                description="Explore travel destinations around the world, each with its highlights, best time to visit and the tours you can book there."
                 jsonLd={destinations.length > 0 ? graph(itemListJsonLd(destinations.map((d) => ({ name: d.name, path: destinationPath(d) })))) : undefined}
             />
             <Container>

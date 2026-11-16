@@ -620,8 +620,8 @@ async function seed() {
         // Seed site settings
         console.log('Seeding site settings...');
         await SiteSettings.save({
-            companyName: 'Wandeazy Travels',
-            contactEmail: 'hello@wandeazy.com',
+            companyName: 'Plan Your Tours',
+            contactEmail: 'hello@planyourtours.com',
             // Phone, address and social links stay empty until the real ones are entered in Admin → Settings
             footer: {
                 showQuickLinks: true,

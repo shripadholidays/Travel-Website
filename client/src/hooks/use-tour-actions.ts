@@ -39,7 +39,7 @@ export function useTourActions(tour?: Pick<Tour, '_id' | 'title'>) {
         const url = `${window.location.origin}/tour/${tour._id}`;
         try {
             if (navigator.share) {
-                await navigator.share({ title: tour.title ?? 'Wandeazy Tour', text: tour.title, url });
+                await navigator.share({ title: tour.title ?? 'Plan Your Tours', text: tour.title, url });
             } else {
                 await navigator.clipboard.writeText(url);
                 toast.success('Link copied to clipboard!');
