@@ -132,7 +132,7 @@ async function confirmBooking(booking) {
             ['Package', describeChoice(booking.packageChoice)],
             ['Total', formatMoney(booking.totalAmount, booking.currency)],
             ['Coupon', booking.coupon?.code],
-        ]);
+        ], { replyTo: email });
     } catch (err) {
         logger.error('Failed to send booking confirmation email', { error: err.message, bookingId: booking._id });
     }
@@ -175,7 +175,7 @@ async function cancelBooking(booking, { byAdmin = false } = {}) {
             ['Travel date', new Date(booking.travelDate).toDateString()],
             ['Refunded', booking.refundedAmount ? formatMoney(booking.refundedAmount, booking.currency) : 'Nothing was charged'],
             ['Cancelled by', byAdmin ? 'Admin' : 'Traveller'],
-        ]);
+        ], { replyTo: booking.contactInfo?.email || booking.user?.email });
     } catch (err) {
         logger.error('Cancellation alert failed', { bookingId: booking._id, error: err.message });
     }

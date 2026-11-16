@@ -114,8 +114,11 @@ const sendVerificationEmail = async (userEmail, verifyUrl) => {
     });
 };
 
-/** Tells the staff inbox (ADMIN_NOTIFY_EMAIL) about something that needs attention. */
-const sendAdminAlert = async (subject, rows) => {
+/**
+ * Tells the staff inbox (ADMIN_NOTIFY_EMAIL) about something that needs attention.
+ * `replyTo` is the customer's email, so hitting Reply on the alert writes straight to them.
+ */
+const sendAdminAlert = async (subject, rows, { replyTo: customerEmail } = {}) => {
     if (!adminNotifyAddress) return null;
     const body = rows
         .filter(([, value]) => value !== undefined && value !== null && value !== '')
@@ -124,6 +127,7 @@ const sendAdminAlert = async (subject, rows) => {
     return sendEmail({
         from: `"${fromName}" <${fromAddress}>`,
         to: adminNotifyAddress,
+        ...(customerEmail && { replyTo: customerEmail }),
         subject,
         html: emailLayout(`<div style="padding: 32px; background: #fff;"><h2 style="color: ${brandColor}; margin-top: 0;">${escapeHtml(subject)}</h2>${body}</div>`),
     });

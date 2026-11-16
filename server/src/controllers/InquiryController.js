@@ -34,7 +34,7 @@ exports.createInquiry = async (req, res) => {
                 ['Travel date', savedInquiry.preferredTravelDate ? new Date(savedInquiry.preferredTravelDate).toDateString() : 'Flexible'],
                 ['Travellers', savedInquiry.numberOfTravelers],
                 ['Message', savedInquiry.message],
-            ]),
+            ], { replyTo: savedInquiry.email }),
         ]).catch(() => {});
 
         // Send a success response with the created inquiry data

@@ -183,7 +183,7 @@ function notifyEditors(post, writer) {
     sendAdminAlert(`Article submitted for review: ${post.title}`, [
         ['Writer', writer?.displayName || writer?.email],
         ['Review it', `${frontendOrigin()}/admin/blog`],
-    ]).catch((err) => logger.error('Review alert failed', { error: err.message }));
+    ], { replyTo: writer?.email }).catch((err) => logger.error('Review alert failed', { error: err.message }));
 }
 
 async function notifyWriter(post) {

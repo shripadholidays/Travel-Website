@@ -54,7 +54,7 @@ exports.createTrip = async (req, res) => {
                 ['Phone', saved.phoneNumber],
                 ['Notes', saved.notes],
                 ['Open it', `${frontendOrigin()}/admin/custom-trips?trip=${saved._id}`],
-            ]),
+            ], { replyTo: saved.email }),
         ]).catch(() => {});
 
         return ResponseHandler.success(res, { trip: forTraveller(saved) }, 'Trip sent! We will email you a final price within 24 hours.');
