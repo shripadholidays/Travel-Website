@@ -66,14 +66,18 @@ const config = {
         },
     },
 
+    // Sent through Resend (resend.com → API Keys). No key = emails are skipped and logged.
     email: {
-        host:        e.MAILGUN_HOST,
-        port:        Number(e.MAILGUN_PORT)  || 587,
-        secure:      e.MAILGUN_SECURE === 'true',
-        domain:      e.MAILGUN_DOMAIN        || 'wandeazy.com',
-        apiKey:      e.MAILGUN_API_KEY,
+        host:        'smtp.resend.com',
+        port:        465,
+        secure:      true,
+        user:        'resend',
+        apiKey:      e.RESEND_API_KEY,
         fromName:    e.EMAIL_FROM_NAME       || 'Wandeazy',
-        fromAddress: e.EMAIL_FROM_ADDRESS    || `noreply@${e.MAILGUN_DOMAIN || 'wandeazy.com'}`,
+        // Must be on the domain verified in Resend
+        fromAddress: e.EMAIL_FROM_ADDRESS    || 'noreply@wandeazy.com',
+        // Where customer replies go (a real inbox). Blank = replies go to the from address.
+        replyTo:     e.EMAIL_REPLY_TO        || '',
         brandColor:  e.EMAIL_BRAND_COLOR     || '#0F172A',
         accentColor: e.EMAIL_ACCENT_COLOR    || '#F97316',
         copyrightYear: e.EMAIL_COPYRIGHT_YEAR || new Date().getFullYear().toString(),

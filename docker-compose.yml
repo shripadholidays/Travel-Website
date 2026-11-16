@@ -29,11 +29,9 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       # Email (optional)
-      MAILGUN_HOST: ${MAILGUN_HOST:-}
-      MAILGUN_PORT: ${MAILGUN_PORT:-}
-      MAILGUN_SECURE: ${MAILGUN_SECURE:-}
-      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
-      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-}
+      EMAIL_REPLY_TO: ${EMAIL_REPLY_TO:-}
     volumes:
       - db-data:/app/data
       - uploads:/app/uploads

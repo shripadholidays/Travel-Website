@@ -2,20 +2,15 @@ const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
 const config = require('../config');
 
-const { host, port, secure, domain, apiKey, fromName, fromAddress, brandColor, accentColor, copyrightYear, adminNotifyAddress } = config.email;
+const { host, port, secure, user, apiKey, fromName, fromAddress, replyTo, brandColor, accentColor, copyrightYear, adminNotifyAddress } = config.email;
 
 // Customer-entered text goes into HTML emails, so escape it.
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let transporter = null;
 
-if (host && apiKey && apiKey !== 'your_mailgun_api_key') {
-    transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: { user: domain, pass: apiKey },
-    });
+if (apiKey && apiKey.startsWith('re_')) {
+    transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass: apiKey } });
 }
 
 const sendEmail = async (mailOptions) => {
@@ -24,7 +19,7 @@ const sendEmail = async (mailOptions) => {
         return null;
     }
     try {
-        const info = await transporter.sendMail(mailOptions);
+        const info = await transporter.sendMail({ ...(replyTo && { replyTo }), ...mailOptions });
         logger.info('Email sent successfully', { messageId: info.messageId, to: mailOptions.to });
         return info;
     } catch (error) {

@@ -43,7 +43,7 @@ Fill these in `.env` to enable:
 - **Razorpay payments** → `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
 - **Stripe payments** → `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
   (all server-side; with both set, pick one in Admin → Settings → Payments)
-- **Email** → the `MAILGUN_*` vars
+- **Email** → `RESEND_API_KEY`, `EMAIL_FROM_ADDRESS`, `EMAIL_REPLY_TO`
 
 > ⚠️ The frontend `VITE_*` values are baked in at **build** time. If you change them, rebuild the client:
 > `docker compose up --build client`
