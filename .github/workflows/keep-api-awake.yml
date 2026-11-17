@@ -1,6 +1,7 @@
 # Render's free plan puts the API to sleep after 15 minutes with no visitors, and the next visitor
 # then waits about a minute. This calls the API every 10 minutes so it never falls asleep.
-# GitHub can start scheduled runs a few minutes late, which is why it runs every 10 and not every 14.
+# GitHub often delays scheduled runs by 30 to 60 minutes, so this alone does not keep it awake.
+# The main keep-awake is an outside pinger (cron-job.org) calling /health every 5 minutes; this is a backup.
 name: Keep API awake
 
 on:
