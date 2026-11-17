@@ -17,8 +17,9 @@ export const config = {
     },
 
     app: {
-        name:      read('APP_NAME')     || 'Plan Your Tours',
-        logoText:  read('LOGO_TEXT')    || 'Plan Your Tours',
+        // Fixed in code on purpose: an old APP_NAME / LOGO_TEXT setting on the host must never rename the site
+        name:      'Plan Your Tours',
+        logoText:  'Plan Your Tours',
     },
 
     /** WhatsApp chat button (bottom right of public pages): number with country code, digits only */

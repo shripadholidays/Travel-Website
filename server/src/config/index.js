@@ -73,7 +73,7 @@ const config = {
         secure:      true,
         user:        'resend',
         apiKey:      e.RESEND_API_KEY,
-        fromName:    e.EMAIL_FROM_NAME       || 'Plan Your Tours',
+        fromName:    'Plan Your Tours', // fixed: the site's name, not a host setting
         // Must be on the domain verified in Resend
         fromAddress: e.EMAIL_FROM_ADDRESS    || 'noreply@planyourtours.com',
         // Where customer replies go (a real inbox). Blank = replies go to the from address.
@@ -91,7 +91,7 @@ const config = {
         keySecret:     e.RAZORPAY_KEY_SECRET      || '',
         webhookSecret: e.RAZORPAY_WEBHOOK_SECRET  || '',
         // Shown at the top of the Razorpay payment window
-        brandName:     e.RAZORPAY_BRAND_NAME      || 'Plan Your Tours',
+        brandName:     'Plan Your Tours',
     },
 
     // Stripe (Developers → API keys / Webhooks). The publishable key reaches the browser through the API.
