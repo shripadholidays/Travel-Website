@@ -78,11 +78,11 @@ function compose({ preview, heading, greeting, lines = [], details = [], button,
       <h1 style="margin:0 0 20px;font-size:22px;line-height:1.3;color:${brandColor};font-weight:700;">${escapeHtml(heading)}</h1>
       ${greeting ? p(greeting) : ''}
       ${lines.map(p).join('')}
-      ${rows.length ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FAF8F5;border:1px solid #F0EBE4;border-radius:8px;margin:4px 0 20px;">
+      ${rows.length ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FAF8F5;border:1px solid #F0EBE4;border-radius:6px;margin:4px 0 20px;">
         ${rows.map(([label, value], i) => `<tr><td style="padding:10px 16px;font-size:13px;color:#64748B;white-space:nowrap;vertical-align:top;${cell(i)}">${escapeHtml(label)}</td><td style="padding:10px 16px;font-size:14px;color:#0F172A;font-weight:600;${cell(i)}">${escapeHtml(value)}</td></tr>`).join('')}
       </table>` : ''}
-      ${button ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 20px;"><tr><td style="border-radius:8px;background:${accentColor};">
-        <a href="${escapeHtml(button.url)}" style="display:inline-block;padding:12px 22px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:8px;">${escapeHtml(button.label)}</a>
+      ${button ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 20px;"><tr><td style="border-radius:6px;background:${accentColor};">
+        <a href="${escapeHtml(button.url)}" style="display:inline-block;padding:12px 22px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:6px;">${escapeHtml(button.label)}</a>
       </td></tr></table>
       <p style="margin:0 0 16px;font-size:12px;line-height:1.5;color:#94A3B8;word-break:break-all;">If the button does not work, open this link: <a href="${escapeHtml(button.url)}" style="color:#64748B;">${escapeHtml(button.url)}</a></p>` : ''}
       ${after.map(p).join('')}
