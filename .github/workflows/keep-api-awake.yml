@@ -1,0 +1,19 @@
+# Render's free plan puts the API to sleep after 15 minutes with no visitors, and the next visitor
+# then waits about a minute. This calls the API every 10 minutes so it never falls asleep.
+# GitHub can start scheduled runs a few minutes late, which is why it runs every 10 and not every 14.
+name: Keep API awake
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    # Only on the public repo, where Actions minutes are free. The private copy skips it at no cost.
+    if: github.repository == 'shripadholidays/Travel-Website'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call the API
+        run: curl --fail --silent --show-error --retry 3 --retry-delay 10 --max-time 90 https://api.planyourtours.com/health
